@@ -1,2 +1,7 @@
 # hustlo
-side-hustle management app
+A side-hustle management app
+
+### TODO
+- [ ] User stories
+- [ ] SRS
+- [ ] Mockup
