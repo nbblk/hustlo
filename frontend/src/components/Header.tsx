@@ -9,8 +9,8 @@ const Header = (props: any) => {
   
   return (<div className={style}>
     <Logo />
-    <Button click={props.logIn} value="Log in" color="transparent" />
-    <Button click={props.signUp} value="Sign up" color="blue" />
+    <Button click={props.logIn} value="Log in" color="transparent" width="24" height="8" />
+    <Button click={props.signUp} value="Sign up" color="blue" width="24" height="8" />
   </div>);
 };
 
