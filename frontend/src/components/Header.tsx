@@ -4,12 +4,13 @@ import Button from "./Button";
 
 const Header = (props: any) => {
   const bgColor = props.color === "transparent" ? "transparent" : "white"; 
-  const style = `m-0 p-4 sticky flex justify-end bg-${bgColor} font-krona`;
+  const boxShadow = bgColor === "transparent" ? "boxShadow" : "";
+  const style = `m-0 p-4 sticky flex justify-end bg-${bgColor} shadow ${boxShadow} font-krona`;
   
   return (<div className={style}>
     <Logo />
-    <Button click={props.logIn} value="Log in" color="blue" />
-    <Button click={props.signUp} value="Sign up" color="white" />
+    <Button click={props.logIn} value="Log in" color="transparent" />
+    <Button click={props.signUp} value="Sign up" color="blue" />
   </div>);
 };
 

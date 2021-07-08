@@ -3,14 +3,13 @@
 @tailwind utilities;
 
 @variants hover {
-    .white {
-        color: white;
-        background-color: blue
+    .transparent {
+        color: #0065ff;
     }
 
     .blue {
         color: white;
-        background-color: navy
+        background-color: #0052cc
     }
 }
 
