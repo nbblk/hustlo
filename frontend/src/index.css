@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@variants hover {
+    .white {
+        color: white;
+        background-color: blue
+    }
+
+    .blue {
+        color: white;
+        background-color: navy
+    }
+}
