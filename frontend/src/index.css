@@ -3,13 +3,14 @@
 @tailwind utilities;
 
 @variants hover {
-    .white {
-        color: white;
-        background-color: blue
+    .transparent {
+        color: #0065ff;
     }
 
     .blue {
         color: white;
-        background-color: navy
+        background-color: #0052cc
     }
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Krona+One&family=Nunito:wght@400;800&display=swap');
