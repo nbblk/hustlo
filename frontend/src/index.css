@@ -13,8 +13,7 @@
   }
 
   .expandable:target {
-    height: 150px;
-    width: 50%;
+    height: 200px;
   }
 }
 
@@ -26,6 +25,16 @@
   display: block;
 }
 
+.topContent {
+  background: linear-gradient(
+    180deg,
+    #dbcded 0%,
+    rgba(222, 209, 236, 0.15) 37.86%,
+    rgba(229, 220, 232, 0.32) 39.32%,
+    rgba(255, 255, 255, 0.44) 74.24%,
+    #ffffff 100%
+  );
+}
 .ctabox {
   background: linear-gradient(
     180deg,

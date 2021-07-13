@@ -7,6 +7,12 @@ module.exports = {
       nunito: ["Nunito", "sans-serif"],
     },
     colors: {
+      white: {
+        DEFAULT: "#ffffff",
+      },
+      black: {
+        DEFAULT: "#000000",
+      },
       blue: {
         DEFAULT: "#0065ff",
         dark: "#0052cc",
