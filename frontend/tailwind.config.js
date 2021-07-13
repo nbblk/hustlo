@@ -17,6 +17,9 @@ module.exports = {
         DEFAULT: "#5aac44",
         light: "#d4f061",
       },
+      emerald: {
+        DEFAULT: "#00b8d9",
+      },
       pink: {
         DEFAULT: "#de93df;",
       },

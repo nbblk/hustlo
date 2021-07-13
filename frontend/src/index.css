@@ -3,14 +3,41 @@
 @tailwind utilities;
 
 @variants hover {
-    .transparent {
-        color: #0065ff;
-    }
+  .transparent {
+    color: #0065ff;
+  }
 
-    .blue {
-        color: white;
-        background-color: #0052cc
-    }
+  .blue {
+    color: white;
+    background-color: #0052cc;
+  }
+
+  .expandable:target {
+    height: 150px;
+    width: 50%;
+  }
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Krona+One&family=Nunito:wght@400;800&display=swap');
+.inactive {
+  display: none;
+}
+
+.active {
+  display: block;
+}
+
+.ctabox {
+  background: linear-gradient(
+    180deg,
+    rgba(28, 23, 255, 0.78) 0%,
+    rgba(84, 53, 231, 0.76308) 0.01%,
+    rgba(91, 49, 211, 0.78) 0.02%,
+    rgba(90, 49, 212, 0.776021) 0.03%,
+    rgba(36, 7, 215, 0.7488) 0.04%,
+    rgba(19, 75, 242, 0.50423) 68.75%,
+    rgba(7, 82, 250, 0.438442) 81.77%,
+    rgba(0, 87, 255, 0.3978) 100%
+  );
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Krona+One&family=Nunito:wght@400;800&display=swap");
