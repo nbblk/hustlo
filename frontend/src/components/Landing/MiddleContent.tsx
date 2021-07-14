@@ -1,5 +1,5 @@
 import Content from "./Content";
-import BrandLogos from "../BrandLogos";
+import BrandLogos from "./BrandLogos";
 import Button from "../Button";
 
 const MiddleContent = () => (

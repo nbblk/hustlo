@@ -3,8 +3,8 @@ import React from "react";
 import Header from "../components/Header";
 import TopContent from "../components/Landing/TopContent";
 import MiddleContent from "../components/Landing/MiddleContent";
-import Features from "../components/Features";
-import Carousel from "../components/Carousel";
+import Features from "../components/Landing/Features";
+import Carousel from "../components/Landing/Carousel";
 import BottomContent from "../components/Landing/BottomContent";
 import Footer from "../components/Landing/Footer";
 

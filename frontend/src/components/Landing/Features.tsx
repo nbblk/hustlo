@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Content from "./Landing/Content";
-import SlideDown from "./SlideDown";
+import Content from "./Content";
+import SlideDown from "../SlideDown";
 
 interface slideMenus {
   first: boolean;
