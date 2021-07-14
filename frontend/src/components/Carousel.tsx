@@ -27,7 +27,7 @@ const Carousel = () => {
       company: "IT Project Manager, Egencia",
     },
     {
-      logoUrl: "./detroit-red-wings.svg",
+      logoUrl: "./detroit-red-wings.png",
       quote:
         "Hustlo makes it easy to keep everyone one the same page. As changes happen, the real-time updates with email notifications have been key.",
       name: "Haydon Dotson",
@@ -75,13 +75,15 @@ const Carousel = () => {
       {testimonials.map((testimonial, index) => {
         const visibility =
           index + 1 === state.activeIndex ? "active" : "inactive";
-        const style = `relative flex flex-col justify-center items-center text-center ${visibility}`;
+        const style = `relative flex flex-col justify-center items-center text-center transition-all ${visibility}`;
         return (
-          <div className={style}>
-            <img alt="logo" src={testimonial.logoUrl} className="w-1/2 m-20" />
-            <FontAwesomeIcon icon={faQuoteLeft} className="absolute left-0" />
+          <div key={index} className={style}>
+            <div className="flex justify-center align-center m-20">
+              <img alt="logo" src={testimonial.logoUrl} className="w-60" />
+            </div>
             <h5 className="uppercase">industry</h5>
             <h3>{testimonial.industry}</h3>
+            <FontAwesomeIcon icon={faQuoteLeft} className="absolute left-0" />
             <blockquote className="text-lg m-8">{testimonial.quote}</blockquote>
             <h5 className="uppercase">{testimonial.name}</h5>
             <h3 className="">{testimonial.company}</h3>
@@ -90,17 +92,17 @@ const Carousel = () => {
       })}
       <div className="h-1 w-full my-10 border-t-4"></div>
       <ul className="flex justify-center items-center">
-        <a onClick={() => goToPrevSlide()}>
+        <span onClick={() => goToPrevSlide()}>
           <FontAwesomeIcon icon={faArrowCircleLeft} className="m-2" />
-        </a>
+        </span>
         {testimonials.map((testimonial, index) => (
-          <a key={index + 1} onClick={() => goToCertainSlide(index + 1)}>
+          <span key={index + 1} onClick={() => goToCertainSlide(index + 1)}>
             <FontAwesomeIcon icon={faCircle} className="m-2 w-2.5 h-2.5" />
-          </a>
+          </span>
         ))}
-        <a onClick={() => goToNextSlide()}>
+        <span onClick={() => goToNextSlide()}>
           <FontAwesomeIcon icon={faArrowCircleRight} className="m-2" />
-        </a>
+        </span>
       </ul>
     </section>
   );

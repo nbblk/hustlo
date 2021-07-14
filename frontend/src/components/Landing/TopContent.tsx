@@ -12,7 +12,7 @@ const TopContent = () => (
     all with Hustlo."
     />
     <InputBox
-      type="text"
+      type="email"
       width="full md:w-2/5"
       height="10"
       marginX="0 md:mx-4"

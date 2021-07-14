@@ -22,6 +22,7 @@ const MiddleContent = () => (
         value="Start doing"
       />
       <img
+        alt="preview"
         src="./Landing preview.png"
         height="700"
         width="1080"

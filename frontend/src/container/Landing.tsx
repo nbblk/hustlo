@@ -13,7 +13,7 @@ class Landing extends React.Component {
     return (
       <div className="h-screen w-screen m-0 p-0 overflow-x-hidden text-center">
         <Header color="transparent" />
-        <div className="p-4 sm:p-12 md:p-24">
+        <div className="p-4 sm:p-12 md:p-48">
           <TopContent />
           <MiddleContent />
           <Features />
