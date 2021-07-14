@@ -12,7 +12,7 @@
     background-color: #0052cc;
   }
 
-  .expandable:target {
+  .expandable {
     height: 200px;
   }
 }

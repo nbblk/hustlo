@@ -1,5 +1,5 @@
 import Content from "./Content";
-import BrandLogos from "../BrandLogos";
+import BrandLogos from "./BrandLogos";
 import Button from "../Button";
 
 const MiddleContent = () => (
@@ -22,6 +22,7 @@ const MiddleContent = () => (
         value="Start doing"
       />
       <img
+        alt="preview"
         src="./Landing preview.png"
         height="700"
         width="1080"

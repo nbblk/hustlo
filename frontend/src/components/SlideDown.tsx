@@ -1,11 +1,12 @@
 const SlideDown = (props: any) => (
   <div
-    id={props.id}
-    className="expandable font-nunito h-0 overflow-hidden transition-all"
+    className={`${
+      props.isExpanded ? "expandable" : ""
+    } font-nunito h-0 overflow-hidden transition-all`}
   >
-    <p>{props.body}</p>
-    <ul>
-      {props.bullets.map((bullet: String, index: Number) => (
+    <p className="my-4">{props.body}</p>
+    <ul className="list-disc">
+      {props.bullets.map((bullet: string, index: number) => (
         <li key={index.toString()}>{bullet}</li>
       ))}
     </ul>
