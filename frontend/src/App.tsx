@@ -1,10 +1,10 @@
 import React from "react";
-import Landing from "./container/Landing";
+import Main from "./container/Main";
 
 function App() {
   return (
     <div className="">
-      <Landing />
+      <Main />
     </div>
   );
 }

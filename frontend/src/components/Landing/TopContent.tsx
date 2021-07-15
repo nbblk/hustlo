@@ -20,7 +20,7 @@ const TopContent = () => (
       placeholder="Email"
     />
     <Button
-      width="full md:w-1/5"
+      width="full md:w-2/5"
       height="10"
       marginX="0 md:mx-4"
       marginY="2"

@@ -12,6 +12,10 @@
     background-color: #0052cc;
   }
 
+  .green {
+    background-color: #05a2be;
+  }
+
   .expandable {
     height: 200px;
   }

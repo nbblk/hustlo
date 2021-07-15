@@ -39,7 +39,7 @@ const Carousel = () => {
       quote:
         "Now that we've switched to a remote environment, with the use of Trello, we can now limit the number of meetings we have regarding specific projects and turn to Trello for updates instead.",
       name: "Haley Ennes",
-      industry: "Marekting",
+      industry: "Marketing",
       company: "HR Manager, Sprout Social",
     },
   ];
