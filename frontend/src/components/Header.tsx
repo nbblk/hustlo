@@ -5,7 +5,7 @@ import Button from "./Button";
 const Header = (props: any) => {
   const bgColor = props.color === "transparent" ? "transparent" : "white";
   const boxShadow = bgColor === "transparent" ? "boxShadow" : "";
-  const style = `w-screen m-0 p-4 sticky top-0 flex justify-end bg-${bgColor} shadow ${boxShadow} font-krona`;
+  const style = `w-screen m-0 p-4 sticky z-50 top-0 flex justify-end bg-${bgColor} shadow ${boxShadow} font-krona`;
 
   return (
     <div className={style}>

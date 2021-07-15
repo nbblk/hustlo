@@ -3,7 +3,7 @@ import BrandLogos from "./BrandLogos";
 import Button from "../Button";
 
 const MiddleContent = () => (
-  <section className="w-full h-full my-40 flex flex-col items-center justify-center">
+  <section className="w-full h-full my-72 flex flex-col items-center justify-center">
     <Content
       title="Start your personal project"
       body="Start with a Hustlo board, lists, and cards. Customize and expand with
