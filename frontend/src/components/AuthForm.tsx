@@ -2,6 +2,9 @@ import { Link } from "react-router-dom";
 import Button from "./Button";
 import InputBox from "./InputBox";
 
+interface DOMEvent<T extends EventTarget> extends Event {
+  readonly target: T;
+}
 const AuthForm = (props: any) => {
   const login = (
     <form>
@@ -37,19 +40,27 @@ const AuthForm = (props: any) => {
         placeholder="Enter email"
         width="full md:1/5"
         height="10"
+        change={props.checkEmail}
       />
       <small className="block my-4">
         By signing up, you confirm that you've read and accepted your{" "}
-        <a className="text-blue">Terms of Service</a> and{" "}
-        <a className="text-blue">Privacy Policy</a>.
+        <a href="/terms-of-service" className="text-blue">
+          Terms of Service
+        </a>{" "}
+        and{" "}
+        <a href="/privacy-policy" className="text-blue">
+          Privacy Policy
+        </a>
+        .
       </small>
       <Button
-        color="gray-lightest"
-        textColor="gray-dark"
+        color="green"
+        textColor="white"
         width="full md:1/5"
         height="10"
         value="Continue"
-        disabled
+        disabled={props.validEmail ? false : true}
+        click={props.submitEmail}
       />
     </form>
   );
@@ -65,16 +76,16 @@ const AuthForm = (props: any) => {
       <div className="w-2/3 m-4 border border-t-1 border-gray-lightest"></div>
       <div className="text-blue text-sm">
         <Link to="/login">
-          <a className="m-2 hover:underline cursor-pointer">
+          <button className="m-2 hover:underline cursor-pointer">
             {props.type === "login"
               ? "Can't log in?"
               : "Already have an account? Log in"}
-          </a>
+          </button>
         </Link>
         <Link to="/signup">
-          <a className="m-2 hover:underline cursor-pointer">
+          <button className="m-2 hover:underline cursor-pointer">
             {props.type === "login" ? "Sign up for an account" : ""}
-          </a>
+          </button>
         </Link>
       </div>
     </div>
