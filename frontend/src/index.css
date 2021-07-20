@@ -53,4 +53,5 @@
   );
 }
 
+@import url("loader.css");
 @import url("https://fonts.googleapis.com/css2?family=Krona+One&family=Nunito:wght@400;800&display=swap");

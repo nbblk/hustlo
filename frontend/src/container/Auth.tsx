@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import axios, { AxiosResponse } from "axios";
+import { useHistory } from "react-router-dom";
 import { VerifaliaRestClient } from "verifalia";
 
 import AuthForm from "../components/AuthForm";
 import Footer from "../components/Landing/Footer";
+import Loader from "../components/Loader";
 import Logo from "../components/Logo";
+import Modal from "../components/Modal";
 
 interface DOMEvent<T extends EventTarget> extends Event {
   readonly target: T;
@@ -15,7 +17,11 @@ const Auth = (props: any) => {
     address: "",
     valid: false,
     verified: false,
+    loading: false,
+    error: false,
   });
+
+  const history = useHistory();
 
   const VERIFALIA_USERNAME = process.env.REACT_APP_VERIFALIA_USERNAME!;
   const VERIFALIA_PASSWORD = process.env.REACT_APP_VERIFALIA_PASSWORD!;
@@ -33,6 +39,7 @@ const Auth = (props: any) => {
     event: DOMEvent<HTMLInputElement>
   ) => {
     event.preventDefault();
+    setEmail({ ...email, loading: true });
     const verifalia = new VerifaliaRestClient({
       username: VERIFALIA_USERNAME,
       password: VERIFALIA_PASSWORD,
@@ -47,12 +54,10 @@ const Auth = (props: any) => {
       result.status === "Success" &&
       result.classification === "Deliverable"
     ) {
-      setEmail({ ...email, verified: true });
-      alert("We will send you an email! Please check your inbox");
+      setEmail({ ...email, verified: true, loading: false });
       sendConfirmEmail();
     } else {
-      setEmail({ ...email, address: "" });
-      alert("Please enter a valid email address:)");
+      setEmail({ ...email, address: "", loading: false, error: true });
     }
   };
 
@@ -60,6 +65,17 @@ const Auth = (props: any) => {
 
   return (
     <div className="w-screen h-screen m-0 p-0 bg-gray-lightest flex justify-center items-center">
+      {email.loading ? <Loader /> : null}
+      {email.verified ? (
+        <Modal
+          height="full md:h-1/4"
+          width="full md:w-1/4"
+          title="Almost finished!"
+          content="We sent a confirmation email to you. Please check your inbox"
+          buttonValue="Got it"
+          buttonClick={() => history.goBack()}
+        />
+      ) : null}
       <div className="absolute top-20 transform -translate-x-32">
         <Logo textSize="5xl" />
       </div>
@@ -70,6 +86,8 @@ const Auth = (props: any) => {
         submitEmail={(event: DOMEvent<HTMLInputElement>) =>
           requestEmailVerification(event)
         }
+        error={email.error}
+        errorMsg="Please enter a valid email address"
       />
       <div className="absolute bottom-4">
         <Footer />
