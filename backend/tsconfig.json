@@ -5,7 +5,9 @@
     "rootDir": "./",
     "outDir": "./build",
     "esModuleInterop": true,
-    "strict": true
+    "sourceMap": true,
+    "strict": true,
+    "baseUrl": "."
   },
   "include": ["./**/*.ts"],
   "exclude": ["node_modules", ".vscode"]
