@@ -10,6 +10,11 @@ const Signup = (props: any) => (
       height="10"
       change={props.checkEmail}
     />
+    <small className="text-red text-left font-nunito">
+      {props.emailValue > 0 && !props.isEmailValid
+        ? "Please enter a valid email"
+        : null}
+    </small>
     <small className="block my-4">
       By signing up, you confirm that you've read and accepted your{" "}
       <a href="/terms-of-service" className="text-blue">
@@ -27,8 +32,8 @@ const Signup = (props: any) => (
       width="full"
       height="10"
       value="Continue"
-      disabled={props.validEmail ? false : true}
-      click={props.submitEmail}
+      disabled={props.isEmailValid ? false : true}
+      click={props.type === "signup" ? props.submitEmail : props.setupPassword}
     />
   </form>
 );
