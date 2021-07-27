@@ -10,12 +10,26 @@ const AuthForm = (props: any) => {
           ? "Login to Hustlo"
           : "Sign up for your account"}
       </h3>
-      {props.type === "login" ? (
-        <Login />
+      {props.type === "password" || "login" ? (
+        <Login
+          type={props.type}
+          emailValue={props.emailValue}
+          passwordValue={props.passwordValue}
+          isEmailValid={props.isEmailValid}
+          isPwdValid={props.isPwdValid}
+          isAllValid={props.isAllValid}
+          checkEmail={props.checkEmail}
+          checkPassword={props.checkPassword}
+          setupPassword={props.setupPassword}
+          login={props.login}
+        />
       ) : (
         <Signup
+          type={props.type}
+          emailValue={props.emailValue}
+          isEmailValid={props.isEmailValid}
           checkEmail={props.checkEmail}
-          validEmail={props.validEmail}
+          validEmail={props.isEmailValid}
           submitEmail={props.submitEmail}
         />
       )}
