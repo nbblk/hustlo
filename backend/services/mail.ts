@@ -1,7 +1,3 @@
-import * as dotenv from "dotenv";
-
-dotenv.config({ path: "./.env" });
-
 const sgMail = require("@sendgrid/mail");
 
 export const send = async (email: string, hash: string) => {

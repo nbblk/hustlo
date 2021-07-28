@@ -3,6 +3,7 @@ import { generateHashcode } from "../utils/util";
 import { send } from "./mail";
 import { hash } from "bcryptjs";
 import { generateJwtToken } from "./jwt";
+import { verifyByPlatform } from "./oauth";
 
 // Store a user data to database
 const createUser = async (email: string): Promise<User> => {
@@ -65,4 +66,29 @@ export const authenticate = async (email: string, password: string) => {
     throw Error("Email or password is incorrect. Please try again. " + error);
   });
   return generateJwtToken(email);
+};
+
+export const verifyToken = async (type: string, token: string) => {
+  const email = await verifyByPlatform(type, token).catch((error) => {
+    throw Error(error);
+  });
+
+  if (!email) {
+    throw Error(
+      `Failed to login with the ${type} account. Try another account.`
+    );
+  } else {
+    const newUser = new UserModel({
+      email: email,
+      isVerified: true,
+    });
+
+    const found = await UserModel.findOne({ email: email });
+    if (!found) {
+      return await newUser.save().catch((error) => {
+        throw Error("Failed to create a user: " + error);
+      });
+    }
+    return generateJwtToken(email);
+  }
 };

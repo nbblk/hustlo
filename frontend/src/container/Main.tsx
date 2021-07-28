@@ -35,6 +35,15 @@ class Main extends React.Component<{}, MainState> {
         <Route path="/signup">
           <Auth type="signup" />
         </Route>
+        <Route path="/password-setup">
+          <Auth type="password" />
+        </Route>
+        <Route exact path="/signup/error">
+          <div>there's an error happened!</div>
+        </Route>
+        <Route path="/main">
+          <div>main</div>
+        </Route>
       </Switch>
     );
   }

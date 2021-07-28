@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 
@@ -142,6 +142,24 @@ const Auth = (props: any) => {
       });
   };
 
+  const googleSuccess = async (response: any) => {
+    await axios.post(`${BASEURL}/oauth`, {
+      type: "google",
+      id_token: response.id_token,
+    });
+    history.replace("/main");
+  };
+
+  const googleFail = (error: any) => {
+    console.error(error);
+    setAccount({
+      ...account,
+      modal: true,
+      error: true,
+      errorMsg: "Fail to connect Google acount",
+    });
+  };
+
   return (
     <div className="w-screen h-screen m-0 p-0 bg-gray-lightest flex justify-center items-center">
       {account.loading ? <Loader /> : null}
@@ -206,6 +224,8 @@ const Auth = (props: any) => {
         login={(event: DOMEvent<HTMLInputElement>) => login(event)}
         error={account.error}
         errorMsg={account.errorMsg}
+        googleSuccess={(response: any) => googleSuccess(response)}
+        googleFail={(error: any) => googleFail(error)}
       />
       <div className="absolute bottom-4">
         <Footer />
