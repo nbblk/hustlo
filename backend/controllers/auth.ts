@@ -4,6 +4,7 @@ import {
   addPassword as updatePassword,
   authenticate,
 } from "../services/auth";
+import { validationResult } from "express-validator";
 
 const clientBaseUrl = process.env.CLIENT_BASE_URL;
 
@@ -13,7 +14,12 @@ const signup = async (req: any, res: any, next: any) => {
       res.status(201).send("Created");
     })
     .catch((error) => {
-      res.status(400).send(error.message);
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).send({ errors: errors.array() });
+      } else {
+        res.status(500).send(error);
+      }
     });
 };
 
@@ -26,24 +32,32 @@ const redirect = async (req: any, res: any, next: any) => {
 };
 
 const addPassword = async (req: any, res: any, next: any) => {
-  // validation
   await updatePassword(req.body.email, req.body.password)
     .then(() => {
       res.status(200).send("Updated");
     })
     .catch((error) => {
-      res.status(400).send(error);
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).send({ errors: errors.array() });
+      } else {
+        res.status(500).send(error);
+      }
     });
 };
 
 const login = async (req: any, res: any, next: any) => {
-  // validation
   await authenticate(req.body.email, req.body.password)
     .then((token) => {
       res.status(200).send(token);
     })
     .catch((error) => {
-      res.status(401).send(error);
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).send({ errors: errors.array() });
+      } else {
+        res.status(401).send(error);
+      }
     });
 };
 
