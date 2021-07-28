@@ -1,5 +1,11 @@
 import express from "express";
-import { signup, redirect, addPassword, login } from "../controllers/auth";
+import {
+  signup,
+  redirect,
+  addPassword,
+  login,
+  verifyOauth,
+} from "../controllers/auth";
 import { body } from "express-validator";
 import { customPasswordValidator as pwdRegex } from "../validations/custom-validator";
 
@@ -24,8 +30,9 @@ authRouter.post(
   "/complete-signup",
   body("email").isEmail(),
   body("password").isLength({ min: 8, max: 20 }).custom(pwdRegex),
-
   addPassword
 );
+
+authRouter.post("/oauth", verifyOauth);
 
 export default authRouter;

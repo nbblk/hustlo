@@ -3,6 +3,7 @@ import {
   verifyUser,
   addPassword as updatePassword,
   authenticate,
+  verifyToken,
 } from "../services/auth";
 import { validationResult } from "express-validator";
 
@@ -61,4 +62,14 @@ const login = async (req: any, res: any, next: any) => {
     });
 };
 
-export { signup, redirect, addPassword, login };
+const verifyOauth = async (req: any, res: any, next: any) => {
+  await verifyToken(req.body.type, req.body.token)
+    .then((token) => {
+      res.status(200).send(token);
+    })
+    .catch((error) => {
+      res.status(401).send(error);
+    });
+};
+
+export { signup, redirect, addPassword, login, verifyOauth };
