@@ -2,6 +2,9 @@ import express from "express";
 import { connect } from "./database/database";
 import authRouter from "./routes/auth";
 import cors from "cors";
+import * as dotenv from "dotenv";
+
+dotenv.config({ path: "./.env" });
 
 const app = express();
 const PORT = 8080;
