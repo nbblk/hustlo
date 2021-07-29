@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { GoogleOauthLoginButton } from "./Form/GoogleOauthLoginButton";
 import Login from "./Form/Login";
+import { MsOauthLoginButton } from "./Form/MsOauthLoginButton";
 import Signup from "./Form/Signup";
 
 const AuthForm = (props: any) => {
@@ -38,14 +39,13 @@ const AuthForm = (props: any) => {
         {props.error ? props.errorMsg : null}
       </div>
       <small className="my-12">OR</small>
-      {props.type === "login" ? (
-        <div>
-          <GoogleOauthLoginButton
-            googleSuccess={props.googleSuccess}
-            googleFail={props.googleFail}
-          />
-        </div>
-      ) : null}
+      <div>
+        <GoogleOauthLoginButton
+          googleSuccess={props.googleSuccess}
+          googleFail={props.googleFail}
+        />
+        <MsOauthLoginButton />
+      </div>
       <div className="w-2/3 m-4 border border-t-1 border-gray-lightest"></div>
       <div className="text-blue text-sm">
         <Link to="/login">

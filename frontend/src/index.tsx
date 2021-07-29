@@ -4,11 +4,15 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { MsalProvider } from "@azure/msal-react";
+import { maslInstance } from "./components/Form/MsOauthLogin";
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <MsalProvider instance={maslInstance}>
+        <App />
+      </MsalProvider>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
