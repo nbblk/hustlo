@@ -2,5 +2,5 @@ import jwt from "jsonwebtoken";
 
 export const generateJwtToken = (email: string) => {
   const secretKey = process.env.JWT_SECRET_KEY;
-  return jwt.sign(email, secretKey!, { expiresIn: "1800s" });
+  return jwt.sign({ email: email }, secretKey!, { expiresIn: "1800s" });
 };

@@ -63,11 +63,12 @@ const login = async (req: any, res: any, next: any) => {
 };
 
 const verifyOauth = async (req: any, res: any, next: any) => {
-  await verifyToken(req.body.type, req.body.token)
+  await verifyToken(req.body.type, req.body.id_token)
     .then((token) => {
       res.status(200).send(token);
     })
     .catch((error) => {
+      console.error(error);
       res.status(401).send(error);
     });
 };
