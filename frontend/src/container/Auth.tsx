@@ -1,13 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import axios from "axios";
 
 import AuthForm from "../components/AuthForm";
 import Footer from "../components/Landing/Footer";
 import Loader from "../components/Loader";
 import Logo from "../components/Logo";
 import Modal from "../components/Modal";
-import { verifyEmail } from "../apis/auth";
+import { useAuth } from "../hooks/use-auth";
 
 interface DOMEvent<T extends EventTarget> extends Event {
   readonly target: T;
@@ -24,17 +23,11 @@ const Auth = (props: any) => {
       valid: false,
     },
     valid: false,
-    isEmailVerified: false,
-    isPasswordUpdated: false,
-    loading: false,
-    error: false,
-    errorMsg: "",
     modal: false,
   });
 
   const history = useHistory();
-
-  const BASEURL = process.env.REACT_APP_BASEURL;
+  const auth = useAuth();
 
   const emailHandler = (event: DOMEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
@@ -56,132 +49,36 @@ const Auth = (props: any) => {
     }
   };
 
-  const requestEmailVerification = async (
-    event: DOMEvent<HTMLInputElement>
-  ) => {
-    event.preventDefault();
+  const modalHandler = () => {
     setAccount({
       ...account,
-      email: { ...account.email },
-      password: { ...account.password },
-      loading: true,
+      modal: false,
+      email: { value: "", valid: false },
+      password: { value: "", valid: false },
     });
-    const isVerified = await verifyEmail(account.email.value);
-    if (isVerified) {
-      await sendConfirmEmail()
-        .then(() => {
-          setAccount({
-            ...account,
-            email: { value: "", valid: false },
-            password: { ...account.password },
-            isEmailVerified: true,
-            loading: false,
-            modal: true,
-          });
-        })
-        .catch((error) => {
-          setAccount({
-            ...account,
-            email: { value: "", valid: false },
-            password: { ...account.password },
-            loading: false,
-            error: true,
-            errorMsg: error.message,
-          });
-        });
+    history.replace("/login");
+  };
+
+  useEffect(() => {
+    if (auth.isPasswordUpdated || auth.isEmailVerified) {
+      setAccount({ ...account, modal: true });
     }
-  };
-
-  const sendConfirmEmail = async () => {
-    await axios
-      .post(`${BASEURL}/confirm-email`, { email: account.email.value })
-      .catch((reason: any) => {
-        throw Error(reason.response.data);
-      });
-  };
-
-  const setupPassword = async (event: DOMEvent<HTMLInputElement>) => {
-    event.preventDefault();
-    await axios
-      .post(`${BASEURL}/complete-signup`, {
-        email: account.email.value,
-        password: account.password.value,
-      })
-      .then(() => {
-        setAccount({
-          ...account,
-          email: { ...account.email },
-          password: { ...account.password },
-          isPasswordUpdated: true,
-          modal: true,
-        });
-      })
-      .catch((reason: any) => {
-        console.error(JSON.stringify(reason));
-      });
-  };
-
-  const login = (event: DOMEvent<HTMLInputElement>) => {
-    event.preventDefault();
-    axios
-      .post(`${BASEURL}/login`, {
-        email: account.email.value,
-        password: account.password.value,
-      })
-      .then(() => {
-        history.replace("/main");
-      })
-      .catch((reason: any) => {
-        setAccount({
-          ...account,
-          email: { value: "", valid: false },
-          password: { value: "", valid: false },
-          error: true,
-          errorMsg: reason.response.data,
-        });
-      });
-  };
-
-  const googleSuccess = async (response: any) => {
-    await axios.post(`${BASEURL}/oauth`, {
-      type: "google",
-      id_token: response.id_token,
-    });
-    history.replace("/main");
-  };
-
-  const googleFail = (error: any) => {
-    console.error(error);
-    setAccount({
-      ...account,
-      modal: true,
-      error: true,
-      errorMsg: "Fail to connect Google acount",
-    });
-  };
+  }, [auth]);
 
   return (
     <div className="w-screen h-screen m-0 p-0 bg-gray-lightest flex justify-center items-center">
-      {account.loading ? <Loader /> : null}
-      {!account.error && account.isPasswordUpdated && account.modal ? (
+      {auth.loading ? <Loader loading /> : null}
+      {account.modal && auth.isPasswordUpdated ? (
         <Modal
           height="full md:h-1/4"
           width="full md:w-1/4"
           title={"All things done!"}
           content={"Please login with your email and new password"}
           buttonValue="Got it"
-          buttonClick={() => {
-            setAccount({
-              ...account,
-              email: { ...account.email },
-              password: { ...account.password },
-              modal: false,
-            });
-            history.replace("/login");
-          }}
+          buttonClick={() => modalHandler()}
         />
       ) : null}
-      {!account.error && account.isEmailVerified && account.modal ? (
+      {account.modal && auth.isEmailVerified ? (
         <Modal
           height="full md:h-1/4"
           width="full md:w-1/4"
@@ -190,15 +87,7 @@ const Auth = (props: any) => {
             "We sent a confirmation email to you. Please check your inbox"
           }
           buttonValue="Got it"
-          buttonClick={() => {
-            setAccount({
-              ...account,
-              email: { ...account.email },
-              password: { ...account.password },
-              modal: false,
-            });
-            history.goBack();
-          }}
+          buttonClick={() => modalHandler()}
         />
       ) : null}
       <div className="absolute top-20 transform -translate-x-32">
@@ -216,16 +105,26 @@ const Auth = (props: any) => {
         isEmailValid={account.email.valid}
         isAllValid={account.valid}
         submitEmail={(event: DOMEvent<HTMLInputElement>) =>
-          requestEmailVerification(event)
+          auth.requestEmailVerification(event, account.email.value)
         }
         setupPassword={(event: DOMEvent<HTMLInputElement>) =>
-          setupPassword(event)
+          auth.setupPassword(event, {
+            email: account.email.value,
+            password: account.password.value,
+          })
         }
-        login={(event: DOMEvent<HTMLInputElement>) => login(event)}
-        error={account.error}
-        errorMsg={account.errorMsg}
-        googleSuccess={(response: any) => googleSuccess(response)}
-        googleFail={(error: any) => googleFail(error)}
+        login={(event: DOMEvent<HTMLInputElement>) =>
+          auth.basicLogin(event, {
+            email: account.email.value,
+            password: account.password.value,
+          })
+        }
+        error={auth.error}
+        errorMsg={auth.errorMsg}
+        googleSuccess={(response: any) => auth.googleLoginSuccess(response)}
+        googleFail={(error: any) => auth.googleLoginFailure(error)}
+        msLoginHandler={(response: any) => auth.msLoginHandler(response)}
+        appleLoginHandler={(response: any) => auth.appleLoginHandler(response)}
       />
       <div className="absolute bottom-4">
         <Footer />

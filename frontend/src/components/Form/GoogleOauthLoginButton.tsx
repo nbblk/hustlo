@@ -6,14 +6,13 @@ export const GoogleOauthLoginButton = (props: any) => {
   return (
     <GoogleLogin
       clientId={process.env.REACT_APP_GOOGLE_OAUTH_ID!}
-      buttonText=""
       icon={false}
       onSuccess={props.googleSuccess}
       onFailure={props.googleFailure}
       cookiePolicy={"single_host_origin"}
-      render={({ onClick, disabled }) => (
+      render={(renderProps) => (
         <OauthButton
-          click={onClick}
+          click={renderProps.onClick}
           value="Continue with Google"
           icon={faGoogle}
         />

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { AppleOauthLoginButton } from "./Form/AppleOauthLoginButton";
 import { GoogleOauthLoginButton } from "./Form/GoogleOauthLoginButton";
 import Login from "./Form/Login";
 import { MsOauthLoginButton } from "./Form/MsOauthLoginButton";
@@ -12,7 +13,7 @@ const AuthForm = (props: any) => {
           ? "Login to Hustlo"
           : "Sign up for your account"}
       </h3>
-      {props.type === "password" || "login" ? (
+      {props.type === "login" || props.type === "password" ? (
         <Login
           type={props.type}
           emailValue={props.emailValue}
@@ -44,7 +45,8 @@ const AuthForm = (props: any) => {
           googleSuccess={props.googleSuccess}
           googleFail={props.googleFail}
         />
-        <MsOauthLoginButton />
+        <MsOauthLoginButton msLoginHandler={props.msLoginHandler} />
+        <AppleOauthLoginButton appleLoginHandler={props.appleLoginHandler} />
       </div>
       <div className="w-2/3 m-4 border border-t-1 border-gray-lightest"></div>
       <div className="text-blue text-sm">

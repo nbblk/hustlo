@@ -1,11 +1,14 @@
-import React from "react";
 import Main from "./container/Main";
+import { useAuth, AuthProvider } from "./hooks/use-auth";
 
 function App() {
+  const auth = useAuth();
+  console.log(process.env.REACT_APP_MS_CLIENT_ID);
+
   return (
-    <div className="">
+    <AuthProvider value={auth}>
       <Main />
-    </div>
+    </AuthProvider>
   );
 }
 
