@@ -6,7 +6,7 @@ export const send = async (email: string, hash: string) => {
     from: process.env.HOST_EMAIL, // Change to your verified sender
     subject: "Welcome Hustlo",
     text: "Finish the signup process",
-    html: `<h1>Almost done😉</h1><p>Please click the <a clicktracking="off" href="${process.env.SERVER_BASE_URL}/confirm-email?h=${hash}">link</a> to finish the signup process</p>`,
+    html: `<h1>Almost done😉</h1><p>Please click the <a clicktracking="off" href="${process.env.SERVER_ORIGIN}/confirm-email?h=${hash}">link</a> to finish the signup process</p>`,
     tracking_settings: {
       click_tracking: { enable: false },
       open_tracking: { enable: false },

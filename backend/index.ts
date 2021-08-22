@@ -8,7 +8,6 @@ dotenv.config({ path: "./.env" });
 
 const app = express();
 const PORT = 8080;
-const allowedOrigins = ["http://localhost:3000"];
 
 connect();
 

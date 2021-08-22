@@ -3,8 +3,9 @@ import {
   signup,
   redirect,
   addPassword,
-  login,
-  verifyOauth,
+  basicLogin,
+  OAuthLogin,
+  logout,
 } from "../controllers/auth";
 import { body } from "express-validator";
 import { customPasswordValidator as pwdRegex } from "../validations/custom-validator";
@@ -19,7 +20,7 @@ authRouter.post(
   "/login",
   body("email").isEmail(),
   body("password").isLength({ min: 8, max: 20 }).custom(pwdRegex),
-  login
+  basicLogin
 );
 
 authRouter.get("/confirm-email", redirect);
@@ -33,6 +34,8 @@ authRouter.post(
   addPassword
 );
 
-authRouter.post("/oauth", verifyOauth);
+authRouter.post("/oauth", OAuthLogin);
+
+authRouter.get("/logout", logout);
 
 export default authRouter;
