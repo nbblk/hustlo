@@ -1,11 +1,20 @@
-import { useAuth } from "../hooks/use-auth";
+import BoardList from "../components/Board/BoardList";
+import MainNavbar from "../components/Board/MainNavbar";
+import Header from "../components/Header/Header";
 
 function Board() {
-  const auth = useAuth();
-
   return (
     <div>
-      Board!!! <button onClick={auth.logout}>logout</button>
+      <Header
+        bgColor="blue"
+        isShadowed={false}
+        fontSize="md"
+        textColor="white"
+      />
+      <main className="w-screen md:w-full h-full flex justify-center">
+        <MainNavbar />
+        <BoardList />
+      </main>
     </div>
   );
 }
