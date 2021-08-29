@@ -91,7 +91,7 @@ const Auth = (props: any) => {
         />
       ) : null}
       <div className="absolute top-20 transform -translate-x-32">
-        <Logo textSize="5xl" />
+        <Logo textSize="5xl" withImage={false} />
       </div>
       <AuthForm
         type={props.type}

@@ -1,9 +1,12 @@
-import React from "react";
+type LogoProps = {
+  withImage: boolean;
+  textSize: string;
+};
 
-const Logo = (props: any) => {
+const Logo = (props: LogoProps) => {
   return (
-    <div className="absolute flex align-center left-0 m-2">
-      <img className="" alt="logo"></img>
+    <div className="flex justify-center items-center">
+      {props.withImage ? <img className="" alt="logo"></img> : null}
       <span className={`ml-2 text-${props.textSize} font-krona`}>Hustlo</span>
     </div>
   );
