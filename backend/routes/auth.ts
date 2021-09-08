@@ -5,7 +5,6 @@ import {
   addPassword,
   basicLogin,
   OAuthLogin,
-  logout,
 } from "../controllers/auth";
 import { body } from "express-validator";
 import { customPasswordValidator as pwdRegex } from "../validations/custom-validator";
@@ -35,7 +34,5 @@ authRouter.post(
 );
 
 authRouter.post("/oauth", OAuthLogin);
-
-authRouter.get("/logout", logout);
 
 export default authRouter;
