@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { AppleOauthLoginButton } from "./Form/AppleOauthLoginButton";
 import { GoogleOauthLoginButton } from "./Form/GoogleOauthLoginButton";
 import Login from "./Form/Login";
 import { MsOauthLoginButton } from "./Form/MsOauthLoginButton";
@@ -7,7 +6,7 @@ import Signup from "./Form/Signup";
 
 const AuthForm = (props: any) => {
   return (
-    <div className="w-full h-full md:w-2/5 xl:w-1/5 md:h-1/3 p-4 md:h-2/3 flex flex-col justify-center items-center bg-white text-center shadow-2xl">
+    <div className="w-screen h-screen md:w-3/5 xl:w-1/3 p-4 flex flex-col justify-center items-center bg-white text-center shadow-2xl">
       <h3 className="my-12 font-bold text-gray">
         {props.type === "login"
           ? "Login to Hustlo"
@@ -36,20 +35,18 @@ const AuthForm = (props: any) => {
           submitEmail={props.submitEmail}
         />
       )}
-      <div className="font-nunito text-red m-4">
-        {props.error ? props.errorMsg : null}
-      </div>
-      <small className="my-12">OR</small>
+      <div className="font-nunito text-red m-4">{props.errorMsg}</div>
+      <small>OR</small>
       <div>
         <GoogleOauthLoginButton
           googleSuccess={props.googleSuccess}
           googleFail={props.googleFail}
         />
         <MsOauthLoginButton msLoginHandler={props.msLoginHandler} />
-        <AppleOauthLoginButton appleLoginHandler={props.appleLoginHandler} />
+        {/* <AppleOauthLoginButton appleLoginHandler={props.appleLoginHandler} /> */}
       </div>
       <div className="w-2/3 m-4 border border-t-1 border-gray-lightest"></div>
-      <div className="text-blue text-sm">
+      <div className="h-1/3 text-blue text-sm">
         <Link to="/login">
           <button className="m-2 hover:underline cursor-pointer">
             {props.type === "login"

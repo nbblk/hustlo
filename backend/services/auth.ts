@@ -2,7 +2,7 @@ import { User, UserModel } from "../models/user";
 import { generateHashcode } from "../utils/util";
 import { send } from "./mail";
 import { hash, compare } from "bcryptjs";
-import { generateJwt, verifyJwt } from "./jwt";
+import { generateJwt } from "./jwt";
 import { verifyTokenByPlatform } from "./oauth";
 
 // Store a user data to database
@@ -17,8 +17,8 @@ const createUser = async (email: string): Promise<User> => {
   // Check if the email already exists.
   const found = await UserModel.findOne({ email: email });
   if (!found) {
-    return await newUser.save().catch((error) => {
-      throw Error("Failed to create a user: " + error);
+    return newUser.save().catch((error: Error) => {
+      throw Error("Failed to create a user: " + error.message);
     });
   } else {
     throw Error("The email already exists. Please log in.");
@@ -31,19 +31,19 @@ export const sendConfirmationEmail = async (email: string) => {
     throw Error(error);
   });
   const hash = created.hash;
-  await send(email, hash).catch((error) => {
+  send(email, hash).catch((error) => {
     throw Error("Failed to send an email: " + error);
   });
 };
 
 // If a user clicks the url, update the isVerified to 'true' and delete the hash
-export const verifyUser = async (hash: string): Promise<void> => {
+export const verifyUser = (hash: string) => {
   const query = { hash: hash };
-  await UserModel.findOneAndUpdate(query, {
+  UserModel.findOneAndUpdate(query, {
     $set: { isVerified: true },
     $unset: { hash: 1 },
-  }).catch((error) => {
-    throw Error("Failed to verify the user: " + error);
+  }).catch((error: Error) => {
+    throw Error("Failed to verify the user: " + error.message);
   });
 };
 
@@ -51,10 +51,12 @@ export const verifyUser = async (hash: string): Promise<void> => {
 export const addPassword = async (email: string, password: string) => {
   const encrypted = await hash(password, 12);
   const query = { email: email, isVerified: true };
-  await UserModel.updateOne(query, {
+  UserModel.updateOne(query, {
     $set: { password: encrypted },
-  }).catch((error: any) => {
-    throw Error("Failed to add password to the existed user: " + error);
+  }).catch((error: Error) => {
+    throw new Error(
+      "Failed to add password to the existed user: " + error.message
+    );
   });
 };
 
@@ -65,43 +67,62 @@ export const authenticate = async (email: string, password: string) => {
   try {
     const result = await UserModel.findOne(query).exec();
     if (result === null) {
-      throw Error("Email or password is incorrect. Please try again. ");
+      throw new Error("Email or password is incorrect. Please try again. ");
     } else {
       const isMatched = await compare(password, result.password);
-      jwt = isMatched ? generateJwt(email) : null;
+
+      if (!isMatched) {
+        throw new Error("Password is incorrect. Please try again.");
+      } else {
+        jwt = generateJwt(email);
+      }
     }
-  } catch (error) {
-    throw Error("Failed to retrieve user: " + error);
+  } catch (error: any) {
+    throw new Error(error);
   }
-  return jwt;
+  return {
+    firstLetter: email.charAt(0).toUpperCase(),
+    email: email,
+    token: jwt,
+  };
 };
 
-export const authenticateUsingOAuth = async (user: any) => {
-  const email = await verifyTokenByPlatform(user).catch((error) => {
-    throw Error(error);
-  });
+export const authenticateUsingOAuth = async (user: {
+  type: string;
+  id_token: string;
+}) => {
+  let email;
+  try {
+    email = await verifyTokenByPlatform(user);
+    if (!email) {
+      throw new Error("Email doesn't exist");
+    }
+    await createOauthUser(user.type, email);
 
-  if (!email) {
-    throw Error(
-      `Failed to login with the ${user.type} account. Try another account.`
+    return {
+      email: email,
+      token: generateJwt(email),
+      firstLetter: email.charAt(0).toUpperCase(),
+    };
+  } catch (error: any) {
+    throw new Error(
+      `Failed to login with the ${user.type} account. Try another account. : ${error}`
     );
-  } else {
-    await createOauthUser(email);
-    return generateJwt(email);
   }
 };
 
 // Create a new user if it doesn't exist, and return a new jwt
-const createOauthUser = async (email: string) => {
-  const found = await UserModel.findOne({ email: email });
+const createOauthUser = async (type: string, email: string) => {
+  const found = await UserModel.findOne({ oauth: type, email: email });
   if (!found) {
     let newUser = new UserModel({
+      oauth: type,
       email: email,
       isVerified: true,
     });
 
-    await newUser.save().catch((error) => {
-      throw Error("Failed to create a user: " + error);
+    newUser.save().catch((error: Error) => {
+      throw new Error("Failed to create a user: " + error.message);
     });
   }
 };

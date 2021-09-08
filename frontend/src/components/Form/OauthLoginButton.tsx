@@ -8,7 +8,7 @@ const OauthLoginButton = (props: any) => {
       <FontAwesomeIcon icon={props.icon} className="mx-2" />
       <Button
         width="full"
-        height="10"
+        height="6"
         textColor="gray-light"
         bgColor="white"
         borderColor="gray-light"

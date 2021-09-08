@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../../hooks/use-auth";
 import ContextPopupHeader from "./ContextPropHeader";
 import UserProfile from "./UserProfile";
 
@@ -7,6 +8,8 @@ type ProfileMenuProps = {
 };
 
 const ProfileMenu = (props: ProfileMenuProps) => {
+  const auth = useAuth();
+
   return (
     <>
       <ContextPopupHeader title="Account" click={props.click} />
@@ -19,9 +22,9 @@ const ProfileMenu = (props: ProfileMenuProps) => {
         <Link to="/activity">
           <li className="m-2">Activity</li>
         </Link>
-        <Link to="/logout">
-          <li className="m-2">Logout</li>
-        </Link>
+        <li className="m-2 cursor-pointer" onClick={auth.basicLogout}>
+          Logout
+        </li>
       </ul>
     </>
   );

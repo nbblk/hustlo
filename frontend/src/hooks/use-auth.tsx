@@ -1,19 +1,16 @@
-import { useState, useContext, createContext } from "react";
-import axios from "axios";
-import { Redirect, Route, useHistory } from "react-router-dom";
+import { useState, useContext, createContext, useEffect } from "react";
+import { Redirect, useHistory } from "react-router-dom";
 import { verifyEmail } from "../apis/auth";
 import { loginRequest } from "../components/Form/MsOauthLogin";
+import useAxios from "../hooks/use-axios";
 
 interface AuthProps {
   loggedIn: boolean;
-  loggedOut: boolean;
   isEmailVerified: boolean;
   isPasswordUpdated: boolean;
-  error: boolean;
   errorMsg: string;
-  loading: boolean;
   basicLogin: (event: DOMEvent<HTMLInputElement>, credential: any) => void;
-  logout: () => void;
+  basicLogout: () => JSX.Element;
   requestEmailVerification: (
     event: DOMEvent<HTMLInputElement>,
     email: string
@@ -22,7 +19,7 @@ interface AuthProps {
   googleLoginSuccess: (response: any) => void;
   googleLoginFailure: (error: any) => void;
   msLoginHandler: (response: any) => void;
-  appleLoginHandler: (response: any) => void;
+  //  appleLoginHandler: (response: any) => void;
 }
 
 interface DOMEvent<T extends EventTarget> extends Event {
@@ -38,15 +35,12 @@ const BASEURL = process.env.REACT_APP_BASEURL;
 
 const authContext = createContext<AuthProps>({
   loggedIn: false,
-  loggedOut: false,
   isEmailVerified: false,
   isPasswordUpdated: false,
-  error: false,
   errorMsg: "",
-  loading: false,
   basicLogin: (event: DOMEvent<HTMLInputElement>, credential: credential) =>
     Promise,
-  logout: () => {},
+  basicLogout: () => <Redirect to="/" />,
   requestEmailVerification: (
     event: DOMEvent<HTMLInputElement>,
     email: string
@@ -56,7 +50,7 @@ const authContext = createContext<AuthProps>({
   googleLoginSuccess: (response: any) => Promise,
   googleLoginFailure: (error: any) => Promise,
   msLoginHandler: (response: any) => Promise,
-  appleLoginHandler: (response: any) => Promise,
+  //  appleLoginHandler: (response: any) => Promise,
 });
 
 export function AuthProvider({ children }: any) {
@@ -69,45 +63,52 @@ export const useAuth = () => {
 };
 
 function useAuthProvider() {
-  const [user, setUser] = useState({
+  const [auth, setAuth] = useState({
     loggedIn: false,
-    loggedOut: false,
     isEmailVerified: false,
     isPasswordUpdated: false,
-    error: false,
-    errorMsg: "",
     loading: false,
+    errorMsg: "",
   });
 
   const history = useHistory();
+  const axios = useAxios();
+
+  useEffect(() => {
+    if (!auth.loggedIn) {
+      if (sessionStorage.getItem("user")) {
+        setAuth({ ...auth, loggedIn: true });
+      }
+    }
+  }, [auth.loggedIn]);
 
   const basicLogin = (
     event: DOMEvent<HTMLInputElement>,
     credential: credential
   ) => {
     event.preventDefault();
-    setUser({ ...user, loading: true });
-    axios
-      .post(`${BASEURL}/login`, credential)
-      .then(() => {
-        setUser({ ...user, loggedIn: true });
-        history.push("/main");
-      })
-      .catch((error: any) => {
-        if (error.response.data) {
-          setUser({
-            ...user!,
-            error: true,
-            errorMsg: error.response.data,
-          });
-        } else {
-          setUser({
-            ...user!,
-            error: true,
-            errorMsg: error.statusText,
-          });
-        }
-      });
+    axios.fetch({
+      method: "POST",
+      url: `${BASEURL}/login`,
+      data: credential,
+    });
+
+    if (!axios.error && axios.response) {
+      sessionStorage.setItem("user", JSON.stringify(axios.response));
+      setAuth({ ...auth, loggedIn: true });
+      history.push("/main");
+    }
+
+    if (axios.error) {
+      console.log(axios.error.toString());
+      setAuth({ ...auth, errorMsg: axios.error.toString() });
+    }
+  };
+
+  const basicLogout = () => {
+    sessionStorage.removeItem("user");
+    setAuth({ ...auth, loggedIn: false });
+    return <Redirect to="/" />;
   };
 
   const requestEmailVerification = async (
@@ -115,37 +116,23 @@ function useAuthProvider() {
     email: string
   ) => {
     event.preventDefault();
-    setUser({
-      ...user,
-      loading: true,
-    });
     const isVerified = await verifyEmail(email);
     if (isVerified) {
-      await sendConfirmEmail(email)
-        .then(() => {
-          setUser({
-            ...user,
-            isEmailVerified: true,
-            loading: false,
-          });
-        })
-        .catch((error) => {
-          setUser({
-            ...user,
-            loading: false,
-            error: true,
-            errorMsg: error.message,
-          });
+      await sendConfirmEmail(email).then(() => {
+        setAuth({
+          ...auth,
+          isEmailVerified: true,
         });
+      });
     }
   };
 
   const sendConfirmEmail = async (email: string) => {
-    await axios
-      .post(`${BASEURL}/confirm-email`, { email: email })
-      .catch((reason: any) => {
-        throw Error(reason.response.data);
-      });
+    axios.fetch({
+      method: "POST",
+      url: `${BASEURL}/confirm-email`,
+      data: { email: email },
+    });
   };
 
   const setupPassword = async (
@@ -153,111 +140,127 @@ function useAuthProvider() {
     credential: credential
   ) => {
     event.preventDefault();
-    setUser({ ...user, loading: true });
-    await axios
-      .post(`${BASEURL}/complete-signup`, {
-        email: credential.email,
-        password: credential.password,
-      })
-      .then(() => {
-        setUser({
-          ...user,
-          isPasswordUpdated: true,
-        });
-      })
-      .catch((error: any) => {
-        setUser({
-          ...user,
-          loading: false,
-          error: true,
-          errorMsg: error.response.data,
-        });
+    axios.fetch({
+      method: "POST",
+      url: `${BASEURL}/complete-signup`,
+      data: { email: credential.email, password: credential.password },
+    });
+
+    if (axios.response) {
+      setAuth({
+        ...auth,
+        isPasswordUpdated: true,
       });
+    }
   };
 
   const logout = () => {
-    axios
-      .get(`${process.env.REACT_APP_BASEURL}/logout`)
-      .then(() => setUser({ ...user, loggedIn: false, loggedOut: true }))
-      .catch((error) => {
-        console.error(error);
-      });
+    sessionStorage.removeItem("user");
+    setAuth({ ...auth, loggedIn: false });
   };
 
   const googleLoginSuccess = (response: any) => {
     console.log(response);
-    axios
-      .post(`${process.env.REACT_APP_BASEURL}/oauth`, {
+    axios.fetch({
+      method: "POST",
+      url: `${BASEURL}/oauth`,
+      data: {
         type: "google",
         id_token: response.tokenId,
-      })
-      .then(() => {
-        setUser({ ...user, loggedIn: true });
-        history.push("/main", { loggedIn: true });
-      })
-      .catch((error) => {
-        console.error(error);
-        setUser({ ...user, error: true, errorMsg: error.message });
-      });
+      },
+    });
+
+    if (!axios.error && axios.response) {
+      sessionStorage.setItem("user", JSON.stringify(axios.response));
+      setAuth({ ...auth, loggedIn: true });
+      history.push("/main");
+    }
+
+    if (axios.error) {
+      // from api server
+      console.error(axios.error);
+      setAuth({ ...auth, errorMsg: axios.error.toString() });
+    }
   };
 
   const googleLoginFailure = (error: any) => {
     console.error(error);
-    setUser({ ...user, error: true, errorMsg: error.message });
+    setAuth({ ...auth, errorMsg: error.message });
   };
 
-  const msLoginHandler = (instance: any) => {
-    instance
-      .loginPopup(loginRequest)
-      .then((response: any) => {
-        axios.post(`${process.env.REACT_APP_BASEURL}/oauth`, {
+  const msLoginHandler = async (instance: any) => {
+    let response;
+    try {
+      response = await instance.loginPopup(loginRequest);
+    } catch (error: any) {
+      console.error(error);
+      setAuth({ ...auth, errorMsg: error.message });
+    }
+
+    if (response) {
+      axios.fetch({
+        method: "POST",
+        url: `${BASEURL}/oauth`,
+        data: {
           type: "ms",
           id_token: response.idToken,
           email: response.account.username,
-        });
-        setUser({ ...user, loggedIn: true });
-        history.push("/main", { loggedIn: true });
-      })
-      .catch((error: any) => {
-        console.error(error);
-        setUser({ ...user, error: true, errorMsg: error.message });
+        },
       });
-  };
 
-  const appleLoginHandler = (response: any) => {
-    console.log(response);
-    try {
-      axios.post(`${process.env.REACT_APP_BASEURL}/oauth`, {
-        type: "apple",
-        id_token: response.id_token,
-      });
-      setUser({ ...user, loggedIn: true });
-      history.push("/main", { loggedIn: true });
-    } catch (error) {
-      console.error(error);
-      setUser({ ...user, error: true, errorMsg: error.message });
+      if (!axios.error && axios.response) {
+        sessionStorage.setItem("user", JSON.stringify(axios.response));
+        setAuth({ ...auth, loggedIn: true });
+        history.push("/main");
+      }
+
+      if (axios.error) {
+        console.error(axios.error);
+        setAuth({ ...auth, errorMsg: axios.error.toString() });
+      }
     }
   };
 
+  // const appleLoginHandler = async (response: any) => {
+  //   if (!response.authorization) {
+  //     setAuth({
+  //       ...auth,
+  //       errorMsg: "Something went wrong. Try another account.",
+  //     });
+  //   }
+
+  //   await axios.fetch({
+  //     method: "POST",
+  //     url: `${BASEURL}/oauth`,
+  //     data: {
+  //       type: "apple",
+  //       id_token: response.authorization.id_token,
+  //       email: response.user.email, // email is only provided just once
+  //     },
+  //   });
+
+  //   if (!axios.error && axios.response) {
+  //     sessionStorage.setItem("user", JSON.stringify(axios.response));
+  //     setAuth({ ...auth, loggedIn: true });
+  //     history.push("/main");
+  //   }
+
+  //   if (axios.error) {
+  //     console.error(axios.error);
+  //     setAuth({ ...auth, errorMsg: axios.error.toString() });
+  //   }
+  // };
+
   return {
-    ...user,
+    ...auth,
     basicLogin,
+    basicLogout,
     requestEmailVerification,
     setupPassword,
     logout,
     googleLoginSuccess,
     googleLoginFailure,
     msLoginHandler,
-    appleLoginHandler,
+    //    appleLoginHandler,
   };
-}
-
-export function PrivateRoute({ children, ...rest }: any) {
-  let auth = useAuth();
-  return (
-    <Route
-      {...rest}
-      render={() => (auth.loggedIn ? children : <Redirect to="/login" />)}
-    />
-  );
 }

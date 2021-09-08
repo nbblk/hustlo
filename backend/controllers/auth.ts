@@ -36,19 +36,17 @@ const signup = async (
     });
 };
 
-const redirect = async (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) => {
+const redirect = async (req: express.Request, res: express.Response) => {
   const hash = req.query.h?.toString();
   if (!hash) {
     res.status(400).send("Invalid access");
   } else {
-    await verifyUser(hash).catch((error) => {
+    try {
+      await verifyUser(hash);
+      res.redirect(`${clientOrigin}/password-setup?h=${hash}`);
+    } catch (error: any) {
       res.send(error).redirect(`${clientOrigin}/signup/error`);
-    });
-    res.redirect(`${clientOrigin}/password-setup?h=${hash}`);
+    }
   }
 };
 
@@ -67,55 +65,34 @@ const addPassword = async (req: any, res: any, next: any) => {
     });
 };
 
-const basicLogin = async (req: any, res: any, next: any) => {
-  await authenticate(req.body.email, req.body.password)
-    .then((token) => {
-      if (token) {
-        res.setHeader("Set-Cookie", [
-          `token=${token}`,
-          "Max-Age=1800",
-          "Secure",
-          "HttpOnly",
-        ]);
-        res.sendStatus(200);
-      } else {
-        throw Error("Email or Password is incorrect. Try again.");
-      }
-    })
-    .catch((error) => {
-      const errors = validationResult(req);
-      let status, message;
-      if (!errors.isEmpty()) {
-        status = 400;
-        message = errors.array();
-      } else {
-        status = 401;
-        message = error.message;
-      }
-      res.status(status).send(error.message);
-    });
+const basicLogin = async (req: express.Request, res: express.Response) => {
+  let userInfo;
+  try {
+    userInfo = await authenticate(req.body.email, req.body.password);
+    res.send(userInfo);
+  } catch (error: any) {
+    const errors = validationResult(req);
+    let status, message;
+    if (!errors.isEmpty()) {
+      status = 400;
+      message = errors.array();
+    } else {
+      status = 401;
+      message = error.message;
+    }
+    res.status(status).send(error.message);
+  }
 };
 
-const OAuthLogin = async (req: any, res: any, next: any) => {
-  await authenticateUsingOAuth({ ...req.body })
-    .then((token) => {
-      res.setHeader("Set-Cookie", [
-        `token=${token}`,
-        "Max-Age=1800",
-        "Secure",
-        "HttpOnly",
-      ]);
-      res.sendStatus(200);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(401).send(error);
-    });
+const OAuthLogin = async (req: express.Request, res: express.Response) => {
+  let userInfo;
+  try {
+    userInfo = await authenticateUsingOAuth({ ...req.body });
+    res.send(userInfo);
+  } catch (error) {
+    console.error(error);
+    res.status(401).send(error);
+  }
 };
 
-const logout = async (req: any, res: any, next: any) => {
-  res.clearCookie("token");
-  res.sendStatus(200);
-};
-
-export { signup, redirect, addPassword, basicLogin, OAuthLogin, logout };
+export { signup, redirect, addPassword, basicLogin, OAuthLogin };

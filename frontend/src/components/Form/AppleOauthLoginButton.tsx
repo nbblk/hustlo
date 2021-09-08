@@ -1,13 +1,18 @@
 import AppleLogin from "react-apple-login";
 import OauthLoginButton from "./OauthLoginButton";
 import { faApple } from "@fortawesome/free-brands-svg-icons";
+import { useAuth } from "../../hooks/use-auth";
 
 export const AppleOauthLoginButton = (props: any) => {
+  const auth = useAuth();
+
   return (
     <AppleLogin
       clientId={process.env.REACT_APP_APPLE_CLIENT_ID!}
       redirectURI={process.env.REACT_APP_APPLE_REDIRECT_URI!}
-      responseMode="query"
+      responseType="id_token"
+      responseMode="form_post"
+      scope="email"
       usePopup={true}
       render={(props) => (
         <OauthLoginButton
@@ -17,7 +22,9 @@ export const AppleOauthLoginButton = (props: any) => {
         />
       )}
       callback={(response) => {
-        props.appleLoginHandler(response);
+        if (!response.error) {
+          //          auth.appleLoginHandler(response);
+        }
       }}
     />
   );
