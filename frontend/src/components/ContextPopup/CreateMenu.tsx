@@ -4,7 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import ContextPopupHeader from "./ContextPropHeader";
 
-const CreateMenu = (props: { click: () => void }) => {
+const CreateMenu = (props: {
+  click: () => void;
+  createWorkspaceClicked: () => void;
+}) => {
   return (
     <>
       <ContextPopupHeader title="Create" click={props.click} />
@@ -21,18 +24,19 @@ const CreateMenu = (props: { click: () => void }) => {
             </small>
           </li>
         </Link>
-        <Link to="/create-workspace">
-          <li className="m-4">
-            <span className="mr-4">
-              <FontAwesomeIcon icon={faPeopleCarry} />
-            </span>
-            Create Workspace
-            <small className="block font-nunito">
-              A Workspace is a group of boards and people. Use it to organize
-              your company, side hustle, family, or friends.
-            </small>
-          </li>
-        </Link>
+        <li
+          className="m-4 cursor-pointer"
+          onClick={props.createWorkspaceClicked}
+        >
+          <span className="mr-4">
+            <FontAwesomeIcon icon={faPeopleCarry} />
+          </span>
+          Create Workspace
+          <small className="block font-nunito">
+            A Workspace is a group of boards and people. Use it to organize your
+            company, side hustle, family, or friends.
+          </small>
+        </li>
       </ul>
     </>
   );

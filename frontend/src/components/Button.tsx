@@ -2,10 +2,10 @@ const Button = (props: any) => {
   const isBordered = props.border ? "border" : "";
   const style = `h-${props.height} w-${props.width} mx-${props.marginX} my-${
     props.marginY
-  } rounded bg-${props.disabled ? "gray-lightest" : props.color} text-${
+  } rounded bg-${props.disabled ? "gray-lightest" : props.bgColor} text-${
     props.disabled ? "gray-dark" : props.textColor
   } hover:${
-    props.disabled ? "gray-lightest" : props.color
+    props.disabled ? `gray-light` : `${props.bgColor}-light`
   } ${isBordered} border-${props.borderColor} text-${props.textSize} cursor-${
     props.disabled ? "not-allowed" : "pointer"
   }`;

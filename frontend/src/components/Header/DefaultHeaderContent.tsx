@@ -11,7 +11,7 @@ const DefaultHeaderContent = () => {
           <Button
             width="32"
             height="8"
-            color="transparent"
+            bgColor="transparent"
             textColor="blue"
             textSize="md"
             value="Log in"
@@ -21,7 +21,7 @@ const DefaultHeaderContent = () => {
           <Button
             width="32"
             height="8"
-            color="blue"
+            bgColor="blue"
             borderColor="transparent"
             textColor="white"
             textSize="md"

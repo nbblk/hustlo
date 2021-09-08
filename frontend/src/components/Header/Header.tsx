@@ -7,6 +7,7 @@ type HeaderProps = {
   isShadowed: boolean;
   textColor: string;
   fontSize: string;
+  createWorkspaceClicked?: () => void;
 };
 
 const Header = (props: HeaderProps) => {
@@ -20,7 +21,13 @@ const Header = (props: HeaderProps) => {
 
   return (
     <nav className={style}>
-      {auth.loggedIn ? <LoggedInHeaderContent /> : <DefaultHeaderContent />}
+      {auth.loggedIn ? (
+        <LoggedInHeaderContent
+          createWorkspaceClicked={props.createWorkspaceClicked}
+        />
+      ) : (
+        <DefaultHeaderContent />
+      )}
     </nav>
   );
 };

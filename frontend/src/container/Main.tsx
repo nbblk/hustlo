@@ -2,15 +2,17 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import Auth from "./Auth";
 import Board from "./Board";
 import Landing from "./Landing";
-import { useAuth, PrivateRoute } from "../hooks/use-auth";
+import PageNotFound from "../components/PageNotFound";
+import { useAuth } from "../hooks/use-auth";
 
-function Main() {
+function Main(props: any) {
   const auth = useAuth();
+  console.dir(props.history);
 
   return (
     <Switch>
       <Route exact path="/">
-        <Landing />
+        {auth.loggedIn ? <Redirect to="/main" /> : <Landing />}
       </Route>
       <Route path="/login">
         <Auth type="login" />
@@ -21,15 +23,14 @@ function Main() {
       <Route path="/password-setup">
         <Auth type="password" />
       </Route>
-      <Route exact path="/signup/error">
-        <div>there's an error happened!</div>
+      <Route path="/main">
+        {auth.loggedIn ? <Board /> : <Redirect to="/login" />}
       </Route>
-      <PrivateRoute path="/main">
-        <Board />
-      </PrivateRoute>
-      <Route path="/logout">
-        {auth.loggedIn ? auth.logout : <Redirect to="/" />}
+      <Route path="/logout">{() => auth.basicLogout()}</Route>
+      <Route path="/page-not-found">
+        <PageNotFound />
       </Route>
+      <Redirect to="/page-not-found" />
     </Switch>
   );
 }

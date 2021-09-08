@@ -1,10 +1,6 @@
 const Footer = () => (
-  <footer className="flex flex-col justify-center items-center">
-    <select className="block">
-      <option>English(US)</option>
-      <option>Korean</option>
-    </select>
-    <small className="m-5">
+  <footer className="w-screen flex flex-col justify-center items-center">
+    <small className="hidden sm:block text-center">
       © Copyright 2021 by Blake Sim. All rights reserved.
     </small>
   </footer>
