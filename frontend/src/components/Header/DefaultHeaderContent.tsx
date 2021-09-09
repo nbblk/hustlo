@@ -5,11 +5,11 @@ import Logo from "../Logo";
 const DefaultHeaderContent = () => {
   return (
     <>
-      <Logo textSize="md" withImage />
-      <div>
+      <Logo textSize="2xl" withImage/>
+      <div className="w-full md:w-auto flex flex-col md:flex-row">
         <Link to="/login">
           <Button
-            width="32"
+            width="full md:w-32"
             height="8"
             bgColor="transparent"
             textColor="blue"
@@ -19,7 +19,7 @@ const DefaultHeaderContent = () => {
         </Link>
         <Link to="/signup">
           <Button
-            width="32"
+            width="full md:w-32"
             height="8"
             bgColor="blue"
             borderColor="transparent"

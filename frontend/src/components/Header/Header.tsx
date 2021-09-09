@@ -11,7 +11,7 @@ type HeaderProps = {
 };
 
 const Header = (props: HeaderProps) => {
-  const style = `w-full m-0 p-1.5 sticky z-50 top-0 flex justify-between items-center bg-${
+  const style = `w-full m-0 p-1.5 sticky z-50 top-0 flex flex-col md:flex-row md:justify-between md:items-center bg-${
     props.bgColor
   } ${props.isShadowed ? "shadow boxShadow" : null} font-krona font-${
     props.fontSize
