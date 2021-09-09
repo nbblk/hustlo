@@ -11,21 +11,22 @@ const BottomContent = () => (
       <div className="w-2/3 flex flex-col md:flex-row justify-center items-center">
         <InputBox
           type="email"
-          width="full"
+          width="full md:w-2/5"
           height="10"
           marginX="0 md:mx-4"
           marginY="4"
           placeholder="Email"
+          change={() => {}}
         />
         <Button
-          width="full"
+          width="full md:w-1/5"
           height="10"
           marginX="0 md:mx-4"
           marginY="0 md:4"
           value="Sign up"
           textColor="white"
           borderColor="transparent"
-          color="emerald hover:green"
+          bgColor="emerald hover:green"
         />
       </div>
     </div>

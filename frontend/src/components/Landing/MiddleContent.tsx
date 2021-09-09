@@ -14,7 +14,7 @@ const MiddleContent = () => (
       <Button
         width="48"
         height="10"
-        color="transparent"
+        bgColor="transparent"
         textColor="blue"
         textSize="md"
         border="true"
@@ -26,7 +26,7 @@ const MiddleContent = () => (
         src="./Landing preview.png"
         height="700"
         width="1080"
-        className="m-8 filter drop-shadow-2xl"
+        className="my-20 filter drop-shadow-2xl"
       />
       <h3 className="m-8 font-nunito text-center text-xl">
         Join over 1,000,000 projects worldwide that are using Hustlo to get more
