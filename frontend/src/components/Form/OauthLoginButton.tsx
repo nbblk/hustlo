@@ -12,6 +12,8 @@ const OauthLoginButton = (props: any) => {
         textColor="gray-light"
         bgColor="white"
         borderColor="gray-light"
+        hoverColor="gray"
+        textSize="md"
         value={props.value}
         click={props.click}
       />

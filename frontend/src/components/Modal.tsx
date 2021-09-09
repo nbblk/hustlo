@@ -19,13 +19,14 @@ const Modal = (props: any) => {
       <h1 className="font-krona text-2xl md:text-xl">{props.title}</h1>
       <p className="font-nunito text-lg md:text-sm">{props.content}</p>
       <Button
-        color="blue"
+        bgColor="blue"
         textColor="white"
+        hoverColor="blue hover:opacity-25" 
         width="full md:w-1/5"
         height="10"
         disabled={false}
         value={props.buttonValue}
-        click={props.buttonClick}
+        click={props.buttonClick}   
       />
     </div>
   );

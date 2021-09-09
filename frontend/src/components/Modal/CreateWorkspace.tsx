@@ -59,14 +59,14 @@ const CreateWorkspace = (props: any) => {
           }
         />
         <Button
-          type="submit"
           height="10"
           width="full"
           bgColor="green"
           textColor="white"
+          hoverColor="green hover:opacity-25"
           value="Continue"
           marginY="2"
-          click={(event: React.FormEvent<HTMLFormElement>) =>
+          click={(event: React.MouseEvent<HTMLButtonElement>) =>
             props.submitWorkspaceForm(event, {
               name: form.name,
               description: form.description,

@@ -12,10 +12,11 @@ const DefaultHeaderContent = () => {
             width="full md:w-32"
             height="8"
             bgColor="transparent"
+            hoverColor="none"
             textColor="blue"
             textSize="md"
-            value="Log in"
-          />
+            value="Log in" 
+             />
         </Link>
         <Link to="/signup">
           <Button
@@ -23,10 +24,11 @@ const DefaultHeaderContent = () => {
             height="8"
             bgColor="blue"
             borderColor="transparent"
-            textColor="white"
+            hoverColor="white"
+            textColor="white hover:text-blue"
             textSize="md"
-            value="Sign up"
-          />
+            value="Sign up" 
+           />
         </Link>
       </div>
     </>

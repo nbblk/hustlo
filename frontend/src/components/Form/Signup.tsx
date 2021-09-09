@@ -9,6 +9,7 @@ const Signup = (props: any) => (
       width="full"
       height="10"
       change={props.checkEmail}
+      value={props.emailValue}
     />
     <small className="text-red text-left font-nunito">
       {props.emailValue > 0 && !props.isEmailValid
@@ -27,13 +28,15 @@ const Signup = (props: any) => (
       .
     </small>
     <Button
-      color="green"
+      bgColor="green"
       textColor="white"
       width="full"
       height="10"
       value="Continue"
       disabled={props.isEmailValid ? false : true}
       click={props.type === "signup" ? props.submitEmail : props.setupPassword}
+      hoverColor="green opacity-50"
+      textSize="md"
     />
   </form>
 );
