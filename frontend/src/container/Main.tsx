@@ -5,9 +5,8 @@ import Landing from "./Landing";
 import PageNotFound from "../components/PageNotFound";
 import { useAuth } from "../hooks/use-auth";
 
-function Main(props: any) {
+function Main() {
   const auth = useAuth();
-  console.dir(props.history);
 
   return (
     <Switch>

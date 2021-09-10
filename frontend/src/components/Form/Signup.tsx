@@ -35,7 +35,7 @@ const Signup = (props: any) => (
       value="Continue"
       disabled={props.isEmailValid ? false : true}
       click={props.type === "signup" ? props.submitEmail : props.setupPassword}
-      hoverColor="green opacity-50"
+      hoverColor="opacity-75"
       textSize="md"
     />
   </form>

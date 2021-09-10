@@ -15,18 +15,18 @@ const MiddleContent = () => {
     build team spirit—all in one place."
       />
       <div className="flex flex-col items-center justify-center">
-      <Button
-        width="48"
-        height="10"
-        bgColor="transparent"
-        textColor="blue hover:text-white"
-        textSize="md"
-        bordered={true}
-        borderColor="blue"
-        hoverColor="blue"
-        value="Start doing"
-        click={() => history.push("/signup")}
-      />
+        <Button
+          width="48"
+          height="10"
+          bgColor="transparent"
+          textColor="blue hover:text-white"
+          textSize="md"
+          bordered={true}
+          borderColor="blue"
+          hoverColor="blue"
+          value="Start doing"
+          click={() => history.push("/signup")}
+        />
         <img
           alt="preview"
           src="./Landing preview.png"

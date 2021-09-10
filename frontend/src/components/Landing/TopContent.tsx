@@ -2,7 +2,7 @@ import Content from "./Content";
 import InputBox from "../InputBox";
 import Button from "../Button";
 import { useHistory } from "react-router";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 const TopContent = () => {
   const history = useHistory();
@@ -24,20 +24,20 @@ const TopContent = () => {
         marginX="0 md:mx-4"
         marginY="4"
         placeholder="Email"
-        change={(event) => setEmail(event.target.value)}
+        change={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
       />
       <Button
-        width="full md:w-1/5"
+        width="full md:w-2/5 xl:w-1/5"
         height="10"
         marginX="0 md:mx-4"
-        marginY="2"
+        marginY="4"
         bgColor="blue"
+        hoverColor="blue hover:opacity-50"
         textColor="white"
         value="Sign up — it’s free!"
         click={() => {
           history.push("/signup", { email: email });
-        }}
-      />
+        } } textSize="md"      />
     </section>
   );
 };
