@@ -28,7 +28,7 @@ const Auth = (props: any) => {
   const axios = useAxios();
 
   const validateEmail = (email: string | undefined) => {
-    let value = typeof email === undefined ? "" : email;
+    let value = typeof email === "undefined" ? "" : email;
     const regex = /\S+@\S+\.\S+/;
     if (regex.test(value!)) {
       setAccount({ ...account, email: { value: value!, valid: true } });
