@@ -6,7 +6,6 @@ import Footer from "../components/Landing/Footer";
 import Loader from "../components/Loader";
 import Modal from "../components/Modal";
 import { useAuth } from "../hooks/use-auth";
-import useAxios from "../hooks/use-axios";
 
 const Auth = (props: any) => {
   const [account, setAccount] = useState({
@@ -25,7 +24,6 @@ const Auth = (props: any) => {
   const history = useHistory();
   const location = useLocation<{ email?: string | undefined }>();
   const auth = useAuth();
-  const axios = useAxios();
 
   const validateEmail = (email: string | undefined) => {
     let value = typeof email === "undefined" ? "" : email;
@@ -66,7 +64,7 @@ const Auth = (props: any) => {
     if (auth.isPasswordUpdated || auth.isEmailVerified) {
       setAccount({ ...account, modal: true });
     }
-  }, [auth, account]);
+  }, [auth]);
 
   useEffect(() => {
     const getEmailFromRoute = () => {
@@ -86,7 +84,7 @@ const Auth = (props: any) => {
 
   return (
     <div className="w-screen h-screen m-0 p-0 bg-gray-lightest flex justify-center items-center">
-      {axios.loading ? <Loader loading /> : null}
+      {auth.loading ? <Loader loading /> : null}
       {account.modal && auth.isPasswordUpdated ? (
         <Modal
           height="full md:h-1/4"
@@ -95,6 +93,7 @@ const Auth = (props: any) => {
           content={"Please login with your email and new password"}
           buttonValue="Got it"
           buttonClick={() => modalHandler()}
+          dismiss={() => setAccount({ ...account, modal: false })}
         />
       ) : null}
       {account.modal && auth.isEmailVerified ? (
@@ -107,6 +106,7 @@ const Auth = (props: any) => {
           }
           buttonValue="Got it"
           buttonClick={() => modalHandler()}
+          dismiss={() => setAccount({ ...account, modal: false })}
         />
       ) : null}
       <AuthForm
@@ -122,14 +122,14 @@ const Auth = (props: any) => {
         isPwdValid={account.password.valid}
         isEmailValid={account.email.valid}
         isAllValid={account.valid}
-        //  submitEmail={(event: DOMEvent<HTMLInputElement>) =>   auth.requestEmailVerification(event, account.email.value)}
-        // setupPassword={(event: DOMEvent<HTMLInputElement>) =>
-        //   auth.setupPassword(event, {
-        //     email: account.email.value,
-        //     password: account.password.value,
-        //   })
-        // }
-        login={(event: FormEvent<HTMLInputElement>) =>
+        submitEmail={(event: FormEvent<HTMLButtonElement>) =>   auth.requestEmailVerification(event, account.email.value)}
+        setupPassword={(event: FormEvent<HTMLButtonElement>) =>
+          auth.setupPassword(event, {
+            email: account.email.value,
+            password: account.password.value,
+          })
+        }
+        login={(event: FormEvent<HTMLButtonElement>) =>
           auth.basicLogin(event, {
             email: account.email.value,
             password: account.password.value,

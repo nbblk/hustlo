@@ -1,29 +1,31 @@
-import { useState, useContext, createContext, useEffect } from "react";
+import {
+  useState,
+  useContext,
+  createContext,
+  useEffect,
+  FormEvent,
+} from "react";
 import { Redirect, useHistory } from "react-router-dom";
 import { verifyEmail } from "../apis/auth";
 import { loginRequest } from "../components/Form/MsOauthLogin";
-import useAxios from "../hooks/use-axios";
+import axios from "axios";
 
 interface AuthProps {
   loggedIn: boolean;
   isEmailVerified: boolean;
   isPasswordUpdated: boolean;
   errorMsg: string;
-  basicLogin: (event: DOMEvent<HTMLInputElement>, credential: any) => void;
+  loading: boolean;
+  basicLogin: (event: FormEvent<HTMLButtonElement>, credential: any) => void;
   basicLogout: () => JSX.Element;
   requestEmailVerification: (
-    event: DOMEvent<HTMLInputElement>,
+    event: FormEvent<HTMLButtonElement>,
     email: string
-  ) => {};
-  setupPassword: (event: DOMEvent<HTMLInputElement>, credential: any) => {};
+  ) => void;
+  setupPassword: (event: FormEvent<HTMLButtonElement>, credential: any) => void;
   googleLoginSuccess: (response: any) => void;
   googleLoginFailure: (error: any) => void;
   msLoginHandler: (response: any) => void;
-  //  appleLoginHandler: (response: any) => void;
-}
-
-interface DOMEvent<T extends EventTarget> extends Event {
-  readonly target: T;
 }
 
 type credential = {
@@ -38,19 +40,21 @@ const authContext = createContext<AuthProps>({
   isEmailVerified: false,
   isPasswordUpdated: false,
   errorMsg: "",
-  basicLogin: (event: DOMEvent<HTMLInputElement>, credential: credential) =>
+  loading: false,
+  basicLogin: (event: FormEvent<HTMLButtonElement>, credential: credential) =>
     Promise,
   basicLogout: () => <Redirect to="/" />,
   requestEmailVerification: (
-    event: DOMEvent<HTMLInputElement>,
+    event: FormEvent<HTMLButtonElement>,
     email: string
   ) => Promise,
-  setupPassword: (event: DOMEvent<HTMLInputElement>, credential: credential) =>
-    Promise,
+  setupPassword: (
+    event: FormEvent<HTMLButtonElement>,
+    credential: credential
+  ) => Promise,
   googleLoginSuccess: (response: any) => Promise,
   googleLoginFailure: (error: any) => Promise,
   msLoginHandler: (response: any) => Promise,
-  //  appleLoginHandler: (response: any) => Promise,
 });
 
 export function AuthProvider({ children }: any) {
@@ -72,7 +76,6 @@ function useAuthProvider() {
   });
 
   const history = useHistory();
-  const axios = useAxios();
 
   useEffect(() => {
     if (!auth.loggedIn) {
@@ -82,26 +85,19 @@ function useAuthProvider() {
     }
   }, [auth.loggedIn]);
 
-  const basicLogin = (
-    event: DOMEvent<HTMLInputElement>,
+  const basicLogin = async (
+    event: FormEvent<HTMLButtonElement>,
     credential: credential
   ) => {
     event.preventDefault();
-    axios.fetch({
-      method: "POST",
-      url: `${BASEURL}/login`,
-      data: credential,
-    });
-
-    if (!axios.error && axios.response) {
-      sessionStorage.setItem("user", JSON.stringify(axios.response));
+    setAuth({ ...auth, loading: true, errorMsg: "" });
+    try {
+      let response = await axios.post(`${BASEURL}/login`, credential);
+      sessionStorage.setItem("user", JSON.stringify(response.data));
       setAuth({ ...auth, loggedIn: true });
       history.push("/main");
-    }
-
-    if (axios.error) {
-      console.log(axios.error.toString());
-      setAuth({ ...auth, errorMsg: axios.error.toString() });
+    } catch (error: any) {
+      setAuth({ ...auth, errorMsg: error.response.data });
     }
   };
 
@@ -112,44 +108,65 @@ function useAuthProvider() {
   };
 
   const requestEmailVerification = async (
-    event: DOMEvent<HTMLInputElement>,
+    event: FormEvent<HTMLButtonElement>,
     email: string
   ) => {
     event.preventDefault();
     const isVerified = await verifyEmail(email);
     if (isVerified) {
-      await sendConfirmEmail(email).then(() => {
-        setAuth({
-          ...auth,
-          isEmailVerified: true,
-        });
+      await sendConfirmEmail(email);
+    } else {
+      setAuth({
+        ...auth,
+        isEmailVerified: false,
+        errorMsg: "Please enter a valid email.",
       });
     }
   };
 
   const sendConfirmEmail = async (email: string) => {
-    axios.fetch({
-      method: "POST",
-      url: `${BASEURL}/confirm-email`,
-      data: { email: email },
-    });
+    setAuth({ ...auth, loading: true, errorMsg: "" });
+    try {
+      await axios.request({
+        method: "POST",
+        url: `${BASEURL}/confirm-email`,
+        data: { email: email },
+      });
+      setAuth({
+        ...auth,
+        isEmailVerified: true,
+        loading: false,
+      });
+    } catch (error: any) {
+      setAuth({
+        ...auth,
+        isEmailVerified: false,
+        errorMsg: error.response.data,
+      });
+    }
   };
 
   const setupPassword = async (
-    event: DOMEvent<HTMLInputElement>,
+    event: FormEvent<HTMLButtonElement>,
     credential: credential
   ) => {
     event.preventDefault();
-    axios.fetch({
-      method: "POST",
-      url: `${BASEURL}/complete-signup`,
-      data: { email: credential.email, password: credential.password },
-    });
-
-    if (axios.response) {
+    setAuth({ ...auth, loading: true, errorMsg: "" });
+    try {
+      axios.request({
+        method: "POST",
+        url: `${BASEURL}/complete-signup`,
+        data: { email: credential.email, password: credential.password },
+      });
       setAuth({
         ...auth,
         isPasswordUpdated: true,
+      });
+    } catch (error: any) {
+      setAuth({
+        ...auth,
+        isPasswordUpdated: false,
+        errorMsg: error.response.data,
       });
     }
   };
@@ -159,46 +176,34 @@ function useAuthProvider() {
     setAuth({ ...auth, loggedIn: false });
   };
 
-  const googleLoginSuccess = (response: any) => {
-    console.log(response);
-    axios.fetch({
-      method: "POST",
-      url: `${BASEURL}/oauth`,
-      data: {
-        type: "google",
-        id_token: response.tokenId,
-      },
-    });
-
-    if (!axios.error && axios.response) {
-      sessionStorage.setItem("user", JSON.stringify(axios.response));
-      setAuth({ ...auth, loggedIn: true });
+  const googleLoginSuccess = async (response: any) => {
+    setAuth({ ...auth, loading: true, errorMsg: "" });
+    try {
+      let userInfo = await axios.request({
+        method: "POST",
+        url: `${BASEURL}/oauth`,
+        data: {
+          type: "google",
+          id_token: response.tokenId,
+        },
+      });
+      sessionStorage.setItem("user", JSON.stringify(userInfo.data));
+      setAuth({ ...auth, loggedIn: true, loading: false });
       history.push("/main");
-    }
-
-    if (axios.error) {
-      // from api server
-      console.error(axios.error);
-      setAuth({ ...auth, errorMsg: axios.error.toString() });
+    } catch (error: any) {
+      setAuth({ ...auth, errorMsg: error.repsonse.data });
     }
   };
 
   const googleLoginFailure = (error: any) => {
-    console.error(error);
     setAuth({ ...auth, errorMsg: error.message });
   };
 
   const msLoginHandler = async (instance: any) => {
-    let response;
+    setAuth({ ...auth, loading: true, errorMsg: "" });
     try {
-      response = await instance.loginPopup(loginRequest);
-    } catch (error: any) {
-      console.error(error);
-      setAuth({ ...auth, errorMsg: error.message });
-    }
-
-    if (response) {
-      axios.fetch({
+      let response = await instance.loginPopup(loginRequest);
+      let userInfo = await axios.request({
         method: "POST",
         url: `${BASEURL}/oauth`,
         data: {
@@ -207,49 +212,14 @@ function useAuthProvider() {
           email: response.account.username,
         },
       });
-
-      if (!axios.error && axios.response) {
-        sessionStorage.setItem("user", JSON.stringify(axios.response));
-        setAuth({ ...auth, loggedIn: true });
-        history.push("/main");
-      }
-
-      if (axios.error) {
-        console.error(axios.error);
-        setAuth({ ...auth, errorMsg: axios.error.toString() });
-      }
+      sessionStorage.setItem("user", JSON.stringify(userInfo.data));
+      setAuth({ ...auth, loggedIn: true, loading: false });
+      history.push("/main");
+    } catch (error: any) {
+      console.error(error);
+      setAuth({ ...auth, errorMsg: error.response.data });
     }
   };
-
-  // const appleLoginHandler = async (response: any) => {
-  //   if (!response.authorization) {
-  //     setAuth({
-  //       ...auth,
-  //       errorMsg: "Something went wrong. Try another account.",
-  //     });
-  //   }
-
-  //   await axios.fetch({
-  //     method: "POST",
-  //     url: `${BASEURL}/oauth`,
-  //     data: {
-  //       type: "apple",
-  //       id_token: response.authorization.id_token,
-  //       email: response.user.email, // email is only provided just once
-  //     },
-  //   });
-
-  //   if (!axios.error && axios.response) {
-  //     sessionStorage.setItem("user", JSON.stringify(axios.response));
-  //     setAuth({ ...auth, loggedIn: true });
-  //     history.push("/main");
-  //   }
-
-  //   if (axios.error) {
-  //     console.error(axios.error);
-  //     setAuth({ ...auth, errorMsg: axios.error.toString() });
-  //   }
-  // };
 
   return {
     ...auth,
@@ -261,6 +231,5 @@ function useAuthProvider() {
     googleLoginSuccess,
     googleLoginFailure,
     msLoginHandler,
-    //    appleLoginHandler,
   };
 }
