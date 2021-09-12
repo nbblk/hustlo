@@ -1,16 +1,13 @@
-import { useAuth } from "../../hooks/use-auth";
-
 const UserProfile = () => {
-  const auth = useAuth(); // add username and email address to states
+  const userProfile = JSON.parse(sessionStorage.getItem("user")!);
 
   return (
     <li className="m-2 flex justify-center items-center">
       <div className="w-12 h-12 m-4 flex justify-center items-center rounded-full bg-green">
-        <span>BS</span>
+        <span>{userProfile.firstLetter}</span>
       </div>
       <div className="flex flex-col justify-start">
-        <h3>username</h3>
-        <small>email address</small>
+        <h3>{userProfile.email}</h3>
       </div>
     </li>
   );

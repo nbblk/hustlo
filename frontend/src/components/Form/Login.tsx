@@ -32,8 +32,10 @@ const Login = (props: any) => (
         : null}
     </small>
     <Button
-      color="green"
+      bgColor="green"
       textColor="white"
+      hoverColor="green hover:opacity-25"
+      textSize="md"
       width="full"
       marginY="2"
       height="10"

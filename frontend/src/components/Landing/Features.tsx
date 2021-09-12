@@ -1,22 +1,33 @@
-import React, { useState } from "react";
+import { MouseEvent, useState } from "react";
 import Content from "./Content";
 import SlideDown from "../SlideDown";
 
-interface slideMenus {
+type SlideIndexes = {
   first: boolean;
   second: boolean;
+};
+
+type FeatureProps = {
+  smallTitle?: string,
+  title: string,
+  body: string,
+  slideDown: boolean,
+  slideDownId?: string,
+  slideDownTitle?: string,
+  slideDownBody?: string,
+  slideDownBullets?: string[]
 }
 
 const Features = () => {
   const [expand, isExpanded] = useState({ first: false, second: false });
 
-  const slideDown = (event: any) => {
-    const target: string = event.currentTarget.dataset.id;
-    const value = expand[target as keyof slideMenus];
+  const slideDown = (event: MouseEvent<HTMLElement>) => {
+    const target: string = event.currentTarget.dataset.id!;
+    const value = expand[target as keyof SlideIndexes];
     isExpanded({ ...expand, [target]: !value });
   };
 
-  const features = [
+  const features: FeatureProps[] = [
     {
       smallTitle: "",
       title: "Features to help your team succeed",
@@ -24,11 +35,11 @@ const Features = () => {
         snacks). From meetings and projects to events and goal setting, Hustlo’s
         intuitive features give any team the ability to quickly set up and
         customize workflows for just about anything.`,
+      slideDown: false,
       slideDownId: "",
       slideDownTitle: "",
       slideDownBody: "",
       slideDownBullets: [],
-      slideDown: null,
     },
     {
       smallTitle: "Choose a view",
@@ -36,6 +47,7 @@ const Features = () => {
       body: `Lists and cards are the building blocks of organizing work on a Hustlo
       board. Grow from there with task assignments, timelines, productivity
       metrics, calendars, and more.`,
+      slideDown: true,
       slideDownId: "first",
       slideDownBody:
         "You can start up a Hustlo board in seconds. With the ability to view board data from many different angles, the entire project stays up-to-date in the way that suits it",
@@ -52,6 +64,7 @@ const Features = () => {
       part of your task can be managed, tracked, and shared with teammates.
       Open any card to uncover an ecosystem of checklists, due dates,
       attachments, conversations, and more.`,
+      slideDown: true,
       slideDownId: "second",
       slideDownBody: `Spin up a Hustlo card with a click, then uncover everything it can
       hold. Break down bigger card tasks into steps with file attachment
@@ -67,6 +80,24 @@ const Features = () => {
     },
   ];
 
+  const getChildren = (feature: FeatureProps) => {
+    let children;
+    if (feature.slideDown) {
+      children = (
+        <SlideDown
+          id={feature.slideDownId}
+          click={(event: MouseEvent<HTMLElement>) => slideDown(event)}
+          isExpanded={expand[feature.slideDownId as keyof SlideIndexes]}
+          body={feature.slideDownBody}
+          bullets={feature.slideDownBullets}
+        />
+      );
+    } else {
+      children = null;
+    }
+    return children;
+  };
+
   return (
     <section className="flex flex-col justify-center items-center">
       {features.map((feature, index) => (
@@ -75,15 +106,7 @@ const Features = () => {
           smallTitle={feature.smallTitle ? feature.smallTitle : ""}
           title={feature.title}
           body={feature.body}
-          children={
-            <SlideDown
-              id={feature.slideDownId}
-              click={(event: any) => slideDown(event)}
-              isExpanded={expand[feature.slideDownId as keyof slideMenus]}
-              body={feature.slideDownBody}
-              bullets={feature.slideDownBullets}
-            />
-          }
+          children={getChildren(feature)}
         />
       ))}
     </section>

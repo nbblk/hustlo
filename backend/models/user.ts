@@ -11,6 +11,7 @@ export interface User {
 
 // 2. Create a Schema corresponding to the document interface.
 const schema = new Schema<User>({
+  oauth: { type: String, required: false },
   email: { type: String, required: true },
   isVerified: { type: Boolean, required: true },
   hash: { type: String, required: false },

@@ -1,4 +1,4 @@
-import { ChangeEvent, ChangeEventHandler } from "react";
+import { ChangeEvent } from "react";
 
 type InputBoxProps = {
   type: string;
@@ -7,18 +7,25 @@ type InputBoxProps = {
   marginX?: string;
   marginY?: string;
   placeholder: string;
-  style?: string;
+  display?: string;
   change: (event: ChangeEvent<HTMLInputElement>) => void;
+  value?: string;
 };
 
 const InputBox = (props: InputBoxProps) => {
-  const style = `border border-gray-lightest h-${props.height} w-${props.width} mx-${props.marginX} my-${props.marginY} p-2 rounded font-xs ${props.style}`;
+  const style = `${props.display!} border border-gray-lightest h-${
+    props.height
+  } w-${props.width} mx-${props.marginX} my-${
+    props.marginY
+  } p-2 rounded font-xs`;
   return (
     <input
       type={props.type}
+      autoComplete={props.type === "password" ? "current-password" : ""}
       className={style}
       placeholder={props.placeholder}
       onChange={props.change}
+      defaultValue={props.value}
     />
   );
 };

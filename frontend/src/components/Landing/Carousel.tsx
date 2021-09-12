@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowCircleLeft,
@@ -71,22 +71,26 @@ const Carousel = () => {
   };
 
   return (
-    <section className="w-full h-full p-4 flex-col justify-center items-center bg-blue-light font-nunito">
+    <section className="w-full h-full p-4 flex flex-col justify-center items-center bg-blue-light font-nunito">
       {testimonials.map((testimonial, index) => {
         const visibility =
           index + 1 === state.activeIndex ? "active" : "inactive";
         const style = `relative flex flex-col justify-center items-center text-center transition-all ${visibility}`;
         return (
           <div key={index} className={style}>
-            <div className="flex justify-center align-center m-20">
+            <div className="flex justify-center items-center m-20">
               <img alt="logo" src={testimonial.logoUrl} className="w-60" />
             </div>
             <h5 className="uppercase">industry</h5>
             <h3>{testimonial.industry}</h3>
             <FontAwesomeIcon icon={faQuoteLeft} className="absolute left-0" />
-            <blockquote className="text-lg m-8">{testimonial.quote}</blockquote>
-            <h5 className="uppercase">{testimonial.name}</h5>
-            <h3 className="">{testimonial.company}</h3>
+            <div className="flex flex-col justify-center items-center">
+              <blockquote className="text-lg m-8 w-full md:w-2/3">
+                {testimonial.quote}
+              </blockquote>
+              <h5 className="uppercase">{testimonial.name}</h5>
+              <h3 className="">{testimonial.company}</h3>
+            </div>
           </div>
         );
       })}

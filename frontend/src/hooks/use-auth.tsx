@@ -1,32 +1,33 @@
-import { useState, useContext, createContext } from "react";
-import axios from "axios";
-import { Redirect, Route, useHistory } from "react-router-dom";
+import {
+  useState,
+  useContext,
+  createContext,
+  useEffect,
+  FormEvent,
+} from "react";
+import { Redirect, useHistory } from "react-router-dom";
 import { verifyEmail } from "../apis/auth";
 import { loginRequest } from "../components/Form/MsOauthLogin";
+import axios from "axios";
 
 interface AuthProps {
   loggedIn: boolean;
-  loggedOut: boolean;
   isEmailVerified: boolean;
   isPasswordUpdated: boolean;
-  error: boolean;
+  isRecoveryEmailSent: boolean,
   errorMsg: string;
   loading: boolean;
-  basicLogin: (event: DOMEvent<HTMLInputElement>, credential: any) => void;
-  logout: () => void;
+  basicLogin: (event: FormEvent<HTMLButtonElement>, credential: credential) => void;
+  basicLogout: () => JSX.Element;
   requestEmailVerification: (
-    event: DOMEvent<HTMLInputElement>,
+    event: FormEvent<HTMLButtonElement>,
     email: string
-  ) => {};
-  setupPassword: (event: DOMEvent<HTMLInputElement>, credential: any) => {};
+  ) => void;
+  setupPassword: (event: FormEvent<HTMLButtonElement>, credential: credential) => void;
+  sendRecoveryEmail: (event: FormEvent<HTMLButtonElement>, email: string) => void;
   googleLoginSuccess: (response: any) => void;
   googleLoginFailure: (error: any) => void;
   msLoginHandler: (response: any) => void;
-  appleLoginHandler: (response: any) => void;
-}
-
-interface DOMEvent<T extends EventTarget> extends Event {
-  readonly target: T;
 }
 
 type credential = {
@@ -38,25 +39,26 @@ const BASEURL = process.env.REACT_APP_BASEURL;
 
 const authContext = createContext<AuthProps>({
   loggedIn: false,
-  loggedOut: false,
   isEmailVerified: false,
   isPasswordUpdated: false,
-  error: false,
+  isRecoveryEmailSent: false,
   errorMsg: "",
   loading: false,
-  basicLogin: (event: DOMEvent<HTMLInputElement>, credential: credential) =>
+  basicLogin: (event: FormEvent<HTMLButtonElement>, credential: credential) =>
     Promise,
-  logout: () => {},
+  basicLogout: () => <Redirect to="/" />,
   requestEmailVerification: (
-    event: DOMEvent<HTMLInputElement>,
+    event: FormEvent<HTMLButtonElement>,
     email: string
   ) => Promise,
-  setupPassword: (event: DOMEvent<HTMLInputElement>, credential: credential) =>
-    Promise,
+  setupPassword: (
+    event: FormEvent<HTMLButtonElement>,
+    credential: credential
+  ) => Promise,
+  sendRecoveryEmail: (event: FormEvent<HTMLButtonElement>, email: string) => Promise,
   googleLoginSuccess: (response: any) => Promise,
   googleLoginFailure: (error: any) => Promise,
   msLoginHandler: (response: any) => Promise,
-  appleLoginHandler: (response: any) => Promise,
 });
 
 export function AuthProvider({ children }: any) {
@@ -69,195 +71,199 @@ export const useAuth = () => {
 };
 
 function useAuthProvider() {
-  const [user, setUser] = useState({
+  const [auth, setAuth] = useState({
     loggedIn: false,
-    loggedOut: false,
     isEmailVerified: false,
     isPasswordUpdated: false,
-    error: false,
-    errorMsg: "",
+    isRecoveryEmailSent: false,
     loading: false,
+    errorMsg: "",
   });
 
   const history = useHistory();
 
-  const basicLogin = (
-    event: DOMEvent<HTMLInputElement>,
+  useEffect(() => {
+    if (!auth.loggedIn) {
+      if (sessionStorage.getItem("user")) {
+        setAuth({ ...auth, loggedIn: true });
+      }
+    }
+  }, [auth.loggedIn]);
+
+  const basicLogin = async (
+    event: FormEvent<HTMLButtonElement>,
     credential: credential
   ) => {
     event.preventDefault();
-    setUser({ ...user, loading: true });
-    axios
-      .post(`${BASEURL}/login`, credential)
-      .then(() => {
-        setUser({ ...user, loggedIn: true });
-        history.push("/main");
-      })
-      .catch((error: any) => {
-        if (error.response.data) {
-          setUser({
-            ...user!,
-            error: true,
-            errorMsg: error.response.data,
-          });
-        } else {
-          setUser({
-            ...user!,
-            error: true,
-            errorMsg: error.statusText,
-          });
-        }
-      });
+    setAuth({ ...auth, loading: true, errorMsg: "" });
+    try {
+      let response = await axios.post(`${BASEURL}/login`, credential);
+      sessionStorage.setItem("user", JSON.stringify(response.data));
+      setAuth({ ...auth, loggedIn: true });
+      history.push("/main");
+    } catch (error: any) {
+      setAuth({ ...auth, errorMsg: error.response.data });
+    }
+  };
+
+  const basicLogout = () => {
+    sessionStorage.removeItem("user");
+    setAuth({ ...auth, loggedIn: false });
+    return <Redirect to="/" />;
   };
 
   const requestEmailVerification = async (
-    event: DOMEvent<HTMLInputElement>,
+    event: FormEvent<HTMLButtonElement>,
     email: string
   ) => {
     event.preventDefault();
-    setUser({
-      ...user,
-      loading: true,
-    });
     const isVerified = await verifyEmail(email);
     if (isVerified) {
-      await sendConfirmEmail(email)
-        .then(() => {
-          setUser({
-            ...user,
-            isEmailVerified: true,
-            loading: false,
-          });
-        })
-        .catch((error) => {
-          setUser({
-            ...user,
-            loading: false,
-            error: true,
-            errorMsg: error.message,
-          });
-        });
+      await sendConfirmEmail(email);
+    } else {
+      setAuth({
+        ...auth,
+        isEmailVerified: false,
+        errorMsg: "Please enter a valid email.",
+      });
     }
   };
 
   const sendConfirmEmail = async (email: string) => {
-    await axios
-      .post(`${BASEURL}/confirm-email`, { email: email })
-      .catch((reason: any) => {
-        throw Error(reason.response.data);
+    setAuth({ ...auth, loading: true, errorMsg: "" });
+    try {
+      await axios.request({
+        method: "POST",
+        url: `${BASEURL}/confirm-email`,
+        data: { email: email },
       });
+      setAuth({
+        ...auth,
+        isEmailVerified: true,
+        loading: false,
+      });
+    } catch (error: any) {
+      setAuth({
+        ...auth,
+        isEmailVerified: false,
+        errorMsg: error.response.data,
+      });
+    }
   };
 
   const setupPassword = async (
-    event: DOMEvent<HTMLInputElement>,
+    event: FormEvent<HTMLButtonElement>,
     credential: credential
   ) => {
     event.preventDefault();
-    setUser({ ...user, loading: true });
-    await axios
-      .post(`${BASEURL}/complete-signup`, {
-        email: credential.email,
-        password: credential.password,
-      })
-      .then(() => {
-        setUser({
-          ...user,
-          isPasswordUpdated: true,
-        });
-      })
-      .catch((error: any) => {
-        setUser({
-          ...user,
-          loading: false,
-          error: true,
-          errorMsg: error.response.data,
-        });
+    setAuth({ ...auth, loading: true, errorMsg: "" });
+    try {
+      axios.request({
+        method: "POST",
+        url: `${BASEURL}/complete-signup`,
+        data: { email: credential.email, password: credential.password },
       });
+      setAuth({
+        ...auth,
+        isPasswordUpdated: true,
+      });
+    } catch (error: any) {
+      setAuth({
+        ...auth,
+        isPasswordUpdated: false,
+        errorMsg: error.response.data,
+      });
+    }
+  };
+
+  const sendRecoveryEmail = async  (
+    event: FormEvent<HTMLButtonElement>,
+    email: string
+  ) => {
+    event.preventDefault();
+    setAuth({ ...auth, loading: true, errorMsg: "" });
+    try {
+      await axios.request({
+        method: "POST",
+        url: `${BASEURL}/recovery-email`,
+        data: { email: email }
+      });
+      setAuth({
+        ...auth,
+        isRecoveryEmailSent: true,
+        loading: false
+      });
+    } catch (error: any) {
+      console.error(error);
+      setAuth({
+        ...auth,
+        isRecoveryEmailSent: false,
+        errorMsg: error.response.data,
+        loading: false
+      });
+    }
   };
 
   const logout = () => {
-    axios
-      .get(`${process.env.REACT_APP_BASEURL}/logout`)
-      .then(() => setUser({ ...user, loggedIn: false, loggedOut: true }))
-      .catch((error) => {
-        console.error(error);
-      });
+    sessionStorage.removeItem("user");
+    setAuth({ ...auth, loggedIn: false });
   };
 
-  const googleLoginSuccess = (response: any) => {
-    console.log(response);
-    axios
-      .post(`${process.env.REACT_APP_BASEURL}/oauth`, {
-        type: "google",
-        id_token: response.tokenId,
-      })
-      .then(() => {
-        setUser({ ...user, loggedIn: true });
-        history.push("/main", { loggedIn: true });
-      })
-      .catch((error) => {
-        console.error(error);
-        setUser({ ...user, error: true, errorMsg: error.message });
+  const googleLoginSuccess = async (response: any) => {
+    setAuth({ ...auth, loading: true, errorMsg: "" });
+    try {
+      let userInfo = await axios.request({
+        method: "POST",
+        url: `${BASEURL}/oauth`,
+        data: {
+          type: "google",
+          id_token: response.tokenId,
+        },
       });
+      sessionStorage.setItem("user", JSON.stringify(userInfo.data));
+      setAuth({ ...auth, loggedIn: true, loading: false });
+      history.push("/main");
+    } catch (error: any) {
+      setAuth({ ...auth, errorMsg: error.repsonse.data });
+    }
   };
 
   const googleLoginFailure = (error: any) => {
-    console.error(error);
-    setUser({ ...user, error: true, errorMsg: error.message });
+    setAuth({ ...auth, errorMsg: error.message });
   };
 
-  const msLoginHandler = (instance: any) => {
-    instance
-      .loginPopup(loginRequest)
-      .then((response: any) => {
-        axios.post(`${process.env.REACT_APP_BASEURL}/oauth`, {
+  const msLoginHandler = async (instance: any) => {
+    setAuth({ ...auth, loading: true, errorMsg: "" });
+    try {
+      let response = await instance.loginPopup(loginRequest);
+      let userInfo = await axios.request({
+        method: "POST",
+        url: `${BASEURL}/oauth`,
+        data: {
           type: "ms",
           id_token: response.idToken,
           email: response.account.username,
-        });
-        setUser({ ...user, loggedIn: true });
-        history.push("/main", { loggedIn: true });
-      })
-      .catch((error: any) => {
-        console.error(error);
-        setUser({ ...user, error: true, errorMsg: error.message });
+        },
       });
-  };
-
-  const appleLoginHandler = (response: any) => {
-    console.log(response);
-    try {
-      axios.post(`${process.env.REACT_APP_BASEURL}/oauth`, {
-        type: "apple",
-        id_token: response.id_token,
-      });
-      setUser({ ...user, loggedIn: true });
-      history.push("/main", { loggedIn: true });
-    } catch (error) {
+      sessionStorage.setItem("user", JSON.stringify(userInfo.data));
+      setAuth({ ...auth, loggedIn: true, loading: false });
+      history.push("/main");
+    } catch (error: any) {
       console.error(error);
-      setUser({ ...user, error: true, errorMsg: error.message });
+      setAuth({ ...auth, errorMsg: error.response.data });
     }
   };
 
   return {
-    ...user,
+    ...auth,
     basicLogin,
+    basicLogout,
     requestEmailVerification,
     setupPassword,
+    sendRecoveryEmail,
     logout,
     googleLoginSuccess,
     googleLoginFailure,
     msLoginHandler,
-    appleLoginHandler,
   };
-}
-
-export function PrivateRoute({ children, ...rest }: any) {
-  let auth = useAuth();
-  return (
-    <Route
-      {...rest}
-      render={() => (auth.loggedIn ? children : <Redirect to="/login" />)}
-    />
-  );
 }
