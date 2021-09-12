@@ -1,68 +1,94 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BoardList from "../components/Board/BoardList";
 import MainNavbar from "../components/Board/MainNavbar";
 import Header from "../components/Header/Header";
-import CreateWorkspace, {
-  WorkspaceFormProps,
-} from "../components/Modal/CreateWorkspace";
-import Modal from "../components/Modal/Modal";
 import Loader from "../components/Loader";
+import { WorkspaceFormProps } from "../components/Modal/CreateWorkspace";
+import CreateWorkspaceModal from "../components/Modal/CreateWorkspace";
 
 function Board() {
   const [board, setBoard] = useState({
     isCreateNewWorkspace: false,
-    loader: false,
-    error: false,
+    loading: false,
+    modal: false,
     errorMsg: "",
+    boards: [],
   });
 
-  const createWorkspaceModal = (
-    <Modal width="1/3" height="1/2" title="Create workspace">
-      <CreateWorkspace
-        submitWorkspaceForm={(
-          event: React.FormEvent<HTMLFormElement>,
-          form: WorkspaceFormProps
-        ) => submitWorkspaceForm(event, form)}
-      />
-    </Modal>
-  );
-
-  const createWorkspaceClicked = () => {
-    setBoard({ ...board, isCreateNewWorkspace: !board.isCreateNewWorkspace });
+  const dismissModal = () => {
+    setBoard({ ...board, modal: false });
   };
 
-  const submitWorkspaceForm = (
-    event: React.FormEvent<HTMLFormElement>,
+  const createWorkspaceClicked = () => {
+    setBoard({ ...board, modal: true, isCreateNewWorkspace: true });
+  };
+
+  const submitWorkspaceForm = async (
+    event: React.FormEvent<HTMLButtonElement>,
     form: WorkspaceFormProps
   ) => {
     event.preventDefault();
-    setBoard({ ...board, loader: true });
-    const uri = `${process.env.REACT_APP_BASEURL}/workspace`;
-    axios
-      .post(
-        uri,
-        { name: form.name, description: form.description },
-        { withCredentials: true }
-      )
-      .then(() => {
-        setBoard({ ...board, isCreateNewWorkspace: false, loader: false });
-      })
-      .catch((error: Error) => {
-        setBoard({
-          ...board,
-          loader: false,
-          error: false,
-          errorMsg: error.message,
-        });
-        console.error(error);
+    let token = JSON.parse(sessionStorage.getItem("user")!).token; // !
+    setBoard({ ...board, loading: true });
+
+    try {
+      await axios.request({
+        method: "POST",
+        url: `${process.env.REACT_APP_BASEURL}/workspace`,
+        data: { name: form.name, description: form.description },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+      setBoard({
+        ...board,
+        loading: false,
+        modal: false,
+        isCreateNewWorkspace: false,
+      });
+    } catch (error: any) {
+      console.error(error);
+      setBoard({
+        ...board,
+        loading: false,
+        errorMsg: error.message,
+      });
+    }
   };
+
+  useEffect(() => {
+    async function getBoards() {
+      let token = JSON.parse(sessionStorage.getItem("user")!).token; // !
+      setBoard({ ...board, loading: true })
+      try {
+        const boards = await axios.request({
+          method: "GET",
+          url: `${process.env.REACT_APP_BASEURL}/workspace`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setBoard({ ...board, boards: boards.data, loading: false })
+      } catch (error: any) {
+        setBoard({ ...board, errorMsg: error.message, loading: false })        
+      }
+    }
+    getBoards();
+  }, []);
 
   return (
     <div>
-      {board.loader ? <Loader loading /> : null}
-      {board.isCreateNewWorkspace ? createWorkspaceModal : null}
+      {board.loading ? <Loader loading /> : null}
+      {board.modal && board.isCreateNewWorkspace ? (
+        <CreateWorkspaceModal
+          dismiss={() => dismissModal()}
+          submit={(
+            event: React.FormEvent<HTMLButtonElement>,
+            props: WorkspaceFormProps
+          ) => submitWorkspaceForm(event, props)}
+        />
+      ) : null}
       <Header
         bgColor="blue"
         isShadowed={false}

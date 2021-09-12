@@ -1,4 +1,4 @@
-import { ChangeEvent, ChangeEventHandler, EventHandler, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import {
   faBell,
   faHamburger,
@@ -13,13 +13,14 @@ import CreateMenu from "../ContextPopup/CreateMenu";
 import NotificationMenu from "../ContextPopup/NotificationMenu";
 import HamburgerMenu from "../ContextPopup/HamburgerMenu";
 
-const LoggedInHeaderContent = () => {
+const LoggedInHeaderContent = (props: any) => {
   const [header, setHeader] = useState({
     boardSearchKeyword: "",
     isHamburgerPopupActive: false,
     isCreatePopupActive: false,
     isNotificationPopupActive: false,
     isProfilePopupActive: false,
+    //    isCreateNewWorkspace: false,
   });
 
   const boardSearchHandler = (event: ChangeEvent<HTMLInputElement>) => {
@@ -66,6 +67,17 @@ const LoggedInHeaderContent = () => {
       isProfilePopupActive: !header.isProfilePopupActive,
     });
   };
+
+  // const createNewWorkspace = () => {
+  //   setHeader({
+  //     ...header,
+  //     isHamburgerPopupActive: false,
+  //     isCreatePopupActive: false,
+  //     isNotificationPopupActive: false,
+  //     isProfilePopupActive: false,
+  //     //      isCreateNewWorkspace: !header.isCreateNewWorkspace,
+  //   });
+  //};
 
   return (
     <>
@@ -118,7 +130,7 @@ const LoggedInHeaderContent = () => {
           marginX="2"
           marginY="2"
           placeholder="Jump to..."
-          style="hidden md:block"
+          display="hidden md:block"
           change={() => {
             console.log("searchbox");
           }}
@@ -162,7 +174,7 @@ const LoggedInHeaderContent = () => {
           isCircle={true}
           textColor="white"
           fontSize="xs"
-          value="BS"
+          value={JSON.parse(sessionStorage.getItem("user")!).firstLetter}
           click={() => profileContextPopup()}
         />
         <div
@@ -172,6 +184,7 @@ const LoggedInHeaderContent = () => {
         >
           <CreateMenu
             click={() => setHeader({ ...header, isCreatePopupActive: false })}
+            createWorkspaceClicked={props.createWorkspaceClicked}
           />
         </div>
         <div
