@@ -12,11 +12,11 @@ export const verifyEmail = async (email: string) => {
   const isVerified = await verifalia.emailValidations
     .submit(email, true)
     .catch((reason) => {
-      console.error(reason.message, reason.repsonse.data);
+      console.error(reason.message, reason.repsonse);
     });
-  const result = isVerified!.entries[0];
+  const result = isVerified?.entries[0];
 
-  return result.status === "Success" && result.classification === "Deliverable"
+  return result?.status === "Success" && result.classification === "Deliverable"
     ? true
     : false;
 };

@@ -14,15 +14,17 @@ interface AuthProps {
   loggedIn: boolean;
   isEmailVerified: boolean;
   isPasswordUpdated: boolean;
+  isRecoveryEmailSent: boolean,
   errorMsg: string;
   loading: boolean;
-  basicLogin: (event: FormEvent<HTMLButtonElement>, credential: any) => void;
+  basicLogin: (event: FormEvent<HTMLButtonElement>, credential: credential) => void;
   basicLogout: () => JSX.Element;
   requestEmailVerification: (
     event: FormEvent<HTMLButtonElement>,
     email: string
   ) => void;
-  setupPassword: (event: FormEvent<HTMLButtonElement>, credential: any) => void;
+  setupPassword: (event: FormEvent<HTMLButtonElement>, credential: credential) => void;
+  sendRecoveryEmail: (event: FormEvent<HTMLButtonElement>, email: string) => void;
   googleLoginSuccess: (response: any) => void;
   googleLoginFailure: (error: any) => void;
   msLoginHandler: (response: any) => void;
@@ -39,6 +41,7 @@ const authContext = createContext<AuthProps>({
   loggedIn: false,
   isEmailVerified: false,
   isPasswordUpdated: false,
+  isRecoveryEmailSent: false,
   errorMsg: "",
   loading: false,
   basicLogin: (event: FormEvent<HTMLButtonElement>, credential: credential) =>
@@ -52,6 +55,7 @@ const authContext = createContext<AuthProps>({
     event: FormEvent<HTMLButtonElement>,
     credential: credential
   ) => Promise,
+  sendRecoveryEmail: (event: FormEvent<HTMLButtonElement>, email: string) => Promise,
   googleLoginSuccess: (response: any) => Promise,
   googleLoginFailure: (error: any) => Promise,
   msLoginHandler: (response: any) => Promise,
@@ -71,6 +75,7 @@ function useAuthProvider() {
     loggedIn: false,
     isEmailVerified: false,
     isPasswordUpdated: false,
+    isRecoveryEmailSent: false,
     loading: false,
     errorMsg: "",
   });
@@ -171,6 +176,34 @@ function useAuthProvider() {
     }
   };
 
+  const sendRecoveryEmail = async  (
+    event: FormEvent<HTMLButtonElement>,
+    email: string
+  ) => {
+    event.preventDefault();
+    setAuth({ ...auth, loading: true, errorMsg: "" });
+    try {
+      await axios.request({
+        method: "POST",
+        url: `${BASEURL}/recovery-email`,
+        data: { email: email }
+      });
+      setAuth({
+        ...auth,
+        isRecoveryEmailSent: true,
+        loading: false
+      });
+    } catch (error: any) {
+      console.error(error);
+      setAuth({
+        ...auth,
+        isRecoveryEmailSent: false,
+        errorMsg: error.response.data,
+        loading: false
+      });
+    }
+  };
+
   const logout = () => {
     sessionStorage.removeItem("user");
     setAuth({ ...auth, loggedIn: false });
@@ -227,6 +260,7 @@ function useAuthProvider() {
     basicLogout,
     requestEmailVerification,
     setupPassword,
+    sendRecoveryEmail,
     logout,
     googleLoginSuccess,
     googleLoginFailure,

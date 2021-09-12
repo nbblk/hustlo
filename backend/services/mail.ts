@@ -1,12 +1,18 @@
 const sgMail = require("@sendgrid/mail");
 
-export const send = async (email: string, hash: string) => {
-  const content = {
+export type template = {
+  title: string,
+  text: string,
+  html: string
+};
+
+export const send = async (email: string, content: template) => {
+  const mail = {
     to: email, // Change to your recipient
     from: process.env.HOST_EMAIL, // Change to your verified sender
-    subject: "Welcome Hustlo",
-    text: "Finish the signup process",
-    html: `<h1>Almost done😉</h1><p>Please click the <a clicktracking="off" href="${process.env.SERVER_ORIGIN}/confirm-email?h=${hash}">link</a> to finish the signup process</p>`,
+    subject: content.title,
+    text: content.text,
+    html: content.html,
     tracking_settings: {
       click_tracking: { enable: false },
       open_tracking: { enable: false },
@@ -14,7 +20,7 @@ export const send = async (email: string, hash: string) => {
   };
 
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  await sgMail.send(content).catch((error: any) => {
+  await sgMail.send(mail).catch((error: any) => {
     throw Error(error);
   });
 };

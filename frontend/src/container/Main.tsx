@@ -26,6 +26,12 @@ function Main() {
         {auth.loggedIn ? <Board /> : <Redirect to="/login" />}
       </Route>
       <Route path="/logout">{() => auth.basicLogout()}</Route>
+      <Route path="/forgot">
+        <Auth type="forgot" />
+      </Route>
+      <Route path="/reset-password">
+        <Auth type="password" />
+      </Route>
       <Route path="/page-not-found">
         <PageNotFound />
       </Route>

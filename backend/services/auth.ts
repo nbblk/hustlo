@@ -8,6 +8,7 @@ import { verifyTokenByPlatform } from "./oauth";
 // Store a user data to database
 const createUser = async (email: string): Promise<User> => {
   const newUser = new UserModel({
+    oauth: null,
     email: email,
     isVerified: false,
     hash: generateHashcode(),
@@ -15,7 +16,7 @@ const createUser = async (email: string): Promise<User> => {
   });
 
   // Check if the email already exists.
-  const found = await UserModel.findOne({ email: email });
+  const found = await UserModel.findOne({ oauth: null, email: email });
   if (!found) {
     return newUser.save().catch((error: Error) => {
       throw Error("Failed to create a user: " + error.message);
@@ -31,26 +32,41 @@ export const sendConfirmationEmail = async (email: string) => {
     throw Error(error);
   });
   const hash = created.hash;
-  send(email, hash).catch((error) => {
+  send(email, {
+    title: "Password reset",
+    text: "We are resetting your password",
+    html: `<h1>Almost done</h1><p>Please click the <a clicktracking="off" href="${process.env.SERVER_ORIGIN}/confirm-email?h=${hash}">link</a> to finish the process.</p>`,
+  }).catch((error) => {
     throw Error("Failed to send an email: " + error);
   });
 };
 
 // If a user clicks the url, update the isVerified to 'true' and delete the hash
-export const verifyUser = (hash: string) => {
-  const query = { hash: hash };
-  UserModel.findOneAndUpdate(query, {
-    $set: { isVerified: true },
-    $unset: { hash: 1 },
-  }).catch((error: Error) => {
-    throw Error("Failed to verify the user: " + error.message);
-  });
+export const verifyUser = async (hash: string, type: string) => {
+  const query = { [type]: hash };
+  let set;
+  
+  if (type === "hash") {
+    set = { isVerified: true };
+  } 
+  if (type === "resetHash") {
+    set = { isReset: true };
+  }
+
+  try {
+    await UserModel.findOneAndUpdate(query, {
+      $set: set,
+      $unset: { [type]: 1 },
+    })    
+  } catch (error: any) {
+    throw Error("Failed to verify the user: " + error.message);    
+  }
 };
 
 // Update the password to finish the signup
 export const addPassword = async (email: string, password: string) => {
   const encrypted = await hash(password, 12);
-  const query = { email: email, isVerified: true };
+  const query = { oauth: null, email: email, isVerified: true };
   UserModel.updateOne(query, {
     $set: { password: encrypted },
   }).catch((error: Error) => {
@@ -124,5 +140,22 @@ const createOauthUser = async (type: string, email: string) => {
     newUser.save().catch((error: Error) => {
       throw new Error("Failed to create a user: " + error.message);
     });
+  }
+};
+
+export const sendEmailWithLink = async (email: string) => {
+  try {
+    let resetHash = await hash(email, 12);
+    await UserModel.findOneAndUpdate(
+      { oauth: null, email: email },
+      { $set: { isReset: false, resetHash: resetHash } }
+    );
+    await send(email, {
+      title: "Password reset",
+      text: "We are resetting your password",
+      html: `<h1>Password reset</h1><p>Please click the <a clicktracking="off" href="${process.env.SERVER_ORIGIN}/reset-password?h=${resetHash}">link</a> to reset your password</p>`,
+    });
+  } catch (error: any) {
+    throw new Error(error);
   }
 };

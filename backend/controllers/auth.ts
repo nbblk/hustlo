@@ -6,6 +6,7 @@ import {
   addPassword as updatePassword,
   authenticate,
   authenticateUsingOAuth,
+  sendEmailWithLink,
 } from "../services/auth";
 import { validationResult } from "express-validator";
 
@@ -29,31 +30,36 @@ const signup = async (
         status = 400;
         message = errors.array();
       } else {
-        status = 500;
+        status = 401;
         message = error.message;
       }
       res.status(status).send(error.message);
     });
 };
 
-const redirect = async (req: express.Request, res: express.Response) => {
+type redirectType = {
+  url: string,
+  type: string
+}
+
+const redirect = async (req: express.Request, res: express.Response, redirect: redirectType) => {
   const hash = req.query.h?.toString();
   if (!hash) {
-    res.status(400).send("Invalid access");
+    res.status(401).send("Invalid access");
   } else {
     try {
-      await verifyUser(hash);
-      res.redirect(`${clientOrigin}/password-setup?h=${hash}`);
+      await verifyUser(hash, redirect.type);
+      res.redirect(redirect.url);
     } catch (error: any) {
-      res.send(error).redirect(`${clientOrigin}/signup/error`);
+      res.send(error).redirect(`${clientOrigin}/error`);
     }
   }
 };
 
-const addPassword = async (req: any, res: any, next: any) => {
+const addPassword = async (req: express.Request, res: express.Response) => {
   await updatePassword(req.body.email, req.body.password)
     .then(() => {
-      res.status(200).send("Updated");
+    res.status(200).send("Updated");
     })
     .catch((error) => {
       const errors = validationResult(req);
@@ -95,4 +101,14 @@ const OAuthLogin = async (req: express.Request, res: express.Response) => {
   }
 };
 
-export { signup, redirect, addPassword, basicLogin, OAuthLogin };
+const sendRecoveryLink = async (req: express.Request, res: express.Response) => {
+  try {
+    await sendEmailWithLink(req.body.email);
+    res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+};
+
+export { signup, redirect, addPassword, basicLogin, OAuthLogin, sendRecoveryLink };

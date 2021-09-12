@@ -61,7 +61,11 @@ const Auth = (props: any) => {
   };
 
   useEffect(() => {
-    if (auth.isPasswordUpdated || auth.isEmailVerified) {
+    if (
+      auth.isPasswordUpdated ||
+      auth.isEmailVerified ||
+      auth.isRecoveryEmailSent
+    ) {
       setAccount({ ...account, modal: true });
     }
   }, [auth]);
@@ -72,9 +76,9 @@ const Auth = (props: any) => {
       try {
         if (props.type === "signup" && location.state.email) {
           email = location.state.email;
-        }          
-      } catch (error: any) { // ReferenceError
-        email = ""
+        }
+      } catch (error: any) {
+        email = "";
       } finally {
         validateEmail(email);
       }
@@ -109,6 +113,17 @@ const Auth = (props: any) => {
           dismiss={() => setAccount({ ...account, modal: false })}
         />
       ) : null}
+      {account.modal && auth.isRecoveryEmailSent ? (
+        <Modal
+          height="full md:h-1/4"
+          width="full md:w-1/4"
+          title={"Recovery link sent"}
+          content={"We sent a recovery link to you. Please check your inbox"}
+          buttonValue="Got it"
+          buttonClick={() => modalHandler()}
+          dismiss={() => setAccount({ ...account, modal: false })}
+        />
+      ) : null}
       <AuthForm
         type={props.type}
         emailValue={account.email.value}
@@ -122,7 +137,12 @@ const Auth = (props: any) => {
         isPwdValid={account.password.valid}
         isEmailValid={account.email.valid}
         isAllValid={account.valid}
-        submitEmail={(event: FormEvent<HTMLButtonElement>) =>   auth.requestEmailVerification(event, account.email.value)}
+        submitEmail={(event: FormEvent<HTMLButtonElement>) =>
+          auth.requestEmailVerification(event, account.email.value)
+        }
+        sendRecoveryEmail={(event: FormEvent<HTMLButtonElement>) =>
+          auth.sendRecoveryEmail(event, account.email.value)
+        }
         setupPassword={(event: FormEvent<HTMLButtonElement>) =>
           auth.setupPassword(event, {
             email: account.email.value,
@@ -139,7 +159,6 @@ const Auth = (props: any) => {
         googleSuccess={(response: any) => auth.googleLoginSuccess(response)}
         googleFail={(error: any) => auth.googleLoginFailure(error)}
         msLoginHandler={(response: any) => auth.msLoginHandler(response)}
-        // appleLoginHandler={(response: any) => auth.appleLoginHandler(response)}
       />
       <div className="absolute bottom-4">
         <Footer />
