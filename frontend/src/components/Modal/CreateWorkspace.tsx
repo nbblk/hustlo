@@ -1,6 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import Button from "../Button";
 import InputBox from "../InputBox";
+import Modal from "./Modal";
 
 export type WorkspaceFormProps = {
   name: { value: string; valid: boolean };
@@ -32,7 +33,12 @@ const CreateWorkspace = (props: any) => {
   };
 
   return (
-    <>
+    <Modal
+      width="1/3"
+      height="1/2"
+      title="Create workspace"
+      dismiss={props.dismiss}
+    >
       <h3 className="mb-4 text-gray-light">
         Boost your productivity by making it easier for everyone to access
         boards in one location.
@@ -66,8 +72,8 @@ const CreateWorkspace = (props: any) => {
           hoverColor="green hover:opacity-25"
           value="Continue"
           marginY="2"
-          click={(event: React.MouseEvent<HTMLButtonElement>) =>
-            props.submitWorkspaceForm(event, {
+          click={(event: React.FormEvent<HTMLButtonElement>) =>
+            props.submit(event, {
               name: form.name,
               description: form.description,
             })
@@ -75,7 +81,7 @@ const CreateWorkspace = (props: any) => {
           disabled={form.name.valid && form.description.valid ? false : true}
         />
       </form>
-    </>
+    </Modal>
   );
 };
 

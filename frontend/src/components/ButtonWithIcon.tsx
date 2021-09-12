@@ -30,7 +30,7 @@ const ButtonWithIcon = (props: buttonProps) => {
       {props.isIcon ? (
         <FontAwesomeIcon icon={props.iconProp!} color={props.textColor} />
       ) : null}
-      {props.value.length > 0 ? props.value : null}
+      {props.value ? props.value : null}
     </button>
   );
 };

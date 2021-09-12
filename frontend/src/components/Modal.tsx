@@ -1,11 +1,8 @@
-import { useHistory } from "react-router-dom";
-
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "./Button";
 
 const Modal = (props: any) => {
-  const history = useHistory();
 
   return (
     <div
@@ -14,7 +11,7 @@ const Modal = (props: any) => {
       <FontAwesomeIcon
         icon={faTimes}
         className="self-end cursor-pointer"
-        onClick={() => history.goBack()}
+        onClick={props.dismiss}
       />
       <h1 className="font-krona text-2xl md:text-xl">{props.title}</h1>
       <p className="font-nunito text-lg md:text-sm">{props.content}</p>
@@ -22,7 +19,7 @@ const Modal = (props: any) => {
         bgColor="blue"
         textColor="white"
         hoverColor="blue hover:opacity-25" 
-        width="full md:w-1/5"
+        width="full md:w-2/5"
         height="10"
         disabled={false}
         value={props.buttonValue}
