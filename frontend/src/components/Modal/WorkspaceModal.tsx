@@ -1,18 +1,26 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
 import Button from "../Button";
 import InputBox from "../InputBox";
 import Modal from "./Modal";
 
 export type WorkspaceFormProps = {
+  type: string,
   name: { value: string; valid: boolean };
   description: { value: string; valid: boolean };
 };
 
-const CreateWorkspace = (props: any) => {
+const WorkspaceModal = (props: any) => {
   const [form, setForm] = useState<WorkspaceFormProps>({
+    type: "Create" || "Update",
     name: { value: "", valid: false },
     description: { value: "", valid: false },
   });
+
+  useEffect(() => {
+    if (props.type === "Update" && props.formValues) {
+      setForm({ type: props.type, name: props.formValues.name, description: props.formValues.description });
+    }
+  }, []);
 
   const nameHandler = (event: ChangeEvent<HTMLInputElement>) => {
     let name = event.target.value;
@@ -36,7 +44,7 @@ const CreateWorkspace = (props: any) => {
     <Modal
       width="1/3"
       height="1/2"
-      title="Create workspace"
+      title={`${props.type} workspace`}
       dismiss={props.dismiss}
     >
       <h3 className="mb-4 text-gray-light">
@@ -51,6 +59,7 @@ const CreateWorkspace = (props: any) => {
           height="1/5"
           width="full"
           marginY="2"
+          value={props.type === "Update" && props.formValues.name ? props.formValues.name : null}
           change={(event: ChangeEvent<HTMLInputElement>) => nameHandler(event)}
         />
         <h6 className="text-sm">Description</h6>
@@ -60,6 +69,7 @@ const CreateWorkspace = (props: any) => {
           height="24"
           width="full"
           marginY="2"
+          value={props.type === "Update" && props.formValues.description ? props.formValues.description : null}
           change={(event: ChangeEvent<HTMLInputElement>) =>
             descriptionHandler(event)
           }
@@ -85,4 +95,4 @@ const CreateWorkspace = (props: any) => {
   );
 };
 
-export default CreateWorkspace;
+export default WorkspaceModal;

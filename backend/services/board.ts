@@ -1,29 +1,24 @@
 import mongoose from "mongoose";
-import { Workspace, WorkspaceModel } from "../models/workspace";
+import { WorkspaceModel } from "../models/workspace";
 
-export const create = async (workspace: Workspace) => {
-  const newWorkspace = new WorkspaceModel({
-    name: workspace.name,
-    description: workspace.description,
-  });
-
-  let createdDoc;
+export const create = async (data: any) => {
   try {
-    createdDoc = await newWorkspace.save();
+    let objectId = mongoose.Types.ObjectId(data.workspaceId);
+    await WorkspaceModel.updateOne({ _id: objectId }, {
+      $push: { "boards": { name: data.name, color: data.color } },
+    });
   } catch (error: any) {
     console.error(error);
-    throw new Error(error.message);
+    throw new Error(error);
   }
-  return createdDoc;
 };
 
-export const fetch = async (_id: string) => {
-  let docs;
-  let objectId = new mongoose.Types.ObjectId(_id); 
+export const fetchByKeyword = async (keyword: string) => {
   try {
-    docs = await WorkspaceModel.findById(objectId);
+    let docs = await WorkspaceModel.find({ "board.$.name": keyword }, { "board.$": 1 }).exec();
+    return docs;
   } catch (error: any) {
     console.error(error);
+    throw new Error(error);
   }
-  return docs;
 };

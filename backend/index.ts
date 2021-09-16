@@ -6,7 +6,7 @@ import authRouter from "./routes/auth";
 import cors from "cors";
 import * as dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import boardRouter from "./routes/board";
+import workspaceRouter from "./routes/workspace";
 
 dotenv.config({ path: "./.env" });
 
@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/", authRouter);
-app.use("/", boardRouter);
+app.use("/workspace", workspaceRouter);
 
 https
   .createServer(

@@ -1,4 +1,4 @@
-import { User, UserModel } from "../models/user";
+import { UserModel } from "../models/user";
 import { generateHashcode } from "../utils/util";
 import { send } from "./mail";
 import { hash, compare } from "bcryptjs";
@@ -6,7 +6,7 @@ import { generateJwt } from "./jwt";
 import { verifyTokenByPlatform } from "./oauth";
 
 // Store a user data to database
-const createUser = async (email: string): Promise<User> => {
+const createUser = async (email: string) => {
   const newUser = new UserModel({
     oauth: null,
     email: email,
@@ -15,15 +15,20 @@ const createUser = async (email: string): Promise<User> => {
     password: null,
   });
 
-  // Check if the email already exists.
-  const found = await UserModel.findOne({ oauth: null, email: email });
-  if (!found) {
-    return newUser.save().catch((error: Error) => {
-      throw Error("Failed to create a user: " + error.message);
-    });
-  } else {
-    throw Error("The email already exists. Please log in.");
+  let userDoc;
+  try {
+    // Check if the email already exists.
+    userDoc = await UserModel.findOne({ oauth: null, email: email });
+    if (userDoc === null) {
+      userDoc = await newUser.save();
+    } else {
+      throw Error("The email already exists. Please log in.");
+    }
+  } catch (error: any) {
+    console.error(error);
+    throw Error("Failed to create a user");
   }
+  return userDoc;
 };
 
 // Send email that includes the url for redirection
@@ -45,10 +50,10 @@ export const sendConfirmationEmail = async (email: string) => {
 export const verifyUser = async (hash: string, type: string) => {
   const query = { [type]: hash };
   let set;
-  
+
   if (type === "hash") {
     set = { isVerified: true };
-  } 
+  }
   if (type === "resetHash") {
     set = { isReset: true };
   }
@@ -57,9 +62,9 @@ export const verifyUser = async (hash: string, type: string) => {
     await UserModel.findOneAndUpdate(query, {
       $set: set,
       $unset: { [type]: 1 },
-    })    
+    });
   } catch (error: any) {
-    throw Error("Failed to verify the user: " + error.message);    
+    throw Error("Failed to verify the user: " + error.message);
   }
 };
 
@@ -80,12 +85,13 @@ export const addPassword = async (email: string, password: string) => {
 export const authenticate = async (email: string, password: string) => {
   const query = { email: email };
   let jwt = null;
+  let userDoc;
   try {
-    const result = await UserModel.findOne(query).exec();
-    if (result === null) {
+    userDoc = await UserModel.findOne(query).exec();
+    if (userDoc === null) {
       throw new Error("Email or password is incorrect. Please try again. ");
     } else {
-      const isMatched = await compare(password, result.password);
+      const isMatched = await compare(password, userDoc.password);
 
       if (!isMatched) {
         throw new Error("Password is incorrect. Please try again.");
@@ -97,6 +103,7 @@ export const authenticate = async (email: string, password: string) => {
     throw new Error(error);
   }
   return {
+    _id: userDoc._id,
     firstLetter: email.charAt(0).toUpperCase(),
     email: email,
     token: jwt,

@@ -1,6 +1,6 @@
 import { Switch, Route, Redirect } from "react-router-dom";
 import Auth from "./Auth";
-import Board from "./Board";
+import Workspace from "./Workspace";
 import Landing from "./Landing";
 import PageNotFound from "../components/PageNotFound";
 import { useAuth } from "../hooks/use-auth";
@@ -23,7 +23,7 @@ function Main() {
         <Auth type="password" />
       </Route>
       <Route path="/main">
-        {auth.loggedIn ? <Board /> : <Redirect to="/login" />}
+        {sessionStorage.getItem("user") ? <Workspace /> : <Redirect to="/login" />}
       </Route>
       <Route path="/logout">{() => auth.basicLogout()}</Route>
       <Route path="/forgot">

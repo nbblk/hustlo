@@ -1,18 +1,48 @@
-import { ChangeEvent } from "react";
-import { Link } from "react-router-dom";
+import axios from "axios";
+import { ChangeEvent, useEffect, useState } from "react";
 import InputBox from "../InputBox";
+import Loader from "../Loader";
 import ContextPopupHeader from "./ContextPropHeader";
 
-interface DOMEvent<T extends EventTarget> extends Event {
-  readonly target: T;
-}
+const HamburgerMenu = (props: any) => {
+  const [search, setSearch] = useState({
+    isSearch: false,
+    keyword: "",
+    loading: false,
+    result: [] as any,
+  });
 
-type HamburgerProps = {
-  click: () => void;
-  change: (event: ChangeEvent<HTMLInputElement>) => void;
-};
+  const searchHandler = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value.length > 0) {
+      setSearch({ isSearch: true, keyword: event.target.value, loading: true, result: [] });
+    } 
+  };
 
-const HamburgerMenu = (props: HamburgerProps) => {
+  useEffect(() => {
+    const getResult = async () => {
+      let user = JSON.parse(sessionStorage.getItem("user")!);
+      let result;
+      try {
+        result = await axios.request({
+          method: "GET",
+          url: `${process.env.REACT_APP_BASEURL}/workspace/board?q=${search.keyword}`,
+          headers: {
+            _id: user._id,
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+        setSearch({ isSearch: true, keyword: "", loading: false, result: result.data });
+      } catch (error) {
+        console.error(error);
+        setSearch({ ...search, isSearch: false, keyword: "", loading: false });
+      }
+    };
+
+    if (search.keyword.length > 0 && search.loading) {
+      getResult();
+    }
+  }, [search.loading]);
+
   return (
     <>
       <ContextPopupHeader title="" click={props.click} />
@@ -20,22 +50,38 @@ const HamburgerMenu = (props: HamburgerProps) => {
         type="text"
         placeholder="Find boards by name..."
         width="full"
-        height="12"
-        change={props.change}
+        height="10"
+        change={(event: ChangeEvent<HTMLInputElement>) => searchHandler(event)}
       />
-      <ul className="my-4 text-left font-nunito">
-        <li className="w-full h-14 my-2 rounded opacity-50 bg-white">
-          workspace1
+      {search.loading ? <Loader loading={true} /> : null}
+      <ul className={`${search.loading ? 'hidden' : 'block'} my-4 text-left font-nunito`}>
+        {search.isSearch
+          ? search.result.map((workspace: any) => {
+            return (
+              <li
+                key={workspace._id}
+                className="w-full h-12 my-2 rounded opacity-50 bg-white flex justify-center items-center cursor-pointer"
+              >
+                {workspace.name}
+              </li>
+            );
+          })
+          : props.list.map((workspace: any) => {
+            return (
+              <li
+                key={workspace._id}
+                className="w-full h-12 my-2 rounded opacity-50 bg-white flex justify-center items-center cursor-pointer"
+              >
+                {workspace.name}
+              </li>
+            );
+          })}
+        <li
+          onClick={props.createBoardClicked}
+          className="underline cursor-pointer text-sm"
+        >
+          Create new board...
         </li>
-        <li className="w-full h-14 my-2 rounded opacity-50 bg-white">
-          workspace2
-        </li>
-        <li className="w-full h-14 my-2 rounded opacity-50 bg-white">
-          workspace3
-        </li>
-        <Link to="/create-board">
-          <li>Create new board...</li>
-        </Link>
       </ul>
     </>
   );

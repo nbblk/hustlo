@@ -12,7 +12,7 @@ export interface ButtonProps {
   textColor: string,
   hoverColor: string,
   textSize?: string,
-  click?: (event: React.MouseEvent<HTMLButtonElement>) => void,
+  click?: (event: React.MouseEvent<HTMLButtonElement>, data?: any) => void,
   value: string
 }
 
