@@ -13,7 +13,6 @@ dotenv.config({ path: "./.env" });
 const fetchWorkspace = async (req: express.Request, res: express.Response) => {
   let list;
   let _id = req.headers["_id"]!.toString();
-  console.log(_id);
   try {
     list = await fetch(_id);
     res.send(list).status(200);

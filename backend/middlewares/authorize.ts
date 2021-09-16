@@ -12,8 +12,6 @@ export function checkAuthToken(
   }
   try {
     const decoded = verifyJwt(token);
-    console.log('decoded', decoded);
-    console.log(req.body.name, req.body.description);
     next();
   } catch (error: any) {
     console.error(error.message)
