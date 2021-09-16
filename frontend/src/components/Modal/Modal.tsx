@@ -8,7 +8,7 @@ interface ModalProps {
   height: string;
   title: string;
   dismiss: () => void;
-  children: ReactNode[]
+  children: ReactNode
 };
 
 const Modal = (props: ModalProps) => {

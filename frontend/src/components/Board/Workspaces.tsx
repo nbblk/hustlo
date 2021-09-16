@@ -14,34 +14,36 @@ const Workspaces = (props: any) => {
                     <h3 className="m-4 font-krona uppercase">
                       {workspace.name}
                     </h3>
-                    <ButtonWithIcon
-                      width={"20"}
-                      height={"auto"}
-                      margin={"2"}
-                      padding={"0"}
-                      value={"Edit"}
-                      textColor={"text-black"}
-                      fontSize={"sm"}
-                      isIcon={true}
-                      iconProp={faEdit}
-                      isCircle={false}
-                      bgColor={"bg-gray-light"}
-                      click={() => props.edit(index)}
-                    />
-                    <ButtonWithIcon
-                      width={"24"}
-                      height={"auto"}
-                      margin={"2"}
-                      padding={"0"}
-                      value={"Delete"}
-                      textColor={"text-black"}
-                      fontSize={"sm"}
-                      isIcon={true}
-                      iconProp={faTimes}
-                      isCircle={false}
-                      bgColor={"bg-gray-light"}
-                      click={() => props.ask(index)}
-                    />
+                    <div className="">
+                      <ButtonWithIcon
+                        width={"20"}
+                        height={"8"}
+                        margin={"2"}
+                        padding={"0"}
+                        value={"Edit"}
+                        textColor={"text-black"}
+                        fontSize={"sm"}
+                        isIcon={true}
+                        iconProp={faEdit}
+                        isCircle={false}
+                        bgColor={"bg-gray-light"}
+                        click={() => props.edit(index)}
+                      />
+                      <ButtonWithIcon
+                        width={"20"}
+                        height={"8"}
+                        margin={"2"}
+                        padding={"0"}
+                        value={"Delete"}
+                        textColor={"text-black"}
+                        fontSize={"sm"}
+                        isIcon={true}
+                        iconProp={faTimes}
+                        isCircle={false}
+                        bgColor={"bg-gray-light"}
+                        click={() => props.ask(index)}
+                      />
+                    </div>
                   </div>
                   <ul className="w-full flex flex-wrap">
                     {workspace.boards
@@ -57,6 +59,7 @@ const Workspaces = (props: any) => {
                     <li
                       key="last"
                       className="w-full md:w-80 h-40 m-5 p-4 flex justify-center items-center rounded bg-gray-lightest text-gray font-nunito text-md cursor-pointer"
+                      onClick={props.createBoard}
                     >
                       Create new board
                     </li>

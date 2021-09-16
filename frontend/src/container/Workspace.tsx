@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import MainNavbar from "../components/Board/MainNavbar";
 import Header from "../components/Header/Header";
 import Loader from "../components/Loader";
@@ -7,26 +7,54 @@ import { WorkspaceFormProps } from "../components/Modal/WorkspaceModal";
 import WorkspaceModal from "../components/Modal/WorkspaceModal";
 import Workspaces from "../components/Board/Workspaces";
 import Modal from "../components/Modal";
+import BoardModal from "../components/Modal/BoardModal";
+
+export type NewBoardProps = {
+  workspaceId: number;
+  name: string;
+  color: string;
+};
 
 function Workspace() {
   const [workspace, setWorkspace] = useState({
-    create: false,
-    update: false,
+    createWorkspace: false,
+    createBoard: true,
+    updateWorkspace: false,
+    fetchWorkspace: false,
+    deleteWorkspace: false,
+    current: { index: 0, name: "" },
     loading: false,
     modal: false,
     errorMsg: "",
     list: [] as any,
-    fetch: false,
-    delete: false,
-    current: { index: 0, name: "" },
   });
 
   const dismissModal = () => {
     setWorkspace({ ...workspace, modal: false });
   };
 
+  const createBoardClicked = () => {
+    setWorkspace({
+      ...workspace,
+      modal: true,
+      createWorkspace: false,
+      createBoard: true,
+      updateWorkspace: false,
+      fetchWorkspace: false,
+      deleteWorkspace: false,
+    });
+  };
+
   const createWorkspaceClicked = () => {
-    setWorkspace({ ...workspace, modal: true, create: true });
+    setWorkspace({
+      ...workspace,
+      modal: true,
+      createWorkspace: true,
+      createBoard: false,
+      updateWorkspace: false,
+      fetchWorkspace: false,
+      deleteWorkspace: false,
+    });
   };
 
   const editWorkspaceClicked = (index: number) => {
@@ -34,16 +62,24 @@ function Workspace() {
       ...workspace,
       current: { index: index, name: workspace.list[index].name },
       modal: true,
-      update: true,
+      updateWorkspace: true,
+      createWorkspace: false,
+      createBoard: false,
+      fetchWorkspace: false,  
+      deleteWorkspace: false,
     });
   };
-  
+
   const askDelete = (index: number) => {
     setWorkspace({
       ...workspace,
       current: { name: workspace.list[index].name, index: index },
       modal: true,
-      delete: true,
+      deleteWorkspace: true,
+      updateWorkspace: false,
+      createWorkspace: false,
+      createBoard: false,
+      fetchWorkspace: false, 
     });
   };
 
@@ -53,14 +89,14 @@ function Workspace() {
   ) => {
     event.preventDefault();
     let newArray = workspace.list.map((item: any, i: number) =>
-      workspace.current.index === i ? { ...item, props} : item
+      workspace.current.index === i ? { ...item, props } : item
     );
     setWorkspace({
       ...workspace,
       list: newArray,
       current: { index: 0, name: "" },
       modal: false,
-      update: false,
+      updateWorkspace: false,
       loading: true,
     });
 
@@ -79,8 +115,8 @@ function Workspace() {
     setWorkspace({
       ...workspace,
       loading: false,
-      update: false,
-      fetch: true,
+      updateWorkspace: false,
+      fetchWorkspace: true,
     });
   };
 
@@ -93,7 +129,7 @@ function Workspace() {
       list: deletedArray,
       current: { index: 0, name: "" },
       modal: false,
-      delete: false,
+      deleteWorkspace: false,
       loading: true,
     });
 
@@ -112,8 +148,8 @@ function Workspace() {
       ...workspace,
       loading: false,
       modal: false,
-      delete: false,
-      fetch: true,
+      deleteWorkspace: false,
+      fetchWorkspace: true,
     });
   };
 
@@ -139,15 +175,55 @@ function Workspace() {
         ...workspace,
         loading: false,
         modal: false,
-        create: false,
-        fetch: true,
+        createWorkspace: false,
+        fetchWorkspace: true,
       });
     } catch (error: any) {
       console.error(error);
       setWorkspace({
         ...workspace,
         loading: false,
+        createWorkspace: false,
         errorMsg: error.message,
+      });
+    }
+  };
+
+  const createBoard = async (
+    event: FormEvent<HTMLButtonElement>,
+    props: NewBoardProps
+  ) => {
+    event.preventDefault();
+    setWorkspace({ ...workspace, loading: true });
+    let user = JSON.parse(sessionStorage.getItem("user")!); // !
+    let workspaceId = workspace.list[props.workspaceId]._id;
+    console.log(workspaceId);
+    try {
+      await axios.request({
+        method: "POST",
+        url: `${process.env.REACT_APP_BASEURL}/workspace/board`,
+        headers: { _id: user._id, Authorization: `Bearer ${user.token}` },
+        data: {
+          workspaceId: workspaceId,
+          name: props.name,
+          color: props.color,
+        },
+      });
+      setWorkspace({
+        ...workspace,
+        loading: false,
+        modal: false,
+        createBoard: false,
+        fetchWorkspace: true,
+      });
+    } catch (error: any) {
+      console.error(error);
+      setWorkspace({
+        ...workspace,
+        loading: false,
+        modal: false,
+        createBoard: false,
+        fetchWorkspace: true,
       });
     }
   };
@@ -170,24 +246,24 @@ function Workspace() {
           ...workspace,
           list: list.data,
           loading: false,
-          fetch: false,
+          fetchWorkspace: false,
         });
       } catch (error: any) {
         setWorkspace({
           ...workspace,
           errorMsg: error.message,
           loading: false,
-          fetch: false,
+          fetchWorkspace: false,
         });
       }
     }
     getList();
-  }, [workspace.fetch]);
+  }, [workspace.fetchWorkspace]);
 
   return (
     <div>
       {workspace.loading ? <Loader loading /> : null}
-      {workspace.modal && workspace.create ? (
+      {workspace.modal && workspace.createWorkspace ? (
         <WorkspaceModal
           type="Create"
           dismiss={() => dismissModal()}
@@ -197,18 +273,30 @@ function Workspace() {
           ) => submitWorkspaceForm(event, props)}
         />
       ) : null}
-      {workspace.modal && workspace.update ? (
+      {workspace.modal && workspace.createBoard ? (
+        <BoardModal
+          list={workspace.list}
+          dismiss={() => dismissModal()}
+          create={(event: FormEvent<HTMLButtonElement>, props: NewBoardProps) =>
+            createBoard(event, props)
+          }
+        />
+      ) : null}
+      {workspace.modal && workspace.updateWorkspace ? (
         <WorkspaceModal
           type="Update"
           dismiss={() => dismissModal()}
-          formValues={{ name: workspace.current.name, description: workspace.list[workspace.current.index].description }}
+          formValues={{
+            name: workspace.current.name,
+            description: workspace.list[workspace.current.index].description,
+          }}
           submit={(
             event: React.FormEvent<HTMLButtonElement>,
             props: WorkspaceFormProps
           ) => updateWorkspace(event, props)}
         />
       ) : null}
-      {workspace.modal && workspace.delete ? (
+      {workspace.modal && workspace.deleteWorkspace ? (
         <Modal
           width={"full md:w-1/4"}
           height={"full md:h-1/3"}
@@ -224,15 +312,20 @@ function Workspace() {
         isShadowed={false}
         fontSize="md"
         textColor="white"
+        list={workspace.list}
+        createBoardClicked={() => createBoardClicked()}
         createWorkspaceClicked={() => createWorkspaceClicked()}
       />
       <main className="w-screen md:w-full h-full flex justify-center">
         <MainNavbar
-          create={() => createWorkspaceClicked()}
+          createWorkspace={() => createWorkspaceClicked()}
+          edit={(index: number) => editWorkspaceClicked(index)}
+          ask={(index: number) => askDelete(index)}
           list={workspace.list}
         />
         <Workspaces
           list={workspace.list}
+          createBoard={() => createBoardClicked()}
           edit={(index: number) => editWorkspaceClicked(index)}
           ask={(index: number) => askDelete(index)}
         />

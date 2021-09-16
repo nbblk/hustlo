@@ -1,8 +1,23 @@
 import { faFlipboard } from "@fortawesome/free-brands-svg-icons";
-import { faArrowDown, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSortDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState, MouseEvent } from "react";
+import ContextMenu from "../ContextPopup/ContextMenu";
 
 const MainNavbar = (props: any) => {
+  let [contextMenu, setContextMenu] = useState({
+    workspaceIndex: 0,
+    isOpened: false,
+  });
+
+  const contextMenuHandler = (
+    event: MouseEvent<HTMLSpanElement>,
+    index: number
+  ) => {
+    event.preventDefault();
+    setContextMenu({ workspaceIndex: index, isOpened: !contextMenu.isOpened });
+  };
+
   return (
     <nav className="hidden md:block md:w-1/5 m-10 font-krona">
       <ul>
@@ -17,14 +32,12 @@ const MainNavbar = (props: any) => {
         <div className="flex justify-between">
           <span>WORKSPACE</span>
           <span className="cursor-pointer">
-            <FontAwesomeIcon
-              icon={faPlus}
-              onClick={props.create}
-            />
+            <FontAwesomeIcon icon={faPlus} onClick={props.createWorkspace} />
           </span>
         </div>
         <ul className="my-2 flex flex-col">
-          {props.list.map((item: any) => (
+          {props.list.map((item: any, index: number) => (
+            
             <li
               key={item._id}
               className="block my-4 flex justify-between items-center"
@@ -33,10 +46,24 @@ const MainNavbar = (props: any) => {
                 {item.name.charAt(0)}
               </span>
               {item.name}
-              <span>
-                <FontAwesomeIcon icon={faArrowDown} />
+              <span
+                className="cursor-pointer relative"
+                onClick={(event: MouseEvent<HTMLSpanElement>) =>
+                  contextMenuHandler(event, index)
+                }
+              >
+                <FontAwesomeIcon icon={faSortDown} />
+                {contextMenu.isOpened ? (
+            <ContextMenu
+              edit={() => props.edit(contextMenu.workspaceIndex)}
+              delete={() => props.ask(contextMenu.workspaceIndex)}
+              active={contextMenu.isOpened ? true : false}
+            />
+          ) : null}
               </span>
+             
             </li>
+            
           ))}
         </ul>
       </div>

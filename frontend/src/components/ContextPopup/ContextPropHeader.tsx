@@ -1,4 +1,4 @@
-import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type HeaderProps = {
@@ -11,7 +11,7 @@ const ContextPopupHeader = (props: HeaderProps) => {
     <div className="flex justify-between">
       <h3>{props.title}</h3>
       <span className="cursor-pointer" onClick={props.click}>
-        <FontAwesomeIcon icon={faWindowClose} />
+        <FontAwesomeIcon icon={faTimes} />
       </span>
     </div>
   );

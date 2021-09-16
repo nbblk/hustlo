@@ -7,11 +7,13 @@ type HeaderProps = {
   isShadowed: boolean;
   textColor: string;
   fontSize: string;
+  list?: any[];
   createWorkspaceClicked?: () => void;
+  createBoardClicked?: () => void;
 };
 
 const Header = (props: HeaderProps) => {
-  const style = `w-full m-0 p-1.5 sticky z-50 top-0 flex flex-col md:flex-row md:justify-between md:items-center bg-${
+  const style = `w-full m-0 p-1 sticky z-50 top-0 flex flex-col md:flex-row justify-center md:justify-between items-center bg-${
     props.bgColor
   } ${props.isShadowed ? "shadow boxShadow" : null} font-krona font-${
     props.fontSize
@@ -23,7 +25,9 @@ const Header = (props: HeaderProps) => {
     <nav className={style}>
       {auth.loggedIn ? (
         <LoggedInHeaderContent
-          createWorkspaceClicked={props.createWorkspaceClicked}
+         list={props.list}
+         createBoardClicked={props.createBoardClicked}
+         createWorkspaceClicked={props.createWorkspaceClicked}
         />
       ) : (
         <DefaultHeaderContent />
