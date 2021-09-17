@@ -5,7 +5,7 @@ export const create = async (data: any) => {
   try {
     let objectId = mongoose.Types.ObjectId(data.workspaceId);
     await WorkspaceModel.updateOne({ _id: objectId }, {
-      $push: { "boards": { name: data.name, color: data.color } },
+      $push: { "boards": { _id: mongoose.Types.ObjectId(), name: data.name, color: data.color } },
     });
   } catch (error: any) {
     console.error(error);
