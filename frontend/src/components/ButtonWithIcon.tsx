@@ -11,8 +11,9 @@ type buttonProps = {
   textColor: string;
   fontSize: string;
   isIcon: boolean;
-  iconProp: IconProp | null;
-  isCircle: boolean;
+  iconProp?: IconProp | null;
+  iconColor?: string;
+  isCircle?: boolean;
   opacity?: string;
   bgColor?: string;
   click?: (event?: React.MouseEvent) => void;
