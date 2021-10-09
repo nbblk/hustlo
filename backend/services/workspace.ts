@@ -6,7 +6,7 @@ export const create = async (workspace: Workspace) => {
     userId: workspace.userId,
     name: workspace.name,
     description: workspace.description,
-    board: [],
+    boards: [],
   });
 
   let createdDoc;
