@@ -49,16 +49,20 @@ const Workspaces = (props: any) => {
                   <ul className="w-full flex flex-wrap">
                     {workspace.boards
                       ? workspace.boards.map((board: any) => {
-                        console.log(board);
-                        return (<Link to={`/board/${board._id}`}>
-                          <li
-                            key={board._id}
-                            className="w-full md:w-80 h-40 m-5 p-4 rounded bg-gray-dark text-white font-nunito text-md cursor-pointer"
-                          >
-                            {board.name}
-                          </li>
-                        </Link>
-                        )})
+                          return (
+                            <Link
+                              key={board._id}
+                              to={{
+                                pathname: `/board/${board._id}`,
+                                state: { curBoard: board, workspaceId: workspace._id, workspaces: props.list },
+                              }}
+                            >
+                              <li className="w-full md:w-80 h-40 m-5 p-4 rounded bg-gray-dark text-white font-nunito text-md cursor-pointer">
+                                {board.name}
+                              </li>
+                            </Link>
+                          );
+                        })
                       : null}
                     <li
                       key="last"
