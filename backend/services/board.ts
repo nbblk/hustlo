@@ -4,9 +4,26 @@ import { WorkspaceModel } from "../models/workspace";
 export const create = async (data: any) => {
   try {
     let objectId = mongoose.Types.ObjectId(data.workspaceId);
-    await WorkspaceModel.updateOne({ _id: objectId }, {
-      $push: { "boards": { name: data.name, color: data.color } },
-    });
+    await WorkspaceModel.updateOne(
+      { _id: objectId },
+      {
+        $push: {
+          boards: {
+            _id: mongoose.Types.ObjectId(),
+            name: data.name,
+            color: data.color,
+            lists: [
+              {
+                _id: mongoose.Types.ObjectId(),
+                title: "",
+                active: false,
+                cards: [],
+              },
+            ],
+          },
+        },
+      }
+    );
   } catch (error: any) {
     console.error(error);
     throw new Error(error);
@@ -15,7 +32,10 @@ export const create = async (data: any) => {
 
 export const fetchByKeyword = async (keyword: string) => {
   try {
-    let docs = await WorkspaceModel.find({ "board.$.name": keyword }, { "board.$": 1 }).exec();
+    let docs = await WorkspaceModel.find(
+      { "board.$.name": keyword },
+      { "board.$": 1 }
+    ).exec();
     return docs;
   } catch (error: any) {
     console.error(error);

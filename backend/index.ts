@@ -2,11 +2,12 @@ import express from "express";
 import fs from "fs";
 import https from "https";
 import { connect } from "./database/database";
-import authRouter from "./routes/auth";
 import cors from "cors";
 import * as dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import authRouter from "./routes/auth";
 import workspaceRouter from "./routes/workspace";
+import boardRouter from "./routes/board";
 
 dotenv.config({ path: "./.env" });
 
@@ -24,6 +25,7 @@ app.use(cookieParser());
 
 app.use("/", authRouter);
 app.use("/workspace", workspaceRouter);
+app.use("/board", boardRouter);
 
 https
   .createServer(
