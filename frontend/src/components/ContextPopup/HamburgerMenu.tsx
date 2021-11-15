@@ -54,7 +54,7 @@ const HamburgerMenu = (props: any) => {
         change={(event: ChangeEvent<HTMLInputElement>) => searchHandler(event)}
       />
       {search.loading ? <Loader loading={true} /> : null}
-      <ul className={`${search.loading ? 'hidden' : 'block'} my-4 text-left font-nunito`}>
+      {/* <ul className={`${search.loading ? 'hidden' : 'block'} my-4 text-left font-nunito`}>
         {search.isSearch
           ? search.result.map((workspace: any) => {
             return (
@@ -82,7 +82,7 @@ const HamburgerMenu = (props: any) => {
         >
           Create new board...
         </li>
-      </ul>
+      </ul> */}
     </>
   );
 };

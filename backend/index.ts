@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth";
 import workspaceRouter from "./routes/workspace";
 import boardRouter from "./routes/board";
+import listRouter from "./routes/list";
+import cardRouter from "./routes/card";
 
 dotenv.config({ path: "./.env" });
 
@@ -26,6 +28,8 @@ app.use(cookieParser());
 app.use("/", authRouter);
 app.use("/workspace", workspaceRouter);
 app.use("/board", boardRouter);
+app.use("/list", listRouter);
+app.use("/card", cardRouter);
 
 https
   .createServer(

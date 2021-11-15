@@ -26,8 +26,8 @@ const ButtonWithIcon = (props: buttonProps) => {
   w-${props.width}
   h-${ props.height} 
   ${props.isCircle ? "rounded-full" : "rounded"} 
-  ${props.bgColor ? props.bgColor : "bg-white"} 
-  ${props.opacity ? props.opacity : "bg-opacity-25"} 
+  bg-${props.bgColor ? props.bgColor : "white"} 
+  bg-${props.opacity ? props.opacity : "opacity-25"} 
   ${props.textColor} 
   text-${props.fontSize} 
   text-center`;

@@ -197,7 +197,6 @@ function Workspace() {
     setWorkspace({ ...workspace, loading: true });
     let user = JSON.parse(sessionStorage.getItem("user")!); // !
     let workspaceId = workspace.list[props.workspaceId]._id;
-    console.log(workspaceId);
     try {
       await axios.request({
         method: "POST",
@@ -241,7 +240,6 @@ function Workspace() {
             Authorization: `Bearer ${user.token}`,
           },
         });
-        console.dir(list);
         setWorkspace({
           ...workspace,
           list: list.data,

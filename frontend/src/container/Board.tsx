@@ -1,27 +1,46 @@
+import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { withRouter, useParams } from "react-router";
-import Header from "../components/Header/Header";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import axios from "axios";
+import Header from "../components/Header/Header";
 import BoardHeader from "../components/Board/BoardHeader";
 import List, { ListProps } from "../components/Board/List";
-import axios from "axios";
 import Loader from "../components/Loader";
-import Modal from "../components/Modal";
 import CardModal from "../components/Modal/CardModal";
+import { LabelType } from "../components/Card/Label";
 
 type BoardProps = {
   _id: string;
-  name: string;
+  title: string;
+  workspaceId: string;
+  color: string;
+  boardTitleActive: boolean;
   lists?: ListProps[] | any;
   current: number;
+  update: boolean;
+  updateList: boolean;
   fetch: boolean;
   loading: boolean;
   clickAddCard: boolean;
   curListId: string;
+  curListIndex: number | undefined;
   cardTitle: string;
   cardTitleActive: boolean;
   cardOpen: boolean;
   curCardId: string;
+  curCardTitle: string;
+  labels: LabelType[];
+  curLabelIndex: number | undefined;
+  curLabelTitle: string;
+  isMainLabel: boolean;
+  isEditLabel: boolean;
+  isAddLabel: boolean;
+  archivedItemsActive: boolean;
+  fetchArchivedItems: boolean;
+  archivedLists?: any;
+  restoreList: boolean;
+  archiveCard: boolean;
+  archivedCards?: any;
 };
 
 export type CardType = {
@@ -29,24 +48,44 @@ export type CardType = {
   title: string;
   description?: string;
   archived: boolean;
+  labelsSelected?: LabelType[];
 };
 
 function Board(props: any) {
-  const { curBoard, workspaceId, workspaces } = props.location.state;
+  const { workspaceId } = props.location.state;
   const { boardId } = useParams<{ boardId: string }>();
   const [board, setBoard] = useState<BoardProps>({
-    _id: boardId,
-    name: "",
-    lists: curBoard.lists,
+    _id: "",
+    workspaceId: "",
+    title: "",
+    color: "",
+    boardTitleActive: false,
+    lists: [],
     current: 0,
     fetch: false,
+    update: false,
+    updateList: false,
     loading: false,
     clickAddCard: false,
     curListId: "",
+    curListIndex: undefined,
     cardTitle: "",
     cardTitleActive: false,
     cardOpen: false,
-    curCardId: ""
+    curCardId: "",
+    curCardTitle: "",
+    labels: [],
+    curLabelIndex: undefined,
+    curLabelTitle: "",
+    isMainLabel: true,
+    isEditLabel: false,
+    isAddLabel: false,
+    archivedItemsActive: false,
+    fetchArchivedItems: false,
+    archivedLists: [],
+    restoreList: false,
+    archiveCard: false,
+    archivedCards: [],
   });
 
   // a little function to help us with reordering the result
@@ -67,15 +106,14 @@ function Board(props: any) {
     if (!result.destination) {
       return;
     }
-    let curList = curBoard.lists
-      ? curBoard.lists.find((list: ListProps, index: number) => {
+    let curList = board.lists
+      ? board.lists.find((list: ListProps, index: number) => {
           if (list._id === result.source.droppableId) {
             setBoard({ ...board, current: index });
           }
           return list;
         })
       : null;
-    console.log(curList);
 
     const cardsOrdered: CardType[] = reorderCard(
       curList!.cards!,
@@ -87,35 +125,75 @@ function Board(props: any) {
 
     let newLists = [...board.lists!];
     newLists[board.current] = curList!;
-    console.log(newLists);
     setBoard({ ...board, lists: newLists });
   };
 
   const changeBoardTitle = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.value.length > 0) {
+    if (event.target.value.length === 0) {
       return;
     }
-    setBoard({ ...board, name: event.target.value });
+    setBoard({ ...board, title: event.target.value });
+  };
+
+  const blurBoardTitle = async () => {
+    let user = JSON.parse(sessionStorage.getItem("user")!);
+
+    try {
+      await axios.request({
+        method: "PUT",
+        url: `${process.env.REACT_APP_BASEURL}/board/title`,
+        headers: { _id: user._id, Authorization: `Bearer ${user.token}` },
+        data: {
+          workspaceId: workspaceId,
+          boardId: boardId,
+          title: board.title,
+        },
+      });
+      setBoard({ ...board, fetch: true, boardTitleActive: false });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const focusListTitle = (index: number) => {
+    let newLists = [...board.lists!];
+    newLists[index].active = true;
+    setBoard({ ...board, lists: newLists });
   };
 
   const changeListTitle = (
     event: ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
-    let inputValue = event.target.value;
-    if (event.target.value.length > 0) {
-      return;
-    }
-    let newLists = [...board.lists!];
-    newLists[index].title = inputValue;
-
-    setBoard({ ...board, lists: newLists });
+    let listTitle = event.target.value;
+    let newLists = [...board.lists];
+    let newList = { ...board.lists[index], title: listTitle };
+    newLists[index] = newList;
+    setBoard({ ...board, lists: newLists, curListId: newList._id });
   };
 
-  const toggleListTitle = (index: number) => {
-    let newLists = [...board.lists!];
-    newLists[index].active = !board.lists![index].active;
-    setBoard({ ...board, lists: newLists });
+  const blurListTitle = async (index: number) => {
+    let newLists = [...board.lists];
+    newLists[index].active = false;
+    setBoard({ ...board, lists: newLists, curListIndex: index });
+    let user = JSON.parse(sessionStorage.getItem("user")!);
+
+    try {
+      await axios.request({
+        method: "PUT",
+        url: `${process.env.REACT_APP_BASEURL}/list/title`,
+        headers: { _id: user._id, Authorization: `Bearer ${user.token}` },
+        data: {
+          workspaceId: workspaceId,
+          boardId: boardId,
+          listId: board.curListId,
+          title: board.lists[index].title,
+        },
+      });
+      setBoard({ ...board, fetch: true });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const addList = async () => {
@@ -142,7 +220,7 @@ function Board(props: any) {
 
     try {
       await axios.request({
-        method: "POST",
+        method: "PUT",
         url: `${process.env.REACT_APP_BASEURL}/board/archive`,
         headers: { _id: user._id, Authorization: `Bearer ${user.token}` },
         data: {
@@ -206,31 +284,237 @@ function Board(props: any) {
     }
   };
 
-  const clickCard = (curCardId: string) => {
-    setBoard({ ...board, cardOpen: true, curCardId: curCardId });
+  const clickCard = (
+    curCardId: string,
+    curCardTitle: string,
+    listId: string
+  ) => {
+    setBoard({
+      ...board,
+      cardOpen: true,
+      curCardId: curCardId,
+      curCardTitle: curCardTitle,
+      curListId: listId,
+    });
   };
 
-  const closeCard = () => {
-    setBoard({ ...board, cardOpen: false, curCardId: "" });
+  const clickLabelColor = async (
+    index: number | undefined,
+    clickedColor: string
+  ) => {
+    if (index === undefined) return;
+
+    let duplicated = board.labels.filter(
+      (label: LabelType) => label.color === clickedColor && label.checked
+    );
+
+    let labels = [...board.labels];
+    labels[index].checked = duplicated.length === 0 ? true : false;
+    setBoard((board) => ({
+      ...board,
+      labels: labels,
+      curLabelIndex: index,
+    }));
+    await updateLabel();
   };
 
-  const saveCardDescription = () => {};
+  const changeOldLabelTitle = (event: ChangeEvent<HTMLInputElement>) => {
+    let value = event.target.value;
+    let newLabels = [...board.labels];
+    newLabels[board.curLabelIndex!].title = value;
+    setBoard({ ...board, labels: newLabels });
+  };
+
+  const clickEditLabelTitleIcon = (event: MouseEvent<HTMLSpanElement>) => {
+    let index = Number(event.currentTarget.getAttribute("data-index"));
+    if (index === null || index === undefined) return;
+
+    setBoard({
+      ...board,
+      isEditLabel: true,
+      isAddLabel: false,
+      isMainLabel: false,
+      curLabelIndex: index,
+      curLabelTitle: board.labels[index].title!,
+    });
+  };
+
+  const clickEditLabelTitleButton = async () => await updateLabel();
+
+  const submitAddNewLabelButton = async (index: number, title: string) => {
+    let labels = [...board.labels];
+    labels[index] = { ...labels[index], title: title, checked: true };
+    setBoard((board) => ({
+      ...board,
+      labels: labels,
+      update: true,
+      curCardTitle: "",
+    }));
+  };
+
+  const updateLabel = async () => {
+    let user = JSON.parse(sessionStorage.getItem("user")!);
+    try {
+      await axios.request({
+        method: "POST",
+        url: `${process.env.REACT_APP_BASEURL}/card/labels`,
+        headers: { _id: user._id, Authorization: `Bearer ${user.token}` },
+        data: {
+          workspaceId: workspaceId,
+          boardId: board._id,
+          listId: board.curListId,
+          cardId: board.curCardId,
+          labels: board.labels,
+        },
+      });
+      setBoard({
+        ...board,
+        loading: false,
+        update: false,
+        fetch: true,
+      });
+    } catch (error) {
+      console.error(error);
+      setBoard({ ...board, loading: false, update: false, fetch: false });
+    }
+  };
+
+  const clickRestoreListButton = async (index: number, listId: string) => {
+    let user = JSON.parse(sessionStorage.getItem("user")!);
+    try {
+      await axios.request({
+        method: "PATCH",
+        url: `${process.env.REACT_APP_BASEURL}/list/restore`,
+        headers: {
+          _id: user._id,
+          Authorization: `Bearer ${user.token}`,
+        },
+        data: {
+          workspaceId: workspaceId,
+          boardId: boardId,
+          listId: listId,
+        },
+      });
+      setBoard({
+        ...board,
+        loading: false,
+        fetch: true,
+      });
+    } catch (error) {
+      console.error(error);
+      setBoard({
+        ...board,
+        loading: false,
+        fetch: false,
+      });
+    }
+  };
+
+  const clickRestoreCardButton = async (
+    index: number,
+    listId: string,
+    cardId: string
+  ) => {
+    let user = JSON.parse(sessionStorage.getItem("user")!);
+    try {
+      await axios.request({
+        method: "PATCH",
+        url: `${process.env.REACT_APP_BASEURL}/card/restore`,
+        headers: {
+          _id: user._id,
+          Authorization: `Bearer ${user.token}`,
+        },
+        data: {
+          workspaceId: workspaceId,
+          boardId: boardId,
+          listId: listId,
+          cardId: cardId,
+        },
+      });
+      setBoard({
+        ...board,
+        loading: false,
+        fetch: true,
+      });
+    } catch (error) {
+      console.error(error);
+      setBoard({
+        ...board,
+        loading: false,
+        fetch: false,
+      });
+    }
+  };
+
+  const archiveCard = async () => {
+    let user = JSON.parse(sessionStorage.getItem("user")!);
+    try {
+      await axios.request({
+        method: "PATCH",
+        url: `${process.env.REACT_APP_BASEURL}/card/archive`,
+        headers: {
+          _id: user._id,
+          Authorization: `Bearer ${user.token}`,
+        },
+        data: {
+          workspaceId: workspaceId,
+          boardId: boardId,
+          listId: board.curListId,
+          cardId: board.curCardId,
+        },
+      });
+      setBoard({
+        ...board,
+        loading: false,
+        fetch: true,
+        archiveCard: false,
+        cardOpen: false,
+      });
+    } catch (error) {
+      console.error(error);
+      setBoard({
+        ...board,
+        loading: false,
+        fetch: false,
+        archiveCard: false,
+        cardOpen: false,
+      });
+    }
+  };
+
+  const clickBoardToMove = () => {
+    setBoard({ ...board, _id: boardId, fetch: true });
+  };
 
   useEffect(() => {
     let user = JSON.parse(sessionStorage.getItem("user")!);
+    if (board.update) {
+      updateLabel();
+    }
+    if (board.archiveCard) {
+      archiveCard();
+    }
 
     const fetch = async () => {
       let result;
       try {
         result = await axios.request({
           method: "GET",
-          url: `${process.env.REACT_APP_BASEURL}/board/${board._id}`,
-          headers: { _id: user._id, Authorization: `Bearer ${user.token}` },
+          url: `${process.env.REACT_APP_BASEURL}/board/${boardId}`,
+          headers: {
+            _id: user._id,
+            Authorization: `Bearer ${user.token}`,
+            workspaceId: workspaceId,
+          },
         });
-        console.log(result.data[0].boards[0].lists);
+        const curBoard = result.data[0];
+        console.log(curBoard);
         setBoard({
           ...board,
-          lists: result.data[0].boards[0].lists,
+          title: curBoard.name,
+          lists: curBoard.lists,
+          color: curBoard.color,
+          labels: curBoard.labels,
           loading: false,
           fetch: false,
         });
@@ -241,7 +525,15 @@ function Board(props: any) {
     };
 
     fetch();
-  }, [board.fetch]);
+    if (board.fetch) {
+      fetch();
+    }
+  }, [
+    board.fetch,
+    board.update,
+    board.restoreList,
+    board.archiveCard,
+  ]);
 
   return (
     <div className="w-full h-screen bg-gray-lightest">
@@ -249,23 +541,79 @@ function Board(props: any) {
       {board.cardOpen ? (
         <CardModal
           id={board.curCardId}
-          dismiss={() => closeCard()}
-          create={() => saveCardDescription()}
+          title={board.curCardTitle}
+          workspaceId={workspaceId}
+          boardId={boardId}
+          listId={board.curListId}
+          labels={board.labels}
+          isMainLabel={board.isMainLabel}
+          isEditLabel={board.isEditLabel}
+          isAddLabel={board.isAddLabel}
+          goBack={() =>
+            setBoard({
+              ...board,
+              isMainLabel: true,
+              isEditLabel: false,
+              isAddLabel: false,
+            })
+          }
+          dismiss={() => setBoard({ ...board, cardOpen: false, curCardId: "" })}
+          clickLabelColor={(index: number, color: string) =>
+            clickLabelColor(index, color)
+          }
+          clickEditLabelTitleIcon={(event: MouseEvent<HTMLSpanElement>) =>
+            clickEditLabelTitleIcon(event)
+          }
+          changeOldLabelTitle={(event: ChangeEvent<HTMLInputElement>) =>
+            changeOldLabelTitle(event)
+          }
+          clickEditLabelTitleButton={() => clickEditLabelTitleButton()}
+          clickAddNewLabelButton={() =>
+            setBoard({
+              ...board,
+              isMainLabel: false,
+              isAddLabel: true,
+              isEditLabel: false,
+            })
+          }
+          submitAddNewLabelButton={(index: number, title: string) =>
+            submitAddNewLabelButton(index, title)
+          }
+          clickArchiveCardButton={() =>
+            setBoard({ ...board, archiveCard: true, cardOpen: false })
+          }
         />
       ) : null}
       <Header
-        bgColor={curBoard.color ? curBoard.color : "blue"}
+        bgColor={board.color ? board.color : "blue"}
         isShadowed={false}
         textColor={"white"}
         fontSize={"md"}
-        list={workspaces}
-        // createBoardClicked={workspace.createBoardClicked}
-        // createWorkspaceClicked={workspace.createWorkspaceClicked}
+        createBoardClicked={props.createBoardClicked}
+        createWorkspaceClicked={props.createWorkspaceClicked}
       />
       <BoardHeader
+        boardId={boardId}
+        workspaceId={workspaceId}
+        title={board.title}
+        titleActive={board.boardTitleActive}
+        archivedItemsActive={board.archivedItemsActive}
+        archivedLists={board.archivedLists}
+        archivedCards={board.archivedCards}
+        focusTitle={() => setBoard({ ...board, boardTitleActive: true })}
         changeTitle={(event: ChangeEvent<HTMLInputElement>) =>
           changeBoardTitle(event)
         }
+        blurTitle={() => blurBoardTitle()}
+        clickRestoreListButton={(index: number, listId: string) =>
+          clickRestoreListButton(index, listId)
+        }
+        clickRestoreCardButton={(
+          index: number,
+          listId: string,
+          cardId: string
+        ) => clickRestoreCardButton(index, listId, cardId)}
+        clickBoardToMove={() => clickBoardToMove()}
       />
       <div className="flex justify-start items-start overflow-auto">
         <DragDropContext onDragEnd={(result: DropResult) => onDragEnd(result)}>
@@ -277,11 +625,12 @@ function Board(props: any) {
               title={list.title}
               active={list.active}
               cards={list.cards}
-              toggle={() => toggleListTitle(index)}
               change={(event: ChangeEvent<HTMLInputElement>) =>
                 changeListTitle(event, index)
               }
-              archive={() => archiveList(list._id)}
+              focusListTitle={() => focusListTitle(index)}
+              blurListTitle={() => blurListTitle(index)}
+              clickArchiveListButton={() => archiveList(list._id)}
               curListId={board.curListId}
               addCard={() => addCard(list._id)}
               clickAddCard={board.clickAddCard}
@@ -290,7 +639,9 @@ function Board(props: any) {
                 changeCardTitle(event)
               }
               blurCardTitle={() => blurCardTitle()}
-              clickCard={(cardId) => clickCard(cardId)}
+              clickCard={(cardId: string, cardTitle: string, listId: string) =>
+                clickCard(cardId, cardTitle, listId)
+              }
             />
           ))}
           <button

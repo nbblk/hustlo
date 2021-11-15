@@ -1,5 +1,5 @@
 import { faEdit, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import ButtonWithIcon from "../ButtonWithIcon";
 
 const Workspaces = (props: any) => {
@@ -54,7 +54,8 @@ const Workspaces = (props: any) => {
                               key={board._id}
                               to={{
                                 pathname: `/board/${board._id}`,
-                                state: { curBoard: board, workspaceId: workspace._id, workspaces: props.list },
+                                state: { workspaceId: workspace._id },
+                                //     state: { curBoard: board, workspaceId: workspace._id, workspaces: props.list },
                               }}
                             >
                               <li className="w-full md:w-80 h-40 m-5 p-4 rounded bg-gray-dark text-white font-nunito text-md cursor-pointer">
