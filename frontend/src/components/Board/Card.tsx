@@ -1,12 +1,14 @@
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
+import { LabelType } from "../Card/Label";
 
-type CardProps = {
+interface CardProps {
   _id: string;
   title: string;
+  labels?: LabelType[];
   provided: DraggableProvided;
   snapshot: DraggableStateSnapshot;
-  click: () => void
-};
+  click: () => void;
+}
 
 const Card = (props: CardProps) => {
   let grid = 8;
@@ -21,7 +23,7 @@ const Card = (props: CardProps) => {
   return (
     <div
       key={props._id}
-      className="rounded m-4 bg-white shadow shadow-md"
+      className="h-auto rounded m-4 bg-white shadow shadow-md flex flex-col justify-center items-start"
       ref={props.provided.innerRef}
       {...props.provided.dragHandleProps}
       {...props.provided.draggableProps}
@@ -32,6 +34,15 @@ const Card = (props: CardProps) => {
       onClick={props.click}
     >
       {props.title}
+      <ul className="w-full flex justify-end itmes-center text-xs">
+        {props.labels?.map((label: LabelType, index: number) => (
+          <li
+            key={index}
+            className={`w-6 h-2
+            } mx-1 bg-${label.color} rounded text-white flex justify-center items-center`}
+          ></li>
+        ))}
+      </ul>
     </div>
   );
 };

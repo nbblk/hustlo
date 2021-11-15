@@ -13,16 +13,15 @@ const ProfileMenu = (props: ProfileMenuProps) => {
   return (
     <>
       <ContextPopupHeader title="Account" click={props.click} />
-      <ul className="flex flex-col justify-even items-start">
+      <ul className="w-full flex flex-col justify-even items-center text-sm">
         <UserProfile />
-        <div className="w-full h-0.2 bg-gray"></div>
-        <Link to="/settings">
-          <li className="m-2">Settings</li>
+        <Link key="1" to="/settings" className="w-full m-1 p-1 hover:bg-gray-lightest">
+          <li>Settings</li>
         </Link>
-        <Link to="/activity">
-          <li className="m-2">Activity</li>
+        <Link key="2" to="/activity" className="w-full m-1 p-1 hover:bg-gray-lightest">
+          <li>Activity</li>
         </Link>
-        <li className="m-2 cursor-pointer" onClick={auth.basicLogout}>
+        <li key="3" className="w-full m-1 p-1 cursor-pointer hover:bg-gray-lightest" onClick={auth.basicLogout}>
           Logout
         </li>
       </ul>

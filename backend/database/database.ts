@@ -8,7 +8,6 @@ const uri = "mongodb+srv://admin:admin@cluster0.sbbtj.mongodb.net/myFirstDatabas
 if (database) {
     return;
 }
-
 mongoose.connect(uri, {
     useNewUrlParser: true,
     useFindAndModify: true,

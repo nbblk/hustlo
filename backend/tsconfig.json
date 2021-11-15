@@ -7,8 +7,9 @@
     "esModuleInterop": true,
     "sourceMap": true,
     "strict": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "typeRoots": [ "./types", "./node_modules/@types"]
   },
   "include": ["./**/*.ts"],
-  "exclude": ["node_modules", ".vscode"]
+  "exclude": ["node_modules", "typings", ".vscode"]
 }

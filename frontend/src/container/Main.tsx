@@ -5,6 +5,7 @@ import Landing from "./Landing";
 import PageNotFound from "../components/PageNotFound";
 import { useAuth } from "../hooks/use-auth";
 import Board from "./Board";
+import Archived from "./Archived";
 
 function Main() {
   const auth = useAuth();
@@ -33,9 +34,12 @@ function Main() {
       <Route path="/reset-password">
         <Auth type="password" />
       </Route>
-      <Route path="/board/:boardId">
+      <Route exact path="/board/:boardId">
         <Board />
       </Route>
+      {/* <Route path="/board/:boardId/archived">
+        <Archived />
+      </Route> */}
       <Route path="/page-not-found">
         <PageNotFound />
       </Route>

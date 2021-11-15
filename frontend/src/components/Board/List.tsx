@@ -1,9 +1,10 @@
+import { faArchive, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { ChangeEvent } from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 import { CardType } from "../../container/Board";
 import InputBox from "../InputBox";
-import AddNewCard from "./AddNewCard";
 import Card from "./Card";
+import ListButton from "./ListButton";
 import ListTitle from "./ListTitle";
 
 export type ListProps = {
@@ -15,13 +16,14 @@ export type ListProps = {
   clickAddCard: boolean;
   cardTitleActive: boolean;
   cards?: CardType[];
-  toggle: () => void;
   change: (event: ChangeEvent<HTMLInputElement>) => void;
-  archive: () => void;
+  blurListTitle: () => void;
+  focusListTitle: () => void;
+  clickArchiveListButton: () => void;
   addCard: () => void;
   changeCardTitle: (event: ChangeEvent<HTMLInputElement>) => void;
   blurCardTitle: () => void;
-  clickCard: (curCarId: string) => void;
+  clickCard: (curCarId: string, curCardTitle: string, listId: string) => void;
 };
 
 const List = (props: ListProps) => {
@@ -44,22 +46,28 @@ const List = (props: ListProps) => {
             index={props.index}
             title={props.title}
             active={props.active}
-            toggle={props.toggle}
             change={props.change}
+            focus={props.focusListTitle}
+            blur={props.blurListTitle}
           />
-          {props.cards?.map((card: CardType, index: number) => (
+          {props.cards ? props.cards.map((card: CardType, index: number) => (
             <Draggable key={card._id} draggableId={card._id} index={index}>
-              {(provided, snapshot) => (
-                <Card
-                  _id={card._id}
-                  title={card.title}
-                  provided={provided}
-                  snapshot={snapshot}
-                  click={() => props.clickCard(card._id)}
-                />
-              )}
+              {(provided, snapshot) => {
+                return (
+                  <Card
+                    _id={card._id}
+                    title={card.title}
+                    labels={card.labelsSelected}
+                    provided={provided}
+                    snapshot={snapshot}
+                    click={() =>
+                      props.clickCard(card._id, card.title, props._id)
+                    }
+                  />
+                );
+              }}
             </Draggable>
-          ))}
+          )) : null}
           {props._id === props.curListId &&
           props.clickAddCard &&
           props.cardTitleActive ? (
@@ -74,13 +82,8 @@ const List = (props: ListProps) => {
               />
             </div>
           ) : null}
-          <AddNewCard click={props.addCard} />
-          <button
-            className="w-full h-10 bg-gray-regular rounded text-center hover:opacity-25"
-            onClick={props.archive}
-          >
-            Archive
-          </button>
+          <ListButton icon={faPlus} value={"Add new card"} click={props.addCard} />
+          <ListButton icon={faArchive} value={"Archive"} click={props.clickArchiveListButton} />
         </div>
       )}
     </Droppable>

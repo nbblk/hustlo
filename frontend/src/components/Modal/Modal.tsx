@@ -1,34 +1,41 @@
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ReactNode } from "react";
 import Backdrop from "./Backdrop";
+import ModalHeader from "./ModalHeader";
 
 interface ModalProps {
   width: string;
   height: string;
   title: string;
+  zIndex?: string;
   bgColor?: string;
-  dismiss: () => void;
   children: ReactNode;
+  goBackEnabled?: boolean;
+  backdropDisabled?: boolean;
+  styles?: string;
+  dismiss: () => void;
+  goBack?: () => void;
 }
 
 const Modal = (props: ModalProps) => {
+  let defaultStyle = "absolute top-1/2 left-1/2 p-4 transform -translate-x-1/2 -translate-y-1/2";
   return (
     <>
-      <Backdrop dismiss={props.dismiss} />
+      {props.backdropDisabled ? null : <Backdrop dismiss={props.dismiss} />}
       <div
-        className={`w-${props.width} h-${
+        className={`${props.styles ? props.styles : defaultStyle} w-${props.width} h-${
           props.height
-        } absolute top-1/2 left-1/2 p-4 transform -translate-x-1/2 -translate-y-1/2 z-40 bg-${
+        } z-${
+          props.zIndex ? props.zIndex : "40"
+        } bg-${
           props.bgColor ? props.bgColor : "white"
         } rounded shadow boxShadow`}
       >
-        <div className="flex justify-between">
-          <h1 className="text-lg my-4">{props.title}</h1>
-          <span className="cursor-pointer" onClick={props.dismiss}>
-            <FontAwesomeIcon icon={faTimes} />
-          </span>
-        </div>
+        <ModalHeader
+          title={props.title}
+          goBackEnabled={props.goBackEnabled}
+          dismiss={props.dismiss}
+          goBack={props.goBack}
+        />
         {props.children}
       </div>
     </>
