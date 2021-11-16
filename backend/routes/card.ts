@@ -1,6 +1,7 @@
 import express from "express";
 import { body, header, param } from "express-validator";
 import multer from "multer";
+import * as dotenv from "dotenv";
 import { checkAuthToken } from "../middlewares/authorize";
 import {
   fetchCard,
@@ -16,9 +17,11 @@ import {
 } from "../controllers/card";
 import { GridFsStorage } from "multer-gridfs-storage";
 
+
+dotenv.config({ path: "./.env" });
+
 const cardRouter = express.Router();
-const url =
-  "mongodb+srv://admin:admin@cluster0.sbbtj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const url = process.env.MONGO_URI!;
 const storage = new GridFsStorage({ url });
 const upload = multer({ storage });
 
