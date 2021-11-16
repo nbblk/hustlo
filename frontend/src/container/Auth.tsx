@@ -136,7 +136,6 @@ const Auth = (props: any) => {
         }
         isPwdValid={account.password.valid}
         isEmailValid={account.email.valid}
-        isAllValid={account.valid}
         submitEmail={(event: FormEvent<HTMLButtonElement>) =>
           auth.requestEmailVerification(event, account.email.value)
         }
@@ -157,7 +156,7 @@ const Auth = (props: any) => {
         }
         errorMsg={auth.errorMsg}
         googleSuccess={(response: any) => auth.googleLoginSuccess(response)}
-        googleFail={(error: any) => auth.googleLoginFailure(error)}
+        googleFailure={(error: any) => auth.googleLoginFailure(error)}
         msLoginHandler={(response: any) => auth.msLoginHandler(response)}
       />
       <div className="absolute bottom-4">

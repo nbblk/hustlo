@@ -20,7 +20,7 @@ type InputBoxProps = {
 const InputBox = (props: InputBoxProps) => {
   const style = `
   ${props.display!} 
-  ${props.border ? props.border + " " + props.borderColor : ""} 
+  ${props.border ? "border " + props.borderColor : ""} 
   h-${props.height} 
   w-${props.width} 
   mx-${props.marginX} 

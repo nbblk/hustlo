@@ -1,3 +1,4 @@
+import { ChangeEvent, FormEvent } from "react";
 import { Link } from "react-router-dom";
 import Forgot from "./Form/Forgot";
 import { GoogleOauthLoginButton } from "./Form/GoogleOauthLoginButton";
@@ -5,7 +6,25 @@ import Login from "./Form/Login";
 import { MsOauthLoginButton } from "./Form/MsOauthLoginButton";
 import Signup from "./Form/Signup";
 
-const AuthForm = (props: any) => {
+interface AuthFormProps {
+  type: string;
+  emailValue: string;
+  passwordValue: string;
+  isEmailValid: boolean;
+  isPwdValid: boolean;
+  errorMsg: string;
+  checkEmail: (event: ChangeEvent<HTMLInputElement>) => void;
+  checkPassword: (event: ChangeEvent<HTMLInputElement>) => void;
+  setupPassword: (event: FormEvent<HTMLButtonElement>) => void;
+  login: (event: FormEvent<HTMLButtonElement>) => void;
+  submitEmail: (event: FormEvent<HTMLButtonElement>) => void;
+  sendRecoveryEmail: (event: FormEvent<HTMLButtonElement>) => void;
+  googleSuccess: (response: any) =>  void;
+  googleFailure: (response: any) => void;
+  msLoginHandler: (response: any) => void;
+}
+
+const AuthForm = (props: AuthFormProps) => {
   const getTitle = () => {
     let title;
     switch (props.type) {
@@ -38,7 +57,6 @@ const AuthForm = (props: any) => {
             passwordValue={props.passwordValue}
             isEmailValid={props.isEmailValid}
             isPwdValid={props.isPwdValid}
-            isAllValid={props.isAllValid}
             checkEmail={props.checkEmail}
             checkPassword={props.checkPassword}
             setupPassword={props.setupPassword}
@@ -54,7 +72,6 @@ const AuthForm = (props: any) => {
             passwordValue={props.passwordValue}
             isEmailValid={props.isEmailValid}
             isPwdValid={props.isPwdValid}
-            isAllValid={props.isAllValid}
             checkEmail={props.checkEmail}
             checkPassword={props.checkPassword}
             setupPassword={props.setupPassword}
@@ -101,7 +118,7 @@ const AuthForm = (props: any) => {
       <div className={`${props.type === "login" ? "block" : "hidden"}`}>
         <GoogleOauthLoginButton
           googleSuccess={props.googleSuccess}
-          googleFail={props.googleFail}
+          googleFailure={props.googleFailure}
         />
         <MsOauthLoginButton msLoginHandler={props.msLoginHandler} />
       </div>
@@ -109,12 +126,14 @@ const AuthForm = (props: any) => {
       <div className="h-1/3 text-blue text-sm">
         <Link to="/forgot">
           <button className="m-2 hover:underline cursor-pointer">
-          {props.type === "login" ? "Can't Log in?" : ""}
+            {props.type === "login" ? "Can't Log in?" : ""}
           </button>
         </Link>
         <Link to="/login">
           <button className="m-2 hover:underline cursor-pointer">
-            {props.type === "signup" || props.type === "forgot" ? "Back to Log in" : ""}
+            {props.type === "signup" || props.type === "forgot"
+              ? "Back to Log in"
+              : ""}
           </button>
         </Link>
         <Link to="/signup">
