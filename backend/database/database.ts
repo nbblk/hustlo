@@ -17,7 +17,9 @@ mongoose.connect(uri, {
     useFindAndModify: true,
     useUnifiedTopology: true,
     useCreateIndex: true
-});
+}).catch((error: any) => {
+    console.error(error);
+})
 
 database = mongoose.connection;
 

@@ -5,7 +5,6 @@ import Landing from "./Landing";
 import PageNotFound from "../components/PageNotFound";
 import { useAuth } from "../hooks/use-auth";
 import Board from "./Board";
-import Archived from "./Archived";
 
 function Main() {
   const auth = useAuth();
@@ -25,7 +24,11 @@ function Main() {
         <Auth type="password" />
       </Route>
       <Route path="/main">
-        {sessionStorage.getItem("user") ? <Workspace /> : <Redirect to="/login" />}
+        {sessionStorage.getItem("user") ? (
+          <Workspace />
+        ) : (
+          <Redirect to="/login" />
+        )}
       </Route>
       <Route path="/logout">{() => auth.basicLogout()}</Route>
       <Route path="/forgot">
@@ -37,9 +40,6 @@ function Main() {
       <Route exact path="/board/:boardId">
         <Board />
       </Route>
-      {/* <Route path="/board/:boardId/archived">
-        <Archived />
-      </Route> */}
       <Route path="/page-not-found">
         <PageNotFound />
       </Route>

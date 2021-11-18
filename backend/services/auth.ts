@@ -120,9 +120,10 @@ export const authenticateUsingOAuth = async (user: {
     if (!email) {
       throw new Error("Email doesn't exist");
     }
-    await createOauthUser(user.type, email);
+    const _id = await createOauthUser(user.type, email);
 
     return {
+      _id: _id,
       email: email,
       token: generateJwt(email),
       firstLetter: email.charAt(0).toUpperCase(),
@@ -148,6 +149,8 @@ const createOauthUser = async (type: string, email: string) => {
       throw new Error("Failed to create a user: " + error.message);
     });
   }
+  const userInfo = await UserModel.findOne({ oauth: type, email: email }, "_id").exec();
+  return userInfo!.id;
 };
 
 export const sendEmailWithLink = async (email: string) => {

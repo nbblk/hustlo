@@ -1,5 +1,5 @@
 import express from "express";
-import { body, param } from "express-validator";
+import { body, header, param } from "express-validator";
 import {
   createWorkspace,
   fetchWorkspace,
@@ -11,7 +11,12 @@ import { checkAuthToken } from "../middlewares/authorize";
 
 const workspaceRouter = express.Router();
 
-workspaceRouter.get("/", checkAuthToken, fetchWorkspace);
+workspaceRouter.get(
+  "/",
+  checkAuthToken,
+  header("_id").notEmpty(),
+  fetchWorkspace
+);
 workspaceRouter.post(
   "/",
   checkAuthToken,
