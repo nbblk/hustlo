@@ -30,7 +30,7 @@ const signup = async (
         status = 400;
         message = errors.array();
       } else {
-        status = 401;
+        status = 400;
         message = error.message;
       }
       res.status(status).send(error.message);

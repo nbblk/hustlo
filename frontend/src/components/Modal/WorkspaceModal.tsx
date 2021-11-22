@@ -42,8 +42,8 @@ const WorkspaceModal = (props: any) => {
 
   return (
     <Modal
-      width="1/3"
-      height="1/2"
+      width="screen md:w-1/3"
+      height="auto md:h-1/2"
       title={`${props.type} workspace`}
       dismiss={props.dismiss}
     >
@@ -59,6 +59,8 @@ const WorkspaceModal = (props: any) => {
           height="1/5"
           width="full"
           marginY="2"
+          border={true}
+          borderColor={"border-gray-lightest"}
           value={props.type === "Update" && props.formValues.name ? props.formValues.name : null}
           change={(event: ChangeEvent<HTMLInputElement>) => nameHandler(event)}
         />
@@ -69,6 +71,8 @@ const WorkspaceModal = (props: any) => {
           height="24"
           width="full"
           marginY="2"
+          border={true}
+          borderColor={"border-gray-lightest"}
           value={props.type === "Update" && props.formValues.description ? props.formValues.description : null}
           change={(event: ChangeEvent<HTMLInputElement>) =>
             descriptionHandler(event)

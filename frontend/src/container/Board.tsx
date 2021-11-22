@@ -589,6 +589,7 @@ function Board(props: any) {
         isShadowed={false}
         textColor={"white"}
         fontSize={"md"}
+        createMenuActive={props.createMenuActive}
         createBoardClicked={props.createBoardClicked}
         createWorkspaceClicked={props.createWorkspaceClicked}
       />

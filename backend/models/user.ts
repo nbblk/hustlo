@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-import { hash } from "bcryptjs";
 
 // 1. Create an interface representing a document in MongoDB.
 export interface User {
@@ -11,9 +10,9 @@ export interface User {
 
 // 2. Create a Schema corresponding to the document interface.
 const schema = new Schema<User>({
-  oauth: { type: String, required: false },
+  oauth: { type: String, required: false, default: "" },
   email: { type: String, required: true },
-  isVerified: { type: Boolean, required: true },
+  isVerified: { type: Boolean, required: true, default: false },
   hash: { type: String, required: false },
   password: { type: String, required: false },
 });

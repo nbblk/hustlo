@@ -2,18 +2,16 @@ import { useAuth } from "../../hooks/use-auth";
 import DefaultHeaderContent from "./DefaultHeaderContent";
 import LoggedInHeaderContent from "./LoggedInHeaderContent";
 
-type HeaderProps = {
+interface HeaderProps {
   bgColor: string;
   isShadowed: boolean;
   textColor: string;
   fontSize: string;
   list?: any[];
-  createWorkspaceClicked?: () => void;
-  createBoardClicked?: () => void;
 };
 
-const Header = (props: HeaderProps) => {
-  const style = `w-full m-0 p-2 sticky z-50 top-0 flex flex-col md:flex-row justify-center md:justify-between items-center bg-${
+const Header = (props: any) => {
+  const style = `w-full m-0 p-2 sticky z-40 top-0 flex flex-col md:flex-row justify-center md:justify-between items-center bg-${
     props.bgColor
   } ${props.isShadowed ? "shadow boxShadow" : null} font-krona font-${
     props.fontSize
@@ -25,7 +23,9 @@ const Header = (props: HeaderProps) => {
     <nav className={style}>
       {auth.loggedIn ? (
         <LoggedInHeaderContent
-         list={props.list}
+         createMenuActive={props.createMenuActive}
+         createMenuClicked={props.createMenuClicked}
+         createMenuDismiss={props.createMenuDismiss}
          createBoardClicked={props.createBoardClicked}
          createWorkspaceClicked={props.createWorkspaceClicked}
         />
