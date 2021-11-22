@@ -16,6 +16,8 @@ type buttonProps = {
   isCircle?: boolean;
   opacity?: string;
   bgColor?: string;
+  border?: boolean;
+  borderColor?: string;
   click?: (event?: React.MouseEvent) => void;
 };
 
@@ -27,7 +29,9 @@ const ButtonWithIcon = (props: buttonProps) => {
   h-${ props.height} 
   ${props.isCircle ? "rounded-full" : "rounded"} 
   bg-${props.bgColor ? props.bgColor : "white"} 
-  bg-${props.opacity ? props.opacity : "opacity-25"} 
+  ${props.border ? "border" : ""}
+  ${props.borderColor ? ` border-${props.borderColor}` : ""}
+  bg-${props.opacity ? props.opacity : "opacity-25"}
   ${props.textColor} 
   text-${props.fontSize} 
   text-center`;

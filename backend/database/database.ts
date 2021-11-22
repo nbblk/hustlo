@@ -1,9 +1,13 @@
 import mongoose from "mongoose";
+import * as dotenv from "dotenv";
 
 let database: mongoose.Connection;
 
+dotenv.config({ path: "./.env" });
+
+const uri = process.env.MONGO_URI!;
+
 export const connect = () => {
-const uri = "mongodb+srv://admin:admin@cluster0.sbbtj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
 if (database) {
     return;
@@ -13,7 +17,9 @@ mongoose.connect(uri, {
     useFindAndModify: true,
     useUnifiedTopology: true,
     useCreateIndex: true
-});
+}).catch((error: any) => {
+    console.error(error);
+})
 
 database = mongoose.connection;
 

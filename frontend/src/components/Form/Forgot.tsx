@@ -11,13 +11,15 @@ const Forgot = (props: any) => {
         height="10"
         width="full"
         marginY="2"
+        border={true}
+        borderColor={"border-gray-lightest"}
         change={props.checkEmail}
       />
-      <small className="text-red text-left font-nunito">
+      <p className="text-red text-sm text-center font-nunito">
         {props.emailValue.length > 0 && !props.isEmailValid
           ? "Please enter a valid email"
           : null}
-      </small>
+      </p>
       <Button
         bgColor="green"
         textColor="white"

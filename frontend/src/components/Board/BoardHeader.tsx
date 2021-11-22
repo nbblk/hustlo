@@ -131,20 +131,6 @@ const BoardHeader = (props: BoardHeaderProps) => {
             disabled={!props.titleActive}
           />
         </span>
-        {/* <ButtonWithIcon
-          width={"10"}
-          height={"10"}
-          margin={"0"}
-          padding={"0"}
-          value={""}
-          textColor={"gray"}
-          bgColor={"bg-gray-regular"}
-          fontSize={"md"}
-          isIcon={true}
-          iconProp={star ? filledStar : emptyStar}
-          isCircle={false}
-          click={() => setStared(!star)}
-        /> */}
         <div className="relative">
           <Button
             height={"10"}
@@ -218,7 +204,6 @@ const BoardHeader = (props: BoardHeaderProps) => {
           />
         ) : null}
       </div>
-      {/* {modal.board ? <div>board</div> : null} */}
     </div>
   );
 };

@@ -2,7 +2,12 @@ import { GoogleLogin } from "react-google-login";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import OauthButton from "./OauthLoginButton";
 
-export const GoogleOauthLoginButton = (props: any) => {
+interface GoogleOauthLoginButton {
+  googleSuccess: (response: any) => void;
+  googleFailure: (response: any) => void;
+}
+
+export const GoogleOauthLoginButton = (props: GoogleOauthLoginButton) => {
   return (
     <GoogleLogin
       clientId={process.env.REACT_APP_GOOGLE_OAUTH_ID!}

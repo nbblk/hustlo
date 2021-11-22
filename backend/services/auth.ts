@@ -26,7 +26,7 @@ const createUser = async (email: string) => {
     }
   } catch (error: any) {
     console.error(error);
-    throw Error("Failed to create a user");
+    throw Error(error);
   }
   return userDoc;
 };
@@ -83,7 +83,7 @@ export const addPassword = async (email: string, password: string) => {
 
 // Retrieve the email and password, then generate jwt to grant access
 export const authenticate = async (email: string, password: string) => {
-  const query = { email: email };
+  const query = { email: email, isVerified: true, oauth: null };
   let jwt = null;
   let userDoc;
   try {
@@ -92,7 +92,6 @@ export const authenticate = async (email: string, password: string) => {
       throw new Error("Email or password is incorrect. Please try again. ");
     } else {
       const isMatched = await compare(password, userDoc.password);
-
       if (!isMatched) {
         throw new Error("Password is incorrect. Please try again.");
       } else {
@@ -120,9 +119,10 @@ export const authenticateUsingOAuth = async (user: {
     if (!email) {
       throw new Error("Email doesn't exist");
     }
-    await createOauthUser(user.type, email);
+    const _id = await createOauthUser(user.type, email);
 
     return {
+      _id: _id,
       email: email,
       token: generateJwt(email),
       firstLetter: email.charAt(0).toUpperCase(),
@@ -148,6 +148,11 @@ const createOauthUser = async (type: string, email: string) => {
       throw new Error("Failed to create a user: " + error.message);
     });
   }
+  const userInfo = await UserModel.findOne(
+    { oauth: type, email: email },
+    "_id"
+  ).exec();
+  return userInfo!.id;
 };
 
 export const sendEmailWithLink = async (email: string) => {

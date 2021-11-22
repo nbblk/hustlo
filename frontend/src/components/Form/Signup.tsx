@@ -10,12 +10,14 @@ const Signup = (props: any) => (
       height="10"
       change={props.checkEmail}
       value={props.emailValue}
+      border={true}
+      borderColor={"border-gray-lightest"}
     />
-    <small className="text-red text-left font-nunito">
+    <p className="text-red text-center text-sm font-nunito">
       {props.emailValue > 0 && !props.isEmailValid
         ? "Please enter a valid email"
         : null}
-    </small>
+    </p>
     <small className="block my-4">
       By signing up, you confirm that you've read and accepted your{" "}
       <a href="/terms-of-service" className="text-blue">

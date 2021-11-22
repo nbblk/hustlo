@@ -1,12 +1,18 @@
-const ContextMenu = (props: any) => (
+interface ContextMenuProps {
+  active: boolean;
+  edit: () => void;
+  delete: () => void;
+}
+
+const ContextMenu = (props: ContextMenuProps) => (
   <div
     className={`${
       props.active ? "block" : "hidden"
-    } z-50 absolute top-0 left-4 w-32 h-20 p-4 flex flex-col justify-center items-start bg-gray-lightest rounded shadowed font-nunito cursor-pointer`}
+    } z-40 absolute top-6 right-0 w-24 h-14 p-4 flex flex-col justify-center items-start bg-white border rounded shadowed font-nunito cursor-pointer`}
   >
-    <ul>
-      <li onClick={props.edit}>Edit</li>
-      <li onClick={props.delete}>Delete</li>
+    <ul className="w-full text-sm">
+      <li className="hover:bg-gray-lightest" onClick={props.edit}>Edit</li>
+      <li className="hover:bg-gray-lightest" onClick={props.delete}>Delete</li>
     </ul>
   </div>
 );

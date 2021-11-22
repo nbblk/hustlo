@@ -16,9 +16,18 @@ const fetchWorkspace = async (req: express.Request, res: express.Response) => {
   try {
     list = await fetch(_id);
     res.send(list).status(200);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    res.sendStatus(500);
+    const errors = validationResult(req);
+    let status, message;
+    if (!errors.isEmpty()) {
+      status = 400;
+      message = errors.array();
+    } else {
+      status = 500;
+      message = error.message;
+    }
+    res.status(status).send(message);
   }
 };
 

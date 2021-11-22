@@ -17,8 +17,9 @@ export type NewBoardProps = {
 
 function Workspace() {
   const [workspace, setWorkspace] = useState({
+    createMenuActive: false,
     createWorkspace: false,
-    createBoard: true,
+    createBoard: false,
     updateWorkspace: false,
     fetchWorkspace: false,
     deleteWorkspace: false,
@@ -33,10 +34,37 @@ function Workspace() {
     setWorkspace({ ...workspace, modal: false });
   };
 
+  const createMenuClicked = () => {
+    setWorkspace({
+      ...workspace,
+      modal: false,
+      createMenuActive: true,
+      createWorkspace: false,
+      createBoard: false,
+      updateWorkspace: false,
+      fetchWorkspace: false,
+      deleteWorkspace: false,
+    })
+  };
+
+  const createMenuDismiss = () => {
+    setWorkspace({
+      ...workspace,
+      modal: false,
+      createMenuActive: false,
+      createWorkspace: false,
+      createBoard: false,
+      updateWorkspace: false,
+      fetchWorkspace: false,
+      deleteWorkspace: false,
+    })
+  };
+
   const createBoardClicked = () => {
     setWorkspace({
       ...workspace,
       modal: true,
+      createMenuActive: false,
       createWorkspace: false,
       createBoard: true,
       updateWorkspace: false,
@@ -49,6 +77,7 @@ function Workspace() {
     setWorkspace({
       ...workspace,
       modal: true,
+      createMenuActive: false,
       createWorkspace: true,
       createBoard: false,
       updateWorkspace: false,
@@ -62,6 +91,7 @@ function Workspace() {
       ...workspace,
       current: { index: index, name: workspace.list[index].name },
       modal: true,
+      createMenuActive: false,
       updateWorkspace: true,
       createWorkspace: false,
       createBoard: false,
@@ -75,6 +105,7 @@ function Workspace() {
       ...workspace,
       current: { name: workspace.list[index].name, index: index },
       modal: true,
+      createMenuActive: false,
       deleteWorkspace: true,
       updateWorkspace: false,
       createWorkspace: false,
@@ -311,6 +342,9 @@ function Workspace() {
         fontSize="md"
         textColor="white"
         list={workspace.list}
+        createMenuActive={workspace.createMenuActive}
+        createMenuClicked={() => createMenuClicked()}
+        createMenuDismiss={() => createMenuDismiss()}
         createBoardClicked={() => createBoardClicked()}
         createWorkspaceClicked={() => createWorkspaceClicked()}
       />
