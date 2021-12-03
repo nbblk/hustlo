@@ -41,6 +41,11 @@ type BoardProps = {
   restoreList: boolean;
   archiveCard: boolean;
   archivedCards?: any;
+  previousDroppableId: string;
+  currentDraggableId: string;
+  currentDroppableId: string;
+  currentDroppableIndex: number;
+  reorderList: boolean;
 };
 
 export type CardType = {
@@ -86,6 +91,11 @@ function Board(props: any) {
     restoreList: false,
     archiveCard: false,
     archivedCards: [],
+    previousDroppableId: "",
+    currentDraggableId: "",
+    currentDroppableId: "",
+    currentDroppableIndex: 0,
+    reorderList: false,
   });
 
   // a little function to help us with reordering the result
@@ -101,11 +111,17 @@ function Board(props: any) {
     return result;
   };
 
-  const onDragEnd = (result: DropResult) => {
-    console.dir(result);
+  const onDragEnd = async (result: DropResult) => {
     if (!result.destination) {
       return;
     }
+    console.log(result);
+    console.log(
+      result.source.droppableId,
+      result.destination.droppableId,
+      result.draggableId,
+      result.destination.index
+    );
     let curList = board.lists
       ? board.lists.find((list: ListProps, index: number) => {
           if (list._id === result.source.droppableId) {
@@ -125,7 +141,53 @@ function Board(props: any) {
 
     let newLists = [...board.lists!];
     newLists[board.current] = curList!;
-    setBoard({ ...board, lists: newLists });
+    setBoard({
+      ...board,
+      lists: newLists,
+      previousDroppableId: result.source.droppableId,
+      currentDroppableId: result.destination.droppableId,
+      currentDraggableId: result.draggableId,
+      currentDroppableIndex: result.destination.index,
+      reorderList: true,
+    });
+  };
+
+  const updateLists = async () => {
+    let user = JSON.parse(sessionStorage.getItem("user")!);
+
+    try {
+      await axios.request({
+        method: "PATCH",
+        url: `${process.env.REACT_APP_BASEURL}/board/list/reorder`,
+        headers: { _id: user._id, Authorization: `Bearer ${user.token}` },
+        data: {
+          workspaceId: workspaceId,
+          boardId: boardId,
+          oldListId: board.previousDroppableId,
+          newListId: board.currentDroppableId,
+          newListIndex: board.currentDroppableIndex,
+          cardId: board.currentDraggableId,
+        },
+      });
+      setBoard({
+        ...board,
+        reorderList: false,
+        previousDroppableId: "",
+        currentDraggableId: "",
+        currentDroppableId: "",
+        currentDroppableIndex: 0,
+      });
+    } catch (error) {
+      setBoard({
+        ...board,
+        reorderList: false,
+        previousDroppableId: "",
+        currentDraggableId: "",
+        currentDroppableId: "",
+        currentDroppableIndex: 0,
+      });
+      console.error(error);
+    }
   };
 
   const changeBoardTitle = (event: ChangeEvent<HTMLInputElement>) => {
@@ -495,6 +557,10 @@ function Board(props: any) {
       archiveCard();
     }
 
+    if (board.reorderList) {
+      updateLists();
+    }
+
     const fetch = async () => {
       let result;
       try {
@@ -528,15 +594,10 @@ function Board(props: any) {
     if (board.fetch) {
       fetch();
     }
-  }, [
-    board.fetch,
-    board.update,
-    board.restoreList,
-    board.archiveCard,
-  ]);
+  }, [board.fetch, board.update, board.archiveCard, board.reorderList]);
 
   return (
-    <div className="w-full h-screen bg-gray-lightest">
+    <div className="w-full h-full bg-gray-lightest overflow-x-scroll">
       {board.loading ? <Loader loading /> : null}
       {board.cardOpen ? (
         <CardModal
@@ -616,7 +677,7 @@ function Board(props: any) {
         ) => clickRestoreCardButton(index, listId, cardId)}
         clickBoardToMove={() => clickBoardToMove()}
       />
-      <div className="flex justify-start items-start overflow-auto">
+      <div className="w-full flex flex-nowrap justify-start items-start overflow-x-scroll">
         <DragDropContext onDragEnd={(result: DropResult) => onDragEnd(result)}>
           {board.lists?.map((list: ListProps, index: number) => (
             <List
@@ -645,12 +706,14 @@ function Board(props: any) {
               }
             />
           ))}
-          <button
-            className="w-60 h-10 mt-4 bg-gray-regular rounded text-center hover:opacity-25"
-            onClick={() => addList()}
-          >
-            Add a list
-          </button>
+          <span className="">
+            <button
+              className="w-64 h-10 mt-4 bg-gray-regular rounded text-center hover:opacity-25"
+              onClick={() => addList()}
+            >
+              Add a list
+            </button>
+          </span>
         </DragDropContext>
       </div>
     </div>

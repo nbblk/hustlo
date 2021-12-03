@@ -149,3 +149,99 @@ export const getBoardTitles = async (workspaceId: string) => {
     throw new Error(error);
   }
 };
+
+export const updateLists = async (data: {
+  workspaceId: string;
+  boardId: string;
+  oldListId: string;
+  newListId: string;
+  newListIndex: number;
+  cardId: string;
+}) => {
+  try {
+    let cardToPush = await WorkspaceModel.aggregate([
+      {
+        $match: { _id: mongoose.Types.ObjectId(data.workspaceId) },
+      },
+      {
+        $unwind: "$boards",
+      },
+      {
+        $match: { "boards._id": mongoose.Types.ObjectId(data.boardId) },
+      },
+      {
+        $project: { boards: 1, _id: 0 },
+      },
+      {
+        $match: { "boards.lists._id": mongoose.Types.ObjectId(data.oldListId)}
+      },
+      {
+        $replaceRoot: { newRoot: "$boards" }
+      },
+      {
+        $unwind: "$lists"
+      },
+      {
+        $match: {"lists.cards._id": mongoose.Types.ObjectId(data.cardId) }
+      },
+      {
+        $project: { lists: 1, _id: 0 }
+      },
+      {
+        $replaceRoot: { newRoot: "$lists" }
+      },
+      {
+        $unwind: "$cards"
+      },
+      {
+        $match: {"cards._id": mongoose.Types.ObjectId(data.cardId)}
+      },
+      {
+        $project: { "cards": 1, _id: 0 }
+      },
+      {
+        $replaceRoot: { newRoot: "$cards" }
+      }
+    ]).exec();
+
+    await WorkspaceModel.findOneAndUpdate(
+      { _id: mongoose.Types.ObjectId(data.workspaceId) },
+      {
+        $pull: {
+          "boards.$[board].lists.$[list].cards": {
+            _id: mongoose.Types.ObjectId(data.cardId),
+          },
+        },
+      },
+      {
+        arrayFilters: [
+          { "board._id": mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": mongoose.Types.ObjectId(data.oldListId) },
+        ],
+      }
+    ).exec();
+    
+    await WorkspaceModel.updateOne(
+      {
+        _id: mongoose.Types.ObjectId(data.workspaceId)
+      },
+      {
+        $push: {
+          "boards.$[board].lists.$[list].cards": {
+            $each: cardToPush,
+            $position: data.newListIndex
+          }
+        }
+      },
+      {
+        arrayFilters: [
+          { "board._id": mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": mongoose.Types.ObjectId(data.newListId) },
+        ],
+      }
+    )
+  } catch (error: any) {
+    console.error(error);
+    throw new Error(error);
+  }
+};
