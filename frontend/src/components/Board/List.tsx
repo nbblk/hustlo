@@ -15,7 +15,7 @@ export type ListProps = {
   active: boolean;
   clickAddCard: boolean;
   cardTitleActive: boolean;
-  cards?: CardType[];
+  cards: CardType[];
   change: (event: ChangeEvent<HTMLInputElement>) => void;
   blurListTitle: () => void;
   focusListTitle: () => void;
@@ -30,14 +30,13 @@ const List = (props: ListProps) => {
   const getListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver ? "lightblue" : "lightgrey",
     padding: 8,
-    width: 250,
   });
 
   return (
     <Droppable droppableId={props._id}>
       {(provided, snapshot) => (
         <div
-          className="w-full h-full rounded m-4 flex flex-col shadow shadow-md overflow-y-auto"
+          className="rounded m-4 flex flex-col shadow shadow-md"
           ref={provided.innerRef}
           style={getListStyle(snapshot.isDraggingOver)}
           {...provided.droppableProps}
@@ -50,24 +49,32 @@ const List = (props: ListProps) => {
             focus={props.focusListTitle}
             blur={props.blurListTitle}
           />
-          {props.cards ? props.cards.map((card: CardType, index: number) => (
-            <Draggable key={card._id} draggableId={card._id} index={index}>
-              {(provided, snapshot) => {
+          {props.cards[0] !== undefined
+            ? props.cards.map((card: CardType, index: number) => {
                 return (
-                  <Card
-                    _id={card._id}
-                    title={card.title}
-                    labels={card.labelsSelected}
-                    provided={provided}
-                    snapshot={snapshot}
-                    click={() =>
-                      props.clickCard(card._id, card.title, props._id)
-                    }
-                  />
+                  <Draggable
+                    key={card._id}
+                    draggableId={card._id}
+                    index={index}
+                  >
+                    {(provided, snapshot) => {
+                      return (
+                        <Card
+                          _id={card._id}
+                          title={card.title}
+                          labels={card.labelsSelected}
+                          provided={provided}
+                          snapshot={snapshot}
+                          click={() =>
+                            props.clickCard(card._id, card.title, props._id)
+                          }
+                        />
+                      );
+                    }}
+                  </Draggable>
                 );
-              }}
-            </Draggable>
-          )) : null}
+              })
+            : null}
           {props._id === props.curListId &&
           props.clickAddCard &&
           props.cardTitleActive ? (
@@ -82,8 +89,17 @@ const List = (props: ListProps) => {
               />
             </div>
           ) : null}
-          <ListButton icon={faPlus} value={"Add new card"} click={props.addCard} />
-          <ListButton icon={faArchive} value={"Archive"} click={props.clickArchiveListButton} />
+          {provided.placeholder}
+          <ListButton
+            icon={faPlus}
+            value={"Add new card"}
+            click={props.addCard}
+          />
+          <ListButton
+            icon={faArchive}
+            value={"Archive"}
+            click={props.clickArchiveListButton}
+          />
         </div>
       )}
     </Droppable>

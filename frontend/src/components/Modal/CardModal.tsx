@@ -340,8 +340,9 @@ const CardModal = (props: CardModalProps) => {
         />
       ) : null}
       <Modal
-        width={"w-full h-4/5 md:w-1/2"}
-        height={"1/2"}
+        width={"full md:w-1/2"}
+        height={"full md:h-4/5 "}
+        zIndex={"40"}
         title={props.title}
         bgColor="gray-lightest"
         dismiss={props.dismiss}

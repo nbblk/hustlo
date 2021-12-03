@@ -33,7 +33,7 @@ type Comment = {
 
 const Contents = (props: ContentsProps) => (
   <div className="w-2/3 h-full flex flex-col justify-between items-start">
-    {props.labels.length > 0 ? (
+    {props.labels.find((label: LabelType) => label.checked) !== undefined ? (
       <Content title={"LABELS"}>
         <ul className="flex justify-center items-center">
           {props.labels.map((label: LabelType, index: number) =>
@@ -52,9 +52,9 @@ const Contents = (props: ContentsProps) => (
     <Content title={"Description"} icon={faPen}>
       <div onClick={props.focusDescription} className="w-full h-auto">
         <textarea
+          className="w-full h-full m-2 p-2 bg-gray-regular rounded"
           defaultValue={props.description}
           placeholder="Add more detailed description..."
-          className="m-2 p-2 bg-gray-regular rounded"
           disabled={!props.descriptionEnabled}
           onChange={props.changeDescription}
           onBlur={props.updateDescription}
@@ -85,26 +85,26 @@ const Contents = (props: ContentsProps) => (
       </Content>
     ) : null}
     <Content title={"Comment"} icon={faComment}>
-      <div className="w-full flex justify-between items-center">
+      <div className="w-full flex flex-col justify-between items-end">
         <InputBox
           type={"text"}
-          height={"8"}
+          height={"full"}
           width={"full"}
           placeholder={"Add a comment..."}
           change={props.changeComment}
         />
         <button
-          className="w-12 h-8 bg-blue text-white rounded"
+          className="w-1/3 md:w-1/5 h-8 my-2 bg-blue text-white rounded hover:opacity-25"
           onClick={props.clickAddCommentButton}
         >
           Add
         </button>
       </div>
-      <ul className="w-full h-auto m-2 font-gray">
+      <ul className="w-full h-auto m-2 font-gray overflow-y-scroll">
         {props.comments.map((comment: Comment) => (
           <li
             key={comment._id}
-            className="w-full flex justify-between items-center"
+            className="w-full my-2 flex flex-col md:flex-row justify-between items-start md:items-center"
           >
             <span className="">{comment.comment}</span>
             <span className="text-xs">{comment.created_at}</span>

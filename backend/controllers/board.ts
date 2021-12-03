@@ -1,8 +1,21 @@
 import express from "express";
-import { create, fetchByKeyword, modifyTitle, updateWorkspace, getWorkspaceList, getBoardTitles } from "../services/board";
+import {
+  create,
+  fetchByKeyword,
+  modifyTitle,
+  updateWorkspace,
+  getWorkspaceList,
+  getBoardTitles,
+  updateLists
+} from "../services/board";
 import * as dotenv from "dotenv";
 import { validationResult } from "express-validator";
-import { create as addList, archive, fetch, fetchArchived } from "../services/list";
+import {
+  create as addList,
+  archive,
+  fetch,
+  fetchArchived,
+} from "../services/list";
 import {
   create as addCard,
   fetchCardInfo,
@@ -82,7 +95,7 @@ const updateTitle = async (req: express.Request, res: express.Response) => {
 
 const fetchLists = async (req: express.Request, res: express.Response) => {
   try {
-    let lists = await fetch(req.params.boardId, req.header('workspaceId')!);
+    let lists = await fetch(req.params.boardId, req.header("workspaceId")!);
     res.send(lists).status(200);
   } catch (error: any) {
     console.error(error);
@@ -109,9 +122,15 @@ const createList = async (req: express.Request, res: express.Response) => {
   }
 };
 
-const fetchArchivedList = async (req: express.Request, res: express.Response) => {
+const fetchArchivedList = async (
+  req: express.Request,
+  res: express.Response
+) => {
   try {
-    let result = await fetchArchived(req.params.boardId!, req.header('workspaceId')!);
+    let result = await fetchArchived(
+      req.params.boardId!,
+      req.header("workspaceId")!
+    );
     res.send(result).status(200);
   } catch (error: any) {
     console.error(error);
@@ -182,7 +201,7 @@ const fetchCard = async (req: express.Request, res: express.Response) => {
       workspaceId: req.body.workspaceId,
       boardId: req.body.boardId,
       listId: req.params.listId,
-    }); 
+    });
     res.send(card).status(200);
   } catch (error: any) {
     console.error(error);
@@ -232,7 +251,7 @@ const changeWorkspace = async (req: express.Request, res: express.Response) => {
     await updateWorkspace({
       workspaceId: req.body.workspaceId,
       boardId: req.body.boardId,
-      newWorkspaceId: req.body.newWorkspaceId
+      newWorkspaceId: req.body.newWorkspaceId,
     });
     res.sendStatus(200);
   } catch (error: any) {
@@ -246,11 +265,14 @@ const changeWorkspace = async (req: express.Request, res: express.Response) => {
       status = 500;
       message = error.message;
     }
-    res.status(status).send(message);    
+    res.status(status).send(message);
   }
 };
 
-const fetchWorkspaceList = async (req: express.Request, res: express.Response) => {
+const fetchWorkspaceList = async (
+  req: express.Request,
+  res: express.Response
+) => {
   try {
     let list = await getWorkspaceList(req.header("_id")!);
     res.send(list).status(200);
@@ -265,11 +287,14 @@ const fetchWorkspaceList = async (req: express.Request, res: express.Response) =
       status = 500;
       message = error.message;
     }
-    res.status(status).send(message);    
+    res.status(status).send(message);
   }
 };
 
-const fetchBoardTitles = async (req: express.Request, res: express.Response) => {
+const fetchBoardTitles = async (
+  req: express.Request,
+  res: express.Response
+) => {
   try {
     let list = await getBoardTitles(req.header("workspaceId")!);
     res.send(list).status(200);
@@ -284,7 +309,33 @@ const fetchBoardTitles = async (req: express.Request, res: express.Response) => 
       status = 500;
       message = error.message;
     }
-    res.status(status).send(message);    
+    res.status(status).send(message);
+  }
+};
+
+const reorderLists = async (req: express.Request, res: express.Response) => {
+  try {
+    await updateLists({
+      workspaceId: req.body.workspaceId,
+      boardId: req.body.boardId,
+      oldListId: req.body.oldListId,
+      newListId: req.body.newListId,
+      newListIndex: req.body.newListIndex,
+      cardId: req.body.cardId,
+    });
+    res.sendStatus(200);
+  } catch (error: any) {
+    console.error(error);
+    const errors = validationResult(req);
+    let status, message;
+    if (!errors.isEmpty()) {
+      status = 400;
+      message = errors.array();
+    } else {
+      status = 500;
+      message = error.message;
+    }
+    res.status(status).send(message);
   }
 };
 
@@ -301,5 +352,6 @@ export {
   updateCardDescription,
   changeWorkspace,
   fetchWorkspaceList,
-  fetchBoardTitles
+  fetchBoardTitles,
+  reorderLists,
 };

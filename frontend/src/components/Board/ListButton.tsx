@@ -8,7 +8,7 @@ interface ListButtonProps {
 }
 
 const ListButton = (props: ListButtonProps) => (
-  <div className="my-2 cursor-pointer hover:opacity-25" onClick={props.click}>
+  <div className="w-64 my-2 cursor-pointer hover:opacity-25" onClick={props.click}>
     <span>
       <FontAwesomeIcon icon={props.icon} className="mx-2" />
       {props.value}
