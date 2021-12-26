@@ -126,45 +126,53 @@ const BoardHeader = (props: BoardHeaderProps) => {
             disabled={!props.titleActive}
           />
         </span>
-        <Button
-          height={"10"}
-          width={"44"}
-          marginX={"2"}
-          marginY={"2"}
-          bgColor={"gray-regular"}
-          textColor={"gray"}
-          hoverColor={"opacity-50"}
-          value={"Change workplace"}
-          click={() =>
-            setModal({ workspace: true, board: false, archived: false })
-          }
-        />
-        {modal.workspace ? (
-          <ChangeWorkspaceMenu
-            dismiss={() => setModal({ ...modal, workspace: false })}
-            workspaceId={props.workspaceId}
-            boardId={props.boardId}
+        <div className="relative">
+          <Button
+            height={"10"}
+            width={"44"}
+            marginX={"2"}
+            marginY={"2"}
+            bgColor={"gray-regular"}
+            textColor={"gray"}
+            hoverColor={"opacity-50"}
+            value={"Change workplace"}
+            click={() =>
+              setModal({ workspace: true, board: false, archived: false })
+            }
           />
-        ) : null}
-        <Button
-          height={"10"}
-          width={"44"}
-          marginX={"2"}
-          marginY={"2"}
-          bgColor={"gray-regular"}
-          textColor={"gray"}
-          hoverColor={"opacity-50"}
-          value={props.title}
-          click={() =>
-            setModal({ workspace: false, board: !modal.board, archived: false })
-          }
-        />
-        {modal.board ? (
-          <MoveBoardMenu
-            workspaceId={props.workspaceId}
-            clickBoardToMove={props.clickBoardToMove}
+          {modal.workspace ? (
+            <ChangeWorkspaceMenu
+              dismiss={() => setModal({ ...modal, workspace: false })}
+              workspaceId={props.workspaceId}
+              boardId={props.boardId}
+            />
+          ) : null}
+        </div>
+        <div className="relative">
+          <Button
+            height={"10"}
+            width={"44"}
+            marginX={"2"}
+            marginY={"2"}
+            bgColor={"gray-regular"}
+            textColor={"gray"}
+            hoverColor={"opacity-50"}
+            value={props.title}
+            click={() =>
+              setModal({
+                workspace: false,
+                board: !modal.board,
+                archived: false,
+              })
+            }
           />
-        ) : null}
+          {modal.board ? (
+            <MoveBoardMenu
+              workspaceId={props.workspaceId}
+              clickBoardToMove={props.clickBoardToMove}
+            />
+          ) : null}
+        </div>
       </div>
       <ButtonWithIcon
         width={"44"}

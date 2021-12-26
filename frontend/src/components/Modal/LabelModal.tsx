@@ -58,6 +58,8 @@ const LabelModal = (props: LabelModalProps) => {
         <Button
           height={"9"}
           width={"full"}
+          marginX={"2"}
+          marginY={"2"}
           bgColor={"gray-lightest"}
           textColor={"gray-dark"}
           hoverColor={"opacity-25"}
@@ -97,6 +99,7 @@ const LabelModal = (props: LabelModalProps) => {
     >
       <h6 className="text-xs">LABELS</h6>
       <Labels
+        selectedLabelIndex={label.index}
         isEdit={props.isEdit}
         isAdd={props.isAdd}
         isMain={props.isMain}

@@ -4,9 +4,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ContextPopupHeader from "./ContextPropHeader";
 
 const CreateMenu = (props: {
-  click: () => void;
-  createBoardClicked: () => void;
-  createWorkspaceClicked: () => void;
+  click?: () => void;
+  createBoardClicked?: () => void;
+  createWorkspaceClicked?: () => void;
 }) => {
   return (
     <>

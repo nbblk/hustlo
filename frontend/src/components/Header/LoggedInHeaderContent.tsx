@@ -5,7 +5,16 @@ import ProfileMenu from "../ContextPopup/ProfileMenu";
 import CreateMenu from "../ContextPopup/CreateMenu";
 import axios from "axios";
 
-const LoggedInHeaderContent = (props: any) => {
+interface LoggedHeaderProps {
+  createMenuDismiss?: () => void;
+  createMenuClicked?: () => void;
+  createBoardClicked?: () => void;
+  createWorkspaceClicked?: () => void;
+  createMenuActive?: boolean;
+  profileMenuActive?: boolean;
+}
+
+const LoggedInHeaderContent = (props: LoggedHeaderProps) => {
   const [header, setHeader] = useState({
     isSearch: false,
     keyword: "",

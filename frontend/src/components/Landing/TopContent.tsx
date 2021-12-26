@@ -23,6 +23,8 @@ const TopContent = () => {
         height="10"
         marginX="0 md:mx-4"
         marginY="4"
+        border={true}
+        borderColor="border-gray-lightest"
         placeholder="Email"
         change={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
       />

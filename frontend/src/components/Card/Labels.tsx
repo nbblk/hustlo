@@ -8,6 +8,7 @@ interface LabelsProps {
   isEdit: boolean;
   isAdd: boolean;
   isMain: boolean;
+  selectedLabelIndex: number;
   clickLabelColor: (index: number, color: string) => void;
   clickEditLabelTitleIcon: (event: MouseEvent<HTMLSpanElement>) => void;
   clickNewLabelColor: (color: string, index: number) => void;
@@ -52,6 +53,7 @@ const Labels = (props: LabelsProps) => {
             !label.checked ? (
               <ColorChip
                 key={index}
+                isSelected={props.selectedLabelIndex === index ? true : false}
                 color={label.color}
                 click={() => props.clickNewLabelColor(label.color, index)}
               />

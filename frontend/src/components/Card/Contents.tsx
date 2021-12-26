@@ -14,7 +14,7 @@ interface ContentsProps {
   description: string;
   labels: LabelType[];
   attachments: [];
-  comments: [];
+  comments: Comment[];
   descriptionEnabled: boolean;
   focusDescription: () => void;
   changeDescription: (event: ChangeEvent<HTMLTextAreaElement>) => void;
@@ -33,22 +33,24 @@ type Comment = {
 
 const Contents = (props: ContentsProps) => (
   <div className="w-2/3 h-full flex flex-col justify-between items-start">
-    {props.labels.find((label: LabelType) => label.checked) !== undefined ? (
-      <Content title={"LABELS"}>
-        <ul className="flex justify-center items-center">
-          {props.labels.map((label: LabelType, index: number) =>
-            label.checked ? (
-              <button
-                key={index}
-                className={`w-12 h-8 mx-1 bg-${label.color} hover:opacity-25 text-white rounded`}
-              >
-                {label.title}
-              </button>
-            ) : null
-          )}
-        </ul>
-      </Content>
-    ) : null}
+    <Content title={"LABELS"}>
+      <ul className="flex justify-start items-center">
+        {props.labels.map((label: LabelType, index: number) =>
+          label.checked ? (
+            <div
+              key={index}
+              className={`${
+                !label.title ? `w-12` : `w-auto`
+              } flex justify-center items-center px-2 h-8 mx-1 bg-${
+                label.color
+              } text-white rounded`}
+            >
+              {label.title}
+            </div>
+          ) : null
+        )}
+      </ul>
+    </Content>
     <Content title={"Description"} icon={faPen}>
       <div onClick={props.focusDescription} className="w-full h-auto">
         <textarea

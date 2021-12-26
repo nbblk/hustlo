@@ -9,18 +9,19 @@ interface ChangeWOrkspaceProps {
   boardId: string;
 }
 
-const ChangeWorkspaceMenu = (props: ChangeWOrkspaceProps, children: any) => {
+const ChangeWorkspaceMenu = (props: ChangeWOrkspaceProps) => {
   const [workspace, setWorkspace] = useState({
     lists: [],
     selected: { title: "", _id: "" },
-    fetch: false
+    fetch: false,
+    success: false
   });
 
   const changeHandler = (event: ChangeEvent<HTMLSelectElement>) => {
     let title = event.target.value;
     let _id = event.target[event.target.selectedIndex].getAttribute("data-id");
     if (title && _id) {
-      setWorkspace({ ...workspace, selected: { title: title, _id: _id }})
+      setWorkspace({ ...workspace, selected: { title: title, _id: _id } });
     }
   };
 
@@ -37,13 +38,14 @@ const ChangeWorkspaceMenu = (props: ChangeWOrkspaceProps, children: any) => {
         data: {
           workspaceId: props.workspaceId,
           boardId: props.boardId,
-          newWorkspaceId: workspace.selected._id
-        }
+          newWorkspaceId: workspace.selected._id,
+        },
       });
-        setWorkspace({
-          ...workspace,
-          fetch: true
-        });
+      setWorkspace({
+        ...workspace,
+        fetch: true,
+        success: true
+      });
     } catch (error) {
       console.error(error);
     }
@@ -75,16 +77,15 @@ const ChangeWorkspaceMenu = (props: ChangeWOrkspaceProps, children: any) => {
       }
     };
     fetchTitles();
-    
+
     if (workspace.fetch) {
       fetchTitles();
     }
   }, [workspace.fetch]);
 
   return (
-    <div className="absolute top-12 left-2 w-60 h-40 p-3 bg-white rounded shadow">
+    <div className="absolute z-50 left-2 w-60 h-40 p-3 bg-white rounded shadow">
       <ContextPopupHeader title="Change workspace" click={props.dismiss} />
-      {/* {children} */}
       <div className="h-2/3 flex flex-col justify-around items-center">
         <select
           className="w-full h-6 border"
@@ -107,6 +108,7 @@ const ChangeWorkspaceMenu = (props: ChangeWOrkspaceProps, children: any) => {
           value={"Change"}
           click={() => clickHandler()}
         />
+        <small className="text-green">{workspace.success ? "Board moved successfully!" : null}</small>
       </div>
     </div>
   );

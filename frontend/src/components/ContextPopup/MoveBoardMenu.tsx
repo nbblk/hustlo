@@ -44,7 +44,7 @@ const MoveBoardMenu = (props: MoveBoardMenuProps) => {
     }
   }, []);
   return (
-    <div className="absolute p-1 top-12 w-60 h-auto flex flex-col justify-center items-center bg-white rounded shadow`">
+    <div className="absolute p-1 w-60 h-auto flex flex-col justify-center items-center bg-white rounded shadow`">
       <ul className="w-full">
         {board.list.map((board: any, index: number) => (
           <Link

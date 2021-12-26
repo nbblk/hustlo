@@ -36,15 +36,9 @@ interface CardModalProps {
   goBack: () => void;
 }
 
-type FileType = {
-  _id: string;
-  filename: string;
-  mimetype: string;
-  size: number;
-};
-
 type CardModalType = {
   title: string;
+  labelsSelected: LabelType[],
   description?: string;
   descriptionEnabled: boolean;
   comments?: [];
@@ -64,6 +58,7 @@ type CardModalType = {
 const CardModal = (props: CardModalProps) => {
   const [card, setCard] = useState<CardModalType>({
     title: "",
+    labelsSelected: props.labels!,
     description: "",
     descriptionEnabled: true,
     comments: [],
@@ -287,15 +282,36 @@ const CardModal = (props: CardModalProps) => {
           },
         });
         result = result.data[0].boards.lists.cards;
-        console.dir(result);
+        const labelsSelected = result.labelsSelected;
+        const newLabels = [...card.labelsSelected];
+
+        if (labelsSelected.length === 0) {
+          newLabels.map((label: LabelType) => {
+            label.checked = false;
+            return;
+          });
+        } else {
+          labelsSelected.map((selected: LabelType) => {
+            newLabels.map((label: LabelType) => {
+              if (label.color === selected.color) {
+                label.checked = true;
+                label.title = selected.title;
+              }
+            })
+          });
+        }
+        console.log(newLabels);
+   
         setCard({
           ...card,
+          labelsSelected: newLabels,
           description: result.description,
           comments: result.comments,
           attachments: result.attachments,
           loading: false,
           fetch: false,
         });
+      
       } catch (error) {
         console.error(error);
         setCard({ ...card, loading: false, fetch: false });
@@ -304,7 +320,7 @@ const CardModal = (props: CardModalProps) => {
 
     fetch();
   }, [card.fetch]);
-
+  
   return (
     <>
       {card.labelModalClicked ? (

@@ -10,7 +10,7 @@ import Modal from "../components/Modal";
 import BoardModal from "../components/Modal/BoardModal";
 
 export type NewBoardProps = {
-  workspaceId: number;
+  workspaceId: string;
   name: string;
   color: string;
 };
@@ -227,14 +227,13 @@ function Workspace() {
     event.preventDefault();
     setWorkspace({ ...workspace, loading: true });
     let user = JSON.parse(sessionStorage.getItem("user")!); // !
-    let workspaceId = workspace.list[props.workspaceId]._id;
     try {
       await axios.request({
         method: "POST",
         url: `${process.env.REACT_APP_BASEURL}/workspace/board`,
         headers: { _id: user._id, Authorization: `Bearer ${user.token}` },
         data: {
-          workspaceId: workspaceId,
+          workspaceId: props.workspaceId,
           name: props.name,
           color: props.color,
         },
@@ -287,7 +286,7 @@ function Workspace() {
       }
     }
     getList();
-  }, [workspace.fetchWorkspace]);
+  }, []);
 
   return (
     <div>
@@ -304,7 +303,7 @@ function Workspace() {
       ) : null}
       {workspace.modal && workspace.createBoard ? (
         <BoardModal
-          list={workspace.list}
+          workspaces={workspace.list}
           dismiss={() => dismissModal()}
           create={(event: FormEvent<HTMLButtonElement>, props: NewBoardProps) =>
             createBoard(event, props)
