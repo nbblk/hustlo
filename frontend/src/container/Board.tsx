@@ -1,4 +1,4 @@
-import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, MouseEvent, useEffect, useState } from "react";
 import { withRouter, useParams } from "react-router";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import axios from "axios";
@@ -8,6 +8,11 @@ import List, { ListProps } from "../components/Board/List";
 import Loader from "../components/Loader";
 import CardModal from "../components/Modal/CardModal";
 import { LabelType } from "../components/Card/Label";
+import WorkspaceModal, {
+  WorkspaceFormProps,
+} from "../components/Modal/WorkspaceModal";
+import { NewBoardProps } from "./Workspace";
+import BoardModal from "../components/Modal/BoardModal";
 
 type BoardProps = {
   _id: string;
@@ -20,7 +25,6 @@ type BoardProps = {
   update: boolean;
   updateList: boolean;
   fetch: boolean;
-  loading: boolean;
   clickAddCard: boolean;
   curListId: string;
   curListIndex: number | undefined;
@@ -41,6 +45,11 @@ type BoardProps = {
   restoreList: boolean;
   archiveCard: boolean;
   archivedCards?: any;
+  previousDroppableId: string;
+  currentDraggableId: string;
+  currentDroppableId: string;
+  currentDroppableIndex: number;
+  reorderList: boolean;
 };
 
 export type CardType = {
@@ -54,6 +63,7 @@ export type CardType = {
 function Board(props: any) {
   const { workspaceId } = props.location.state;
   const { boardId } = useParams<{ boardId: string }>();
+  const [loading, setLoading] = useState(false);
   const [board, setBoard] = useState<BoardProps>({
     _id: "",
     workspaceId: "",
@@ -65,7 +75,6 @@ function Board(props: any) {
     fetch: false,
     update: false,
     updateList: false,
-    loading: false,
     clickAddCard: false,
     curListId: "",
     curListIndex: undefined,
@@ -86,6 +95,20 @@ function Board(props: any) {
     restoreList: false,
     archiveCard: false,
     archivedCards: [],
+    previousDroppableId: "",
+    currentDraggableId: "",
+    currentDroppableId: "",
+    currentDroppableIndex: 0,
+    reorderList: false,
+  });
+
+  const [menu, setMenu] = useState({
+    modal: false,
+    createMenuActive: false,
+    createWorkspace: false,
+    createBoard: false,
+    fetchWorkspace: false,
+    list: [],
   });
 
   // a little function to help us with reordering the result
@@ -101,11 +124,17 @@ function Board(props: any) {
     return result;
   };
 
-  const onDragEnd = (result: DropResult) => {
-    console.dir(result);
+  const onDragEnd = async (result: DropResult) => {
     if (!result.destination) {
       return;
     }
+    console.log(result);
+    console.log(
+      result.source.droppableId,
+      result.destination.droppableId,
+      result.draggableId,
+      result.destination.index
+    );
     let curList = board.lists
       ? board.lists.find((list: ListProps, index: number) => {
           if (list._id === result.source.droppableId) {
@@ -125,7 +154,149 @@ function Board(props: any) {
 
     let newLists = [...board.lists!];
     newLists[board.current] = curList!;
-    setBoard({ ...board, lists: newLists });
+    setBoard({
+      ...board,
+      lists: newLists,
+      previousDroppableId: result.source.droppableId,
+      currentDroppableId: result.destination.droppableId,
+      currentDraggableId: result.draggableId,
+      currentDroppableIndex: result.destination.index,
+      reorderList: true,
+    });
+  };
+
+  const createMenuClicked = () => {
+    setMenu({ ...menu, createMenuActive: true });
+  };
+
+  const createMenuDismiss = () => {
+    setMenu({ ...menu, createMenuActive: false });
+  };
+
+  const createBoardClicked = () => {
+    setMenu({
+      ...menu,
+      modal: true,
+      createMenuActive: false,
+      createWorkspace: false,
+      createBoard: true,
+    });
+  };
+
+  const createWorkspaceClicked = () => {
+    setMenu({
+      ...menu,
+      modal: true,
+      createMenuActive: false,
+      createWorkspace: true,
+      createBoard: false,
+    });
+  };
+
+  const dismissModal = () => {
+    setMenu({ ...menu, modal: false });
+  };
+
+  const submitWorkspaceForm = async (
+    event: React.FormEvent<HTMLButtonElement>,
+    form: WorkspaceFormProps
+  ) => {
+    event.preventDefault();
+    let user = JSON.parse(sessionStorage.getItem("user")!); // !
+    setLoading(true);
+
+    try {
+      await axios.request({
+        method: "POST",
+        url: `${process.env.REACT_APP_BASEURL}/workspace`,
+        data: { name: form.name, description: form.description },
+        headers: {
+          _id: user._id,
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      setMenu({
+        ...menu,
+        modal: false,
+      });
+      setLoading(false);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+
+  const createBoard = async (
+    event: FormEvent<HTMLButtonElement>,
+    props: NewBoardProps
+  ) => {
+    event.preventDefault();
+    setLoading(true);
+    let user = JSON.parse(sessionStorage.getItem("user")!); // !
+    try {
+      await axios.request({
+        method: "POST",
+        url: `${process.env.REACT_APP_BASEURL}/workspace/board`,
+        headers: { _id: user._id, Authorization: `Bearer ${user.token}` },
+        data: {
+          workspaceId: props.workspaceId,
+          name: props.name,
+          color: props.color,
+        },
+      });
+      setMenu({
+        ...menu,
+        modal: false,
+        createBoard: false,
+      });
+      setLoading(false);
+    } catch (error: any) {
+      console.error(error);
+      setMenu({
+        ...menu,
+        modal: false,
+        createBoard: false,
+      });
+      setLoading(false);
+    }
+  };
+
+  const updateLists = async () => {
+    let user = JSON.parse(sessionStorage.getItem("user")!);
+
+    try {
+      await axios.request({
+        method: "PATCH",
+        url: `${process.env.REACT_APP_BASEURL}/board/list/reorder`,
+        headers: { _id: user._id, Authorization: `Bearer ${user.token}` },
+        data: {
+          workspaceId: workspaceId,
+          boardId: boardId,
+          oldListId: board.previousDroppableId,
+          newListId: board.currentDroppableId,
+          newListIndex: board.currentDroppableIndex,
+          cardId: board.currentDraggableId,
+        },
+      });
+      setBoard({
+        ...board,
+        reorderList: false,
+        previousDroppableId: "",
+        currentDraggableId: "",
+        currentDroppableId: "",
+        currentDroppableIndex: 0,
+      });
+    } catch (error) {
+      setBoard({
+        ...board,
+        reorderList: false,
+        previousDroppableId: "",
+        currentDraggableId: "",
+        currentDroppableId: "",
+        currentDroppableIndex: 0,
+      });
+      console.error(error);
+    }
   };
 
   const changeBoardTitle = (event: ChangeEvent<HTMLInputElement>) => {
@@ -361,7 +532,7 @@ function Board(props: any) {
         headers: { _id: user._id, Authorization: `Bearer ${user.token}` },
         data: {
           workspaceId: workspaceId,
-          boardId: board._id,
+          boardId: boardId,
           listId: board.curListId,
           cardId: board.curCardId,
           labels: board.labels,
@@ -369,13 +540,14 @@ function Board(props: any) {
       });
       setBoard({
         ...board,
-        loading: false,
         update: false,
         fetch: true,
       });
+      setLoading(false);
     } catch (error) {
       console.error(error);
-      setBoard({ ...board, loading: false, update: false, fetch: false });
+      setBoard({ ...board, update: false, fetch: false });
+      setLoading(false);
     }
   };
 
@@ -397,16 +569,16 @@ function Board(props: any) {
       });
       setBoard({
         ...board,
-        loading: false,
         fetch: true,
       });
+      setLoading(false);
     } catch (error) {
       console.error(error);
       setBoard({
         ...board,
-        loading: false,
         fetch: false,
       });
+      setLoading(false);
     }
   };
 
@@ -433,16 +605,16 @@ function Board(props: any) {
       });
       setBoard({
         ...board,
-        loading: false,
         fetch: true,
       });
+      setLoading(false);
     } catch (error) {
       console.error(error);
       setBoard({
         ...board,
-        loading: false,
         fetch: false,
       });
+      setLoading(false);
     }
   };
 
@@ -465,20 +637,51 @@ function Board(props: any) {
       });
       setBoard({
         ...board,
-        loading: false,
         fetch: true,
         archiveCard: false,
         cardOpen: false,
       });
+      setLoading(false);
     } catch (error) {
       console.error(error);
       setBoard({
         ...board,
-        loading: false,
         fetch: false,
         archiveCard: false,
         cardOpen: false,
       });
+      setLoading(false);
+    }
+  };
+
+  const fetchWorkspaceList = async () => {
+    let user = JSON.parse(sessionStorage.getItem("user")!); // !
+    setLoading(true);
+    try {
+      const list = await axios.request({
+        method: "GET",
+        url: `${process.env.REACT_APP_BASEURL}/workspace`,
+        headers: {
+          _id: user._id,
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      let workspaces: any = [];
+      list.data.map((workspace: any) => {
+        workspaces.push({ _id: workspace._id, name: workspace.name });
+      });
+      setMenu({
+        ...menu,
+        list: workspaces,
+        fetchWorkspace: false,
+      });
+      setLoading(false);
+    } catch (error: any) {
+      setMenu({
+        ...menu,
+        fetchWorkspace: false,
+      });
+      setLoading(false);
     }
   };
 
@@ -495,6 +698,10 @@ function Board(props: any) {
       archiveCard();
     }
 
+    if (board.reorderList) {
+      updateLists();
+    }
+
     const fetch = async () => {
       let result;
       try {
@@ -508,36 +715,58 @@ function Board(props: any) {
           },
         });
         const curBoard = result.data[0];
-        console.log(curBoard);
         setBoard({
           ...board,
           title: curBoard.name,
           lists: curBoard.lists,
           color: curBoard.color,
           labels: curBoard.labels,
-          loading: false,
           fetch: false,
         });
+        setLoading(false);
       } catch (error) {
         console.error(error);
-        setBoard({ ...board, loading: false, fetch: false });
+        setBoard({ ...board, fetch: false });
+        setLoading(false);
       }
     };
 
     fetch();
+    fetchWorkspaceList();
+
     if (board.fetch) {
       fetch();
     }
   }, [
     board.fetch,
     board.update,
-    board.restoreList,
     board.archiveCard,
+    board.reorderList,
+    menu.createWorkspace,
   ]);
 
   return (
-    <div className="w-full h-screen bg-gray-lightest">
-      {board.loading ? <Loader loading /> : null}
+    <div className="w-full h-full bg-gray-lightest overflow-x-scroll">
+      {loading ? <Loader loading /> : null}
+      {menu.modal && menu.createBoard ? (
+        <BoardModal
+          workspaces={menu.list}
+          dismiss={() => dismissModal()}
+          create={(event: FormEvent<HTMLButtonElement>, props: NewBoardProps) =>
+            createBoard(event, props)
+          }
+        />
+      ) : null}
+      {menu.modal && menu.createWorkspace ? (
+        <WorkspaceModal
+          type="Create"
+          dismiss={() => dismissModal()}
+          submit={(
+            event: React.FormEvent<HTMLButtonElement>,
+            props: WorkspaceFormProps
+          ) => submitWorkspaceForm(event, props)}
+        />
+      ) : null}
       {board.cardOpen ? (
         <CardModal
           id={board.curCardId}
@@ -589,9 +818,11 @@ function Board(props: any) {
         isShadowed={false}
         textColor={"white"}
         fontSize={"md"}
-        createMenuActive={props.createMenuActive}
-        createBoardClicked={props.createBoardClicked}
-        createWorkspaceClicked={props.createWorkspaceClicked}
+        createMenuActive={menu.createMenuActive}
+        createMenuClicked={() => createMenuClicked()}
+        createMenuDismiss={() => createMenuDismiss()}
+        createBoardClicked={() => createBoardClicked()}
+        createWorkspaceClicked={() => createWorkspaceClicked()}
       />
       <BoardHeader
         boardId={boardId}
@@ -616,7 +847,7 @@ function Board(props: any) {
         ) => clickRestoreCardButton(index, listId, cardId)}
         clickBoardToMove={() => clickBoardToMove()}
       />
-      <div className="flex justify-start items-start overflow-auto">
+      <div className="w-full flex flex-nowrap justify-start items-start overflow-x-scroll">
         <DragDropContext onDragEnd={(result: DropResult) => onDragEnd(result)}>
           {board.lists?.map((list: ListProps, index: number) => (
             <List
@@ -645,12 +876,14 @@ function Board(props: any) {
               }
             />
           ))}
-          <button
-            className="w-60 h-10 mt-4 bg-gray-regular rounded text-center hover:opacity-25"
-            onClick={() => addList()}
-          >
-            Add a list
-          </button>
+          <span className="">
+            <button
+              className="w-64 h-10 mt-4 bg-gray-regular rounded text-center hover:opacity-25"
+              onClick={() => addList()}
+            >
+              Add a list
+            </button>
+          </span>
         </DragDropContext>
       </div>
     </div>

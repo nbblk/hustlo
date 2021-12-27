@@ -1,8 +1,4 @@
-import {
-  faArchive,
-  faStar as filledStar,
-} from "@fortawesome/free-solid-svg-icons";
-import { faStar as emptyStar } from "@fortawesome/free-regular-svg-icons";
+import { faArchive } from "@fortawesome/free-solid-svg-icons";
 import { ChangeEvent, useEffect, useState } from "react";
 import Button from "../Button";
 import ButtonWithIcon from "../ButtonWithIcon";
@@ -33,7 +29,6 @@ interface BoardHeaderProps {
 }
 
 const BoardHeader = (props: BoardHeaderProps) => {
-  const [star, setStared] = useState(false);
   const [modal, setModal] = useState({
     workspace: false,
     board: false,
@@ -117,13 +112,13 @@ const BoardHeader = (props: BoardHeaderProps) => {
   ]);
 
   return (
-    <div className="w-screen h-14 p-4 bg-transparent flex justify-between items-center">
-      <div className="flex relative">
+    <div className="w-full p-4 bg-transparent flex flex-col md:flex-row justify-between items-center">
+      <div className="w-full flex flex-col md:flex-row justify-center md:justify-start items-center">
         <span className="cursor-pointer" onClick={props.focusTitle}>
           <InputBox
             type={"text"}
             height={"10"}
-            width={"40"}
+            width={"44"}
             placeholder={props.title ? "" : "Enter board title"}
             value={props.title}
             change={props.changeTitle}
@@ -136,10 +131,11 @@ const BoardHeader = (props: BoardHeaderProps) => {
             height={"10"}
             width={"44"}
             marginX={"2"}
+            marginY={"2"}
             bgColor={"gray-regular"}
             textColor={"gray"}
             hoverColor={"opacity-50"}
-            value={"my side projects"}
+            value={"Change workplace"}
             click={() =>
               setModal({ workspace: true, board: false, archived: false })
             }
@@ -157,53 +153,57 @@ const BoardHeader = (props: BoardHeaderProps) => {
             height={"10"}
             width={"44"}
             marginX={"2"}
+            marginY={"2"}
             bgColor={"gray-regular"}
             textColor={"gray"}
             hoverColor={"opacity-50"}
             value={props.title}
             click={() =>
-              setModal({ workspace: false, board: !modal.board, archived: false })
+              setModal({
+                workspace: false,
+                board: !modal.board,
+                archived: false,
+              })
             }
           />
           {modal.board ? (
-            <MoveBoardMenu workspaceId={props.workspaceId} clickBoardToMove={props.clickBoardToMove} />
+            <MoveBoardMenu
+              workspaceId={props.workspaceId}
+              clickBoardToMove={props.clickBoardToMove}
+            />
           ) : null}
         </div>
       </div>
-      <div className="relative">
-        <ButtonWithIcon
-          width={"44"}
-          height={"10"}
-          margin={"2"}
-          padding={""}
-          value={"Archived items"}
-          textColor={"gray"}
-          bgColor={"gray hover:opacity-25"}
-          fontSize={""}
-          isIcon={true}
-          iconProp={faArchive}
-          click={() => setModal({ ...modal, archived: !modal.archived })}
+      <ButtonWithIcon
+        width={"44"}
+        height={"10"}
+        margin={"2"}
+        padding={""}
+        value={"Archived items"}
+        textColor={"gray"}
+        bgColor={"gray hover:opacity-25"}
+        fontSize={""}
+        isIcon={true}
+        iconProp={faArchive}
+        click={() => setModal({ ...modal, archived: !modal.archived })}
+      />
+      {modal.archived ? (
+        <ArchivedModal
+          isCard={archived.isCard}
+          archivedLists={archived.lists}
+          archivedCards={archived.cards}
+          restoreList={(index: number, id: string) => {
+            props.clickRestoreListButton(index, id);
+            setArchived({ ...archived, fetchLists: true });
+          }}
+          switch={() => setArchived({ ...archived, isCard: !archived.isCard })}
+          dismiss={() => setModal({ ...modal, archived: false })}
+          restoreCard={(index: number, listId: string, cardId: string) => {
+            props.clickRestoreCardButton(index, listId, cardId);
+            setArchived({ ...archived, fetchCards: true });
+          }}
         />
-        {modal.archived ? (
-          <ArchivedModal
-            isCard={archived.isCard}
-            archivedLists={archived.lists}
-            archivedCards={archived.cards}
-            restoreList={(index: number, id: string) => {
-              props.clickRestoreListButton(index, id);
-              setArchived({ ...archived, fetchLists: true });
-            }}
-            switch={() =>
-              setArchived({ ...archived, isCard: !archived.isCard })
-            }
-            dismiss={() => setModal({ ...modal, archived: false })}
-            restoreCard={(index: number, listId: string, cardId: string) => {
-              props.clickRestoreCardButton(index, listId, cardId);
-              setArchived({ ...archived, fetchCards: true });
-            }}
-          />
-        ) : null}
-      </div>
+      ) : null}
     </div>
   );
 };

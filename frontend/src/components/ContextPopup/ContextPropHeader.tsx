@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type HeaderProps = {
   title: string;
-  click: () => void;
+  click?: () => void;
 };
 
 const ContextPopupHeader = (props: HeaderProps) => {

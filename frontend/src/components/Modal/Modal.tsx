@@ -17,16 +17,15 @@ interface ModalProps {
 }
 
 const Modal = (props: ModalProps) => {
-  let defaultStyle = "absolute h-auto top-1/2 left-1/2 p-4 z-50 transform -translate-x-1/2 -translate-y-1/2";
+  let defaultStyle =
+    "absolute h-auto top-1/2 left-1/2 p-4 z-40 transform -translate-x-1/2 -translate-y-1/2";
   return (
     <>
       {props.backdropDisabled ? null : <Backdrop dismiss={props.dismiss} />}
       <div
-        className={`${props.styles ? props.styles : defaultStyle} w-${props.width} h-${
-          props.height
-        } z-${
-          props.zIndex ? props.zIndex : "40"
-        } bg-${
+        className={`${props.styles ? props.styles : defaultStyle} w-${
+          props.width
+        } h-${props.height} z-${props.zIndex ? props.zIndex : "40"} bg-${
           props.bgColor ? props.bgColor : "white"
         } rounded shadow boxShadow`}
       >

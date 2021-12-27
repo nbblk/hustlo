@@ -27,10 +27,7 @@ const ArchivedModal = (props: ArchivedModalProps) => {
             </span>
             <ul>
               {list.cards.map((card: any, index: number) => (
-                <li
-                  key={card._id}
-                  className="my-1 flex justify-between"
-                >
+                <li key={card._id} className="my-1 flex justify-between">
                   {card.title}
                   <button
                     className="bg-transparent hover:underline hover:text-blue"

@@ -23,7 +23,7 @@ const Card = (props: CardProps) => {
   return (
     <div
       key={props._id}
-      className="h-auto rounded m-4 bg-white shadow shadow-md flex flex-col justify-center items-start"
+      className="w-64 rounded m-4 bg-white shadow shadow-md flex flex-col justify-center items-start hover:opacity-50"
       ref={props.provided.innerRef}
       {...props.provided.dragHandleProps}
       {...props.provided.draggableProps}

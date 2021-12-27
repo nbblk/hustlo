@@ -27,7 +27,7 @@ const Archived = (props: any) => {
           },
         });
         const curBoard = result.data[0];
-        console.log(curBoard);
+
         setArchived({
           ...archived,
           lists: curBoard.lists,

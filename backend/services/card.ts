@@ -297,14 +297,14 @@ export const getArchivedCards = async (data: {
           lists: {
             $filter: {
               input: "$lists",
-              cond: { $ne: [{ $size: "$$this.cards"}, 0]}
-            }
-          }
-        }
+              cond: { $ne: [{ $size: "$$this.cards" }, 0] },
+            },
+          },
+        },
       },
-      { $project: { "lists": 1, "_id": 0 }}
+      { $project: { lists: 1, _id: 0 } },
     ]);
-    console.log(docs);
+
     return docs;
   } catch (error: any) {
     console.error(error);
@@ -318,7 +318,6 @@ export const archive = async (data: {
   listId: string;
   cardId: string;
 }) => {
-  console.log(data.workspaceId, data.boardId, data.listId, data.cardId);
   try {
     await WorkspaceModel.updateOne(
       {

@@ -1,25 +1,24 @@
 import React from "react";
 
 export interface ButtonProps {
-  height: string,
-  width: string,
-  marginX?: string,
-  marginY?: string,
-  disabled?: boolean,
-  bordered?: boolean,
-  borderColor?: string,
-  bgColor: string,
-  textColor: string,
-  hoverColor: string,
-  textSize?: string,
-  click?: (event: React.MouseEvent<HTMLButtonElement>, data?: any) => void,
-  value: string
+  height: string;
+  width: string;
+  marginX?: string;
+  marginY?: string;
+  disabled?: boolean;
+  bordered?: boolean;
+  borderColor?: string;
+  bgColor: string;
+  textColor: string;
+  hoverColor: string;
+  textSize?: string;
+  click?: (event: React.MouseEvent<HTMLButtonElement>, data?: any) => void;
+  value: string;
 }
 
 const Button = (props: ButtonProps) => {
   const isBordered = props.bordered ? "border" : "";
-  const style = 
-  `h-${props.height} 
+  const style = `h-${props.height} 
   w-${props.width} 
   mx-${props.marginX} 
   my-${props.marginY} 
@@ -28,7 +27,9 @@ const Button = (props: ButtonProps) => {
   text-${props.disabled ? "gray-dark" : props.textColor} 
   hover:${props.disabled ? "gray-light" : `bg-${props.hoverColor}`} 
   ${isBordered} border-${props.borderColor} 
-  text-${props.textSize ? props.textSize : "md"} cursor-${props.disabled ? "not-allowed" : "pointer"}
+  text-${props.textSize ? props.textSize : "md"} cursor-${
+    props.disabled ? "not-allowed" : "pointer"
+  }
   `;
   return (
     <button

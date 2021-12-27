@@ -3,7 +3,7 @@ import Button from "../Button";
 import Modal from "../Modal/Modal";
 
 interface AttahcmentProps {
-  selectedFile: File | null ;
+  selectedFile: File | null;
   dismiss: () => void;
   changeFile: (event: ChangeEvent<HTMLInputElement>) => void;
   clickUploadButton: (event: MouseEvent<HTMLButtonElement>) => void;
@@ -18,11 +18,11 @@ const AttachmentModal = (props: AttahcmentProps) => {
       title={"Upload files"}
       dismiss={props.dismiss}
     >
-      <input type="file" onChange={props.changeFile} name="File"/>
+      <input type="file" onChange={props.changeFile} name="File" />
       <div>
-          <p>filename: {props.selectedFile?.name}</p>
-          <p>size: {props.selectedFile?.size}</p>
-          <p>lastModified: {props.selectedFile?.lastModified.toLocaleString()}</p>
+        <p>filename: {props.selectedFile?.name}</p>
+        <p>size: {props.selectedFile?.size}</p>
+        <p>lastModified: {props.selectedFile?.lastModified.toLocaleString()}</p>
       </div>
       <Button
         height={"8"}

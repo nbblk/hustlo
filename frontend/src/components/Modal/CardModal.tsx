@@ -36,15 +36,9 @@ interface CardModalProps {
   goBack: () => void;
 }
 
-type FileType = {
-  _id: string;
-  filename: string;
-  mimetype: string;
-  size: number;
-};
-
 type CardModalType = {
   title: string;
+  labelsSelected: LabelType[];
   description?: string;
   descriptionEnabled: boolean;
   comments?: [];
@@ -64,6 +58,7 @@ type CardModalType = {
 const CardModal = (props: CardModalProps) => {
   const [card, setCard] = useState<CardModalType>({
     title: "",
+    labelsSelected: props.labels!,
     description: "",
     descriptionEnabled: true,
     comments: [],
@@ -195,9 +190,9 @@ const CardModal = (props: CardModalProps) => {
 
   const downloadAttachment = async (fileId: string, filename: string) => {
     if (!fileId || !filename) return;
-    
-    let extension = filename.split('.')[1];
-    console.log(extension);
+
+    let extension = filename.split(".")[1];
+
     let user = JSON.parse(sessionStorage.getItem("user")!);
     try {
       const result = await axios.request({
@@ -208,14 +203,14 @@ const CardModal = (props: CardModalProps) => {
           filename: filename,
           Authorization: `Bearer ${user.token}`,
         },
-        responseType: 'blob'
+        responseType: "blob",
       });
 
       if (result.data) {
         const url = window.URL.createObjectURL(new Blob([result.data]));
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
-        link.setAttribute('download', `Filename.${extension}`);
+        link.setAttribute("download", `Filename.${extension}`);
 
         document.body.appendChild(link);
         link.click();
@@ -258,7 +253,6 @@ const CardModal = (props: CardModalProps) => {
         loading: false,
         fetch: true,
       });
-
     } catch (error) {
       console.error(error);
       setCard({
@@ -287,9 +281,33 @@ const CardModal = (props: CardModalProps) => {
           },
         });
         result = result.data[0].boards.lists.cards;
-        console.dir(result);
+        const labelsSelected = result.labelsSelected;
+        const newLabels = [...card.labelsSelected];
+
+        newLabels.map((label: LabelType) => {
+          label.title = "";
+          label.checked = false;
+        });
+
+        if (labelsSelected.length === 0) {
+          newLabels.map((label: LabelType) => {
+            label.checked = false;
+            return;
+          });
+        } else {
+          newLabels.map((label: LabelType) => {
+            labelsSelected.map((selected: LabelType) => {
+              if (label.color === selected.color) {
+                label.checked = true;
+                label.title = selected.title;
+              }
+            });
+          });
+        }
+
         setCard({
           ...card,
+          labelsSelected: newLabels,
           description: result.description,
           comments: result.comments,
           attachments: result.attachments,
@@ -340,8 +358,9 @@ const CardModal = (props: CardModalProps) => {
         />
       ) : null}
       <Modal
-        width={"w-full h-4/5 md:w-1/2"}
-        height={"1/2"}
+        width={"full md:w-1/2"}
+        height={"full md:h-4/5 "}
+        zIndex={"40"}
         title={props.title}
         bgColor="gray-lightest"
         dismiss={props.dismiss}
@@ -366,7 +385,9 @@ const CardModal = (props: CardModalProps) => {
               changeComment(event)
             }
             clickAddCommentButton={() => clickAddCommentButton()}
-            clickFilename={(fileId: string, filename: string) => downloadAttachment(fileId, filename)}
+            clickFilename={(fileId: string, filename: string) =>
+              downloadAttachment(fileId, filename)
+            }
             clickDeleteFileIcon={(fileId: string) => deleteAttachment(fileId)}
           />
           <SideMenu

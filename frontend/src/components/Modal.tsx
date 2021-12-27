@@ -3,13 +3,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "./Button";
 
 export interface ModalProps {
-  width: string,
-  height: string,
-  title: string,
-  content: string,
-  buttonValue: string,
-  dismiss: () => void,
-  buttonClick: (event: React.MouseEvent<HTMLButtonElement> | void) => void,
+  width: string;
+  height: string;
+  title: string;
+  content: string;
+  buttonValue: string;
+  dismiss: () => void;
+  buttonClick: (event: React.MouseEvent<HTMLButtonElement> | void) => void;
 }
 
 const Modal = (props: any) => {
@@ -27,12 +27,12 @@ const Modal = (props: any) => {
       <Button
         bgColor="blue"
         textColor="white"
-        hoverColor="blue hover:opacity-25" 
+        hoverColor="blue hover:opacity-25"
         width="full md:w-2/5"
         height="10"
         disabled={false}
         value={props.buttonValue}
-        click={props.buttonClick}   
+        click={props.buttonClick}
       />
     </div>
   );

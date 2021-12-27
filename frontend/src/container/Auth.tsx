@@ -8,6 +8,10 @@ import Modal from "../components/Modal";
 import { useAuth } from "../hooks/use-auth";
 
 const Auth = (props: any) => {
+  const auth = useAuth();
+  const history = useHistory();
+  const location = useLocation<{ email?: string | undefined }>();
+
   const [account, setAccount] = useState({
     email: {
       value: "",
@@ -18,12 +22,15 @@ const Auth = (props: any) => {
       valid: false,
     },
     valid: false,
-    modal: false,
+    errorMsg: "",
   });
 
-  const history = useHistory();
-  const location = useLocation<{ email?: string | undefined }>();
-  const auth = useAuth();
+  const [modal, setModal] = useState({
+    isVerifyEmailSent: false,
+    isPasswordUpdated: false,
+    isRecoveryEmailSent: false,
+    isSignupCompleted: false,
+  });
 
   const validateEmail = (email: string | undefined) => {
     let value = typeof email === "undefined" ? "" : email;
@@ -53,22 +60,63 @@ const Auth = (props: any) => {
   const modalHandler = () => {
     setAccount({
       ...account,
-      modal: false,
       email: { value: "", valid: false },
       password: { value: "", valid: false },
+    });
+    setModal({
+      ...modal,
+      isVerifyEmailSent: false,
+      isPasswordUpdated: false,
+      isRecoveryEmailSent: false,
+      isSignupCompleted: false,
     });
     history.replace("/login");
   };
 
   useEffect(() => {
-    if (
-      auth.isPasswordUpdated ||
-      auth.isEmailVerified ||
-      auth.isRecoveryEmailSent
-    ) {
-      setAccount({ ...account, modal: true });
+    if (auth.isVerifyEmailSent) {
+      setModal({
+        ...modal,
+        isVerifyEmailSent: true,
+        isPasswordUpdated: false,
+        isRecoveryEmailSent: false,
+        isSignupCompleted: false,
+      });
+    }
+
+    if (auth.isPasswordUpdated) {
+      setModal({
+        ...modal,
+        isPasswordUpdated: true,
+        isVerifyEmailSent: false,
+        isRecoveryEmailSent: false,
+        isSignupCompleted: true,
+      });
+    }
+
+    if (auth.isRecoveryEmailSent) {
+      setModal({
+        ...modal,
+        isRecoveryEmailSent: true,
+        isPasswordUpdated: false,
+        isVerifyEmailSent: false,
+        isSignupCompleted: false,
+      });
+    }
+
+    if (auth.errorMsg) {
+      setAccount({ ...account, errorMsg: auth.errorMsg });
     }
   }, [auth]);
+
+  useEffect(() => {
+    setAccount({
+      email: { value: "", valid: false },
+      password: { value: "", valid: false },
+      valid: false,
+      errorMsg: "",
+    });
+  }, [props.type]);
 
   useEffect(() => {
     const getEmailFromRoute = () => {
@@ -89,18 +137,7 @@ const Auth = (props: any) => {
   return (
     <div className="w-screen h-screen m-0 p-0 bg-gray-lightest flex justify-center items-center">
       {auth.loading ? <Loader loading /> : null}
-      {account.modal && auth.isPasswordUpdated ? (
-        <Modal
-          height="full md:h-1/4"
-          width="full md:w-1/4"
-          title={"All things done!"}
-          content={"Please login with your email and new password"}
-          buttonValue="Got it"
-          buttonClick={() => modalHandler()}
-          dismiss={() => setAccount({ ...account, modal: false })}
-        />
-      ) : null}
-      {account.modal && auth.isEmailVerified ? (
+      {modal.isVerifyEmailSent ? (
         <Modal
           height="full md:h-1/4"
           width="full md:w-1/4"
@@ -110,10 +147,37 @@ const Auth = (props: any) => {
           }
           buttonValue="Got it"
           buttonClick={() => modalHandler()}
-          dismiss={() => setAccount({ ...account, modal: false })}
+          dismiss={() =>
+            setModal({
+              ...modal,
+              isPasswordUpdated: false,
+              isRecoveryEmailSent: false,
+              isVerifyEmailSent: false,
+              isSignupCompleted: false,
+            })
+          }
         />
       ) : null}
-      {account.modal && auth.isRecoveryEmailSent ? (
+      {modal.isPasswordUpdated ? (
+        <Modal
+          height="full md:h-1/4"
+          width="full md:w-1/4"
+          title={"All things done!"}
+          content={"Please login with your email and new password"}
+          buttonValue="Got it"
+          buttonClick={() => modalHandler()}
+          dismiss={() =>
+            setModal({
+              ...modal,
+              isPasswordUpdated: false,
+              isRecoveryEmailSent: false,
+              isVerifyEmailSent: false,
+              isSignupCompleted: false,
+            })
+          }
+        />
+      ) : null}
+      {modal.isRecoveryEmailSent ? (
         <Modal
           height="full md:h-1/4"
           width="full md:w-1/4"
@@ -121,7 +185,15 @@ const Auth = (props: any) => {
           content={"We sent a recovery link to you. Please check your inbox"}
           buttonValue="Got it"
           buttonClick={() => modalHandler()}
-          dismiss={() => setAccount({ ...account, modal: false })}
+          dismiss={() =>
+            setModal({
+              ...modal,
+              isPasswordUpdated: false,
+              isRecoveryEmailSent: false,
+              isVerifyEmailSent: false,
+              isSignupCompleted: false,
+            })
+          }
         />
       ) : null}
       <AuthForm
@@ -154,7 +226,7 @@ const Auth = (props: any) => {
             password: account.password.value,
           })
         }
-        errorMsg={auth.errorMsg}
+        errorMsg={account.errorMsg}
         googleSuccess={(response: any) => auth.googleLoginSuccess(response)}
         googleFailure={(error: any) => auth.googleLoginFailure(error)}
         msLoginHandler={(response: any) => auth.msLoginHandler(response)}

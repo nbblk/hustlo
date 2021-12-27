@@ -215,11 +215,14 @@ const deleteAttachment = async (
   }
 };
 
-const fetchArchivedCards = async (req: express.Request, res: express.Response) => {
+const fetchArchivedCards = async (
+  req: express.Request,
+  res: express.Response
+) => {
   const data = {
     workspaceId: req.header("workspaceId")!,
-    boardId: req.header("boardId")!
-  }
+    boardId: req.header("boardId")!,
+  };
   try {
     let cards = await getArchivedCards(data);
     res.send(cards).status(200);

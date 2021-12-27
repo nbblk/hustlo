@@ -10,7 +10,7 @@ interface ContentProps {
 }
 
 const Content = (props: ContentProps) => (
-  <>
+  <div className="w-full my-2">
     <h1 className="my-2">
       {props.icon ? (
         <span>
@@ -20,7 +20,7 @@ const Content = (props: ContentProps) => (
       {props.title}
     </h1>
     {props.children}
-  </>
+  </div>
 );
 
 export default Content;

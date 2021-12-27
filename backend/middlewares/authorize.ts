@@ -14,7 +14,7 @@ export function checkAuthToken(
     const decoded = verifyJwt(token);
     next();
   } catch (error: any) {
-    console.error(error.message)
+    console.error(error.message);
     return res.sendStatus(401);
   }
 }

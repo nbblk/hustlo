@@ -12,7 +12,7 @@ interface SideMenuProps {
 }
 
 const SideMenu = (props: SideMenuProps) => (
-  <div className="w-1/4 h-1/2 flex flex-col justify-start item-end">
+  <div className="w-1/4 h-1/2 flex flex-col justify-between md:justify-start item-end">
     <ButtonWithIcon
       width={"full"}
       height={"8"}

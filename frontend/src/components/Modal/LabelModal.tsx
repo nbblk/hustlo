@@ -52,12 +52,14 @@ const LabelModal = (props: LabelModalProps) => {
           }
         />
       );
-    } 
+    }
     if (props.isAdd) {
       button = (
         <Button
           height={"9"}
           width={"full"}
+          marginX={"2"}
+          marginY={"2"}
           bgColor={"gray-lightest"}
           textColor={"gray-dark"}
           hoverColor={"opacity-25"}
@@ -65,7 +67,7 @@ const LabelModal = (props: LabelModalProps) => {
           click={() => props.submitAddNewLabelButton(label.index, label.title)}
         />
       );
-    } 
+    }
     if (props.isMain) {
       button = (
         <Button
@@ -85,10 +87,10 @@ const LabelModal = (props: LabelModalProps) => {
   return (
     <Modal
       styles={
-        "absolute p-4 top-28 right-1/3 transform translate-x-1/2 translate-y-1/2"
+        "absolute z-50 p-4 md:top-28 md:right-1/3 transform-none md:transform md:translate-x-1/2 md:translate-y-1/2"
       }
-      width={"1/5"}
-      height={"1/2"}
+      width={"full md:w-1/5"}
+      height={"full md:h-auto"}
       zIndex={"50"}
       title={""}
       dismiss={props.dismiss}
@@ -97,6 +99,7 @@ const LabelModal = (props: LabelModalProps) => {
     >
       <h6 className="text-xs">LABELS</h6>
       <Labels
+        selectedLabelIndex={label.index}
         isEdit={props.isEdit}
         isAdd={props.isAdd}
         isMain={props.isMain}

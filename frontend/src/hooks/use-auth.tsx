@@ -12,19 +12,28 @@ import axios from "axios";
 
 interface AuthProps {
   loggedIn: boolean;
-  isEmailVerified: boolean;
+  isVerifyEmailSent: boolean;
   isPasswordUpdated: boolean;
-  isRecoveryEmailSent: boolean,
+  isRecoveryEmailSent: boolean;
   errorMsg: string;
   loading: boolean;
-  basicLogin: (event: FormEvent<HTMLButtonElement>, credential: credential) => void;
+  basicLogin: (
+    event: FormEvent<HTMLButtonElement>,
+    credential: credential
+  ) => void;
   basicLogout: () => JSX.Element;
   requestEmailVerification: (
     event: FormEvent<HTMLButtonElement>,
     email: string
   ) => void;
-  setupPassword: (event: FormEvent<HTMLButtonElement>, credential: credential) => void;
-  sendRecoveryEmail: (event: FormEvent<HTMLButtonElement>, email: string) => void;
+  setupPassword: (
+    event: FormEvent<HTMLButtonElement>,
+    credential: credential
+  ) => void;
+  sendRecoveryEmail: (
+    event: FormEvent<HTMLButtonElement>,
+    email: string
+  ) => void;
   googleLoginSuccess: (response: any) => void;
   googleLoginFailure: (error: any) => void;
   msLoginHandler: (response: any) => void;
@@ -39,26 +48,19 @@ const BASEURL = process.env.REACT_APP_BASEURL;
 
 const authContext = createContext<AuthProps>({
   loggedIn: false,
-  isEmailVerified: false,
+  isVerifyEmailSent: false,
   isPasswordUpdated: false,
   isRecoveryEmailSent: false,
   errorMsg: "",
   loading: false,
-  basicLogin: (event: FormEvent<HTMLButtonElement>, credential: credential) =>
-    Promise,
+  basicLogin: () => Promise,
   basicLogout: () => <Redirect to="/" />,
-  requestEmailVerification: (
-    event: FormEvent<HTMLButtonElement>,
-    email: string
-  ) => Promise,
-  setupPassword: (
-    event: FormEvent<HTMLButtonElement>,
-    credential: credential
-  ) => Promise,
-  sendRecoveryEmail: (event: FormEvent<HTMLButtonElement>, email: string) => Promise,
-  googleLoginSuccess: (response: any) => Promise,
-  googleLoginFailure: (error: any) => Promise,
-  msLoginHandler: (response: any) => Promise,
+  requestEmailVerification: () => Promise,
+  setupPassword: () => Promise,
+  sendRecoveryEmail: () => Promise,
+  googleLoginSuccess: () => Promise,
+  googleLoginFailure: () => Promise,
+  msLoginHandler: () => Promise,
 });
 
 export function AuthProvider({ children }: any) {
@@ -73,7 +75,7 @@ export const useAuth = () => {
 function useAuthProvider() {
   const [auth, setAuth] = useState({
     loggedIn: false,
-    isEmailVerified: false,
+    isVerifyEmailSent: false,
     isPasswordUpdated: false,
     isRecoveryEmailSent: false,
     loading: false,
@@ -88,7 +90,11 @@ function useAuthProvider() {
         setAuth({ ...auth, loggedIn: true });
       }
     }
-  }, [auth.loggedIn]);
+
+    if (auth.isPasswordUpdated) {
+      setAuth({ ...auth, isPasswordUpdated: false });
+    }
+  }, [auth.loggedIn, auth.isPasswordUpdated]);
 
   const basicLogin = async (
     event: FormEvent<HTMLButtonElement>,
@@ -99,7 +105,13 @@ function useAuthProvider() {
     try {
       let response = await axios.post(`${BASEURL}/login`, credential);
       sessionStorage.setItem("user", JSON.stringify(response.data));
-      setAuth({ ...auth, loggedIn: true });
+      setAuth({
+        ...auth,
+        loggedIn: true,
+        isVerifyEmailSent: false,
+        isPasswordUpdated: false,
+        isRecoveryEmailSent: false,
+      });
       history.push("/main");
     } catch (error: any) {
       setAuth({ ...auth, errorMsg: error.response.data });
@@ -117,20 +129,23 @@ function useAuthProvider() {
     email: string
   ) => {
     event.preventDefault();
+    setAuth({ ...auth, loading: true, errorMsg: "" });
     const isVerified = await verifyEmail(email);
     if (isVerified) {
       await sendConfirmEmail(email);
     } else {
       setAuth({
         ...auth,
-        isEmailVerified: false,
+        isVerifyEmailSent: false,
+        isPasswordUpdated: false,
+        isRecoveryEmailSent: false,
         errorMsg: "Please enter a valid email.",
+        loading: false,
       });
     }
   };
 
   const sendConfirmEmail = async (email: string) => {
-    setAuth({ ...auth, loading: true, errorMsg: "" });
     try {
       await axios.request({
         method: "POST",
@@ -139,13 +154,17 @@ function useAuthProvider() {
       });
       setAuth({
         ...auth,
-        isEmailVerified: true,
+        isVerifyEmailSent: true,
+        isPasswordUpdated: false,
+        isRecoveryEmailSent: false,
         loading: false,
       });
     } catch (error: any) {
       setAuth({
         ...auth,
-        isEmailVerified: false,
+        isVerifyEmailSent: false,
+        isPasswordUpdated: false,
+        isRecoveryEmailSent: false,
         errorMsg: error.response.data,
       });
     }
@@ -166,17 +185,21 @@ function useAuthProvider() {
       setAuth({
         ...auth,
         isPasswordUpdated: true,
+        isVerifyEmailSent: false,
+        isRecoveryEmailSent: false,
       });
     } catch (error: any) {
       setAuth({
         ...auth,
         isPasswordUpdated: false,
+        isVerifyEmailSent: false,
+        isRecoveryEmailSent: false,
         errorMsg: error.response.data,
       });
     }
   };
 
-  const sendRecoveryEmail = async  (
+  const sendRecoveryEmail = async (
     event: FormEvent<HTMLButtonElement>,
     email: string
   ) => {
@@ -186,20 +209,24 @@ function useAuthProvider() {
       await axios.request({
         method: "POST",
         url: `${BASEURL}/recovery-email`,
-        data: { email: email }
+        data: { email: email },
       });
       setAuth({
         ...auth,
         isRecoveryEmailSent: true,
-        loading: false
+        isVerifyEmailSent: false,
+        isPasswordUpdated: false,
+        loading: false,
       });
     } catch (error: any) {
       console.error(error);
       setAuth({
         ...auth,
         isRecoveryEmailSent: false,
+        isVerifyEmailSent: false,
+        isPasswordUpdated: false,
         errorMsg: error.response.data,
-        loading: false
+        loading: false,
       });
     }
   };
@@ -221,10 +248,23 @@ function useAuthProvider() {
         },
       });
       sessionStorage.setItem("user", JSON.stringify(userInfo.data));
-      setAuth({ ...auth, loggedIn: true, loading: false });
+      setAuth({
+        ...auth,
+        loggedIn: true,
+        loading: false,
+        isVerifyEmailSent: false,
+        isPasswordUpdated: false,
+        isRecoveryEmailSent: false,
+      });
       history.push("/main");
     } catch (error: any) {
-      setAuth({ ...auth, errorMsg: error.repsonse.data });
+      setAuth({
+        ...auth,
+        isVerifyEmailSent: false,
+        isPasswordUpdated: false,
+        isRecoveryEmailSent: false,
+        errorMsg: error.repsonse.data,
+      });
     }
   };
 
@@ -233,7 +273,14 @@ function useAuthProvider() {
   };
 
   const msLoginHandler = async (instance: any) => {
-    setAuth({ ...auth, loading: true, errorMsg: "" });
+    setAuth({
+      ...auth,
+      loading: true,
+      errorMsg: "",
+      isVerifyEmailSent: false,
+      isPasswordUpdated: false,
+      isRecoveryEmailSent: false,
+    });
     try {
       let response = await instance.loginPopup(loginRequest);
       let userInfo = await axios.request({
@@ -246,11 +293,24 @@ function useAuthProvider() {
         },
       });
       sessionStorage.setItem("user", JSON.stringify(userInfo.data));
-      setAuth({ ...auth, loggedIn: true, loading: false });
+      setAuth({
+        ...auth,
+        loggedIn: true,
+        loading: false,
+        isVerifyEmailSent: false,
+        isPasswordUpdated: false,
+        isRecoveryEmailSent: false,
+      });
       history.push("/main");
     } catch (error: any) {
       console.error(error);
-      setAuth({ ...auth, errorMsg: error.response.data });
+      setAuth({
+        ...auth,
+        isVerifyEmailSent: false,
+        isPasswordUpdated: false,
+        isRecoveryEmailSent: false,
+        errorMsg: error.response.data,
+      });
     }
   };
 

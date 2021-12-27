@@ -11,6 +11,7 @@ import {
   changeWorkspace,
   fetchWorkspaceList,
   fetchBoardTitles,
+  reorderLists,
 } from "../controllers/board";
 
 const boardRouter = express.Router();
@@ -88,5 +89,17 @@ boardRouter.get(
   checkAuthToken,
   header("workspaceId").notEmpty(),
   fetchBoardTitles
-)
+);
+
+boardRouter.patch(
+  "/list/reorder",
+  checkAuthToken,
+  body("workspaceId").notEmpty(),
+  body("boardId").notEmpty(),
+  body("oldListId").notEmpty(),
+  body("newListId").notEmpty(),
+  body("newListIndex").notEmpty(),
+  body("cardId").notEmpty(),
+  reorderLists
+);
 export default boardRouter;

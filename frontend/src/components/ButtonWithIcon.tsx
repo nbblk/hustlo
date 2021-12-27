@@ -22,11 +22,10 @@ type buttonProps = {
 };
 
 const ButtonWithIcon = (props: buttonProps) => {
-  const style = 
-  `m-${props.margin} 
+  const style = `m-${props.margin} 
   p-${props.padding} 
   w-${props.width}
-  h-${ props.height} 
+  h-${props.height} 
   ${props.isCircle ? "rounded-full" : "rounded"} 
   bg-${props.bgColor ? props.bgColor : "white"} 
   ${props.border ? "border" : ""}
@@ -39,7 +38,11 @@ const ButtonWithIcon = (props: buttonProps) => {
   return (
     <button className={style} onClick={props.click}>
       {props.isIcon ? (
-        <FontAwesomeIcon icon={props.iconProp!} color={props.textColor} className="mx-1"/>
+        <FontAwesomeIcon
+          icon={props.iconProp!}
+          color={props.textColor}
+          className="mx-1"
+        />
       ) : null}
       {props.value ? props.value : null}
     </button>

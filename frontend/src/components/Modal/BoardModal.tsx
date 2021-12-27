@@ -6,8 +6,13 @@ import Backdrop from "./Backdrop";
 import ColorChip from "./ColorChip";
 import Modal from "./Modal";
 
+type WorkspaceName = {
+  _id: string;
+  name: string;
+};
+
 type BoardModalProps = {
-  list: any[];
+  workspaces: WorkspaceName[];
   dismiss: () => void;
   create: (event: FormEvent<HTMLButtonElement>, props: NewBoardProps) => void;
 };
@@ -28,12 +33,11 @@ const BoardModal = (props: BoardModalProps) => {
   const [board, setBoard] = useState<NewBoardProps>({
     name: "",
     color: "",
-    workspaceId: 0,
+    workspaceId: props.workspaces[0]._id,
   });
 
   const nameHandler = (event: ChangeEvent<HTMLInputElement>) => {
     let name = event.target.value;
-    if (!name || name.length < 0) return;
     setBoard({ ...board, name: name });
   };
 
@@ -46,8 +50,8 @@ const BoardModal = (props: BoardModalProps) => {
   };
 
   const dropdownHandler = (event: ChangeEvent<HTMLSelectElement>) => {
-    let workspace = Number(event.target.value);
-    setBoard({ ...board, workspaceId: workspace });
+    let workspaceId = event.target.value;
+    setBoard({ ...board, workspaceId: workspaceId });
   };
 
   return (
@@ -75,18 +79,20 @@ const BoardModal = (props: BoardModalProps) => {
                 }
               />
               <select
-                defaultValue={props.list[0].name}
+                defaultValue={props.workspaces[0].name}
                 className="w-full h-12 my-2 text-gray border border-gray-lightest rounded"
                 onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                   dropdownHandler(event)
                 }
               >
-                {props.list
-                  ? props.list.map((workspace: any, index: number) => (
-                      <option key={index} value={index}>
-                        {workspace.name}
-                      </option>
-                    ))
+                {props.workspaces
+                  ? props.workspaces.map(
+                      (workspace: WorkspaceName, index: number) => (
+                        <option key={index} value={workspace._id}>
+                          {workspace.name}
+                        </option>
+                      )
+                    )
                   : null}
               </select>
             </div>
@@ -98,6 +104,7 @@ const BoardModal = (props: BoardModalProps) => {
                   click={(event: MouseEvent<HTMLButtonElement>) =>
                     colorHandler(event)
                   }
+                  isSelected={board.color === item ? true : false}
                 />
               ))}
             </div>
@@ -109,12 +116,15 @@ const BoardModal = (props: BoardModalProps) => {
             textColor={"white"}
             hoverColor={"opacity-50"}
             value={"Create board"}
+            disabled={board.name ? false : true}
             click={(event: FormEvent<HTMLButtonElement>) => {
-              props.create(event, {
-                name: board.name,
-                color: board.color,
-                workspaceId: board.workspaceId,
-              });
+              if (board.name.length > 0) {
+                props.create(event, {
+                  name: board.name,
+                  color: board.color,
+                  workspaceId: board.workspaceId,
+                });
+              }
             }}
           />
         </form>

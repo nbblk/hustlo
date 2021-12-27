@@ -8,6 +8,7 @@ interface LabelsProps {
   isEdit: boolean;
   isAdd: boolean;
   isMain: boolean;
+  selectedLabelIndex: number;
   clickLabelColor: (index: number, color: string) => void;
   clickEditLabelTitleIcon: (event: MouseEvent<HTMLSpanElement>) => void;
   clickNewLabelColor: (color: string, index: number) => void;
@@ -25,6 +26,8 @@ const Labels = (props: LabelsProps) => {
           height={"9"}
           width={"full"}
           marginY={"4"}
+          border={true}
+          borderColor={"border-gray-lightest"}
           placeholder={"Enter the title..."}
           change={props.changeOldLabelTitle}
         />
@@ -40,14 +43,17 @@ const Labels = (props: LabelsProps) => {
           height={"9"}
           width={"full"}
           marginY={"4"}
+          border={true}
+          borderColor={"border-gray-lightest"}
           placeholder={"Enter the title..."}
           change={props.changeNewLabelTitle}
         />
-        <ul className="w-full flex flex-wrap">
+        <ul className="w-full flex flex-wrap justify-center items-center">
           {props.labels.map((label: LabelType, index: number) =>
             !label.checked ? (
               <ColorChip
                 key={index}
+                isSelected={props.selectedLabelIndex === index ? true : false}
                 color={label.color}
                 click={() => props.clickNewLabelColor(label.color, index)}
               />

@@ -44,7 +44,7 @@ export const fetch = async (boardId: string, workspaceId: string) => {
         },
       },
     ]).exec();
-    console.log(docs);
+
     return docs;
   } catch (error: any) {
     console.error(error);

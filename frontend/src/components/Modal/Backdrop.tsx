@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const Backdrop = (props: { dismiss: () => void; }) => {
+const Backdrop = (props: { dismiss: () => void }) => {
   const [active] = useState(true);
 
   return (

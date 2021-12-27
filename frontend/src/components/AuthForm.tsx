@@ -19,7 +19,7 @@ interface AuthFormProps {
   login: (event: FormEvent<HTMLButtonElement>) => void;
   submitEmail: (event: FormEvent<HTMLButtonElement>) => void;
   sendRecoveryEmail: (event: FormEvent<HTMLButtonElement>) => void;
-  googleSuccess: (response: any) =>  void;
+  googleSuccess: (response: any) => void;
   googleFailure: (response: any) => void;
   msLoginHandler: (response: any) => void;
 }
@@ -114,13 +114,15 @@ const AuthForm = (props: AuthFormProps) => {
       <h3 className="my-12 font-bold text-gray">{getTitle()}</h3>
       {getForm()}
       <div className="font-nunito text-red m-4">{props.errorMsg}</div>
-      <small>OR</small>
       <div className={`${props.type === "login" ? "block" : "hidden"}`}>
-        <GoogleOauthLoginButton
-          googleSuccess={props.googleSuccess}
-          googleFailure={props.googleFailure}
-        />
-        <MsOauthLoginButton msLoginHandler={props.msLoginHandler} />
+        <small>OR</small>
+        <div>
+          <GoogleOauthLoginButton
+            googleSuccess={props.googleSuccess}
+            googleFailure={props.googleFailure}
+          />
+          <MsOauthLoginButton msLoginHandler={props.msLoginHandler} />
+        </div>
       </div>
       <div className="w-2/3 m-4 border border-t-1 border-gray-lightest"></div>
       <div className="h-1/3 text-blue text-sm">

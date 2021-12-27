@@ -4,7 +4,7 @@ import InputBox from "../InputBox";
 import Modal from "./Modal";
 
 export type WorkspaceFormProps = {
-  type: string,
+  type: string;
   name: { value: string; valid: boolean };
   description: { value: string; valid: boolean };
 };
@@ -18,7 +18,11 @@ const WorkspaceModal = (props: any) => {
 
   useEffect(() => {
     if (props.type === "Update" && props.formValues) {
-      setForm({ type: props.type, name: props.formValues.name, description: props.formValues.description });
+      setForm({
+        type: props.type,
+        name: props.formValues.name,
+        description: props.formValues.description,
+      });
     }
   }, []);
 
@@ -61,7 +65,11 @@ const WorkspaceModal = (props: any) => {
           marginY="2"
           border={true}
           borderColor={"border-gray-lightest"}
-          value={props.type === "Update" && props.formValues.name ? props.formValues.name : null}
+          value={
+            props.type === "Update" && props.formValues.name
+              ? props.formValues.name
+              : null
+          }
           change={(event: ChangeEvent<HTMLInputElement>) => nameHandler(event)}
         />
         <h6 className="text-sm">Description</h6>
@@ -73,7 +81,11 @@ const WorkspaceModal = (props: any) => {
           marginY="2"
           border={true}
           borderColor={"border-gray-lightest"}
-          value={props.type === "Update" && props.formValues.description ? props.formValues.description : null}
+          value={
+            props.type === "Update" && props.formValues.description
+              ? props.formValues.description
+              : null
+          }
           change={(event: ChangeEvent<HTMLInputElement>) =>
             descriptionHandler(event)
           }
