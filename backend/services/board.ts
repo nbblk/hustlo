@@ -91,7 +91,7 @@ export const updateWorkspace = async (data: {
         _id: 0,
       }
     ).exec();
-    console.log("tobeRemoved", tobeRemoved);
+
     await WorkspaceModel.updateOne(
       {
         _id: mongoose.Types.ObjectId(data.workspaceId),
@@ -173,35 +173,35 @@ export const updateLists = async (data: {
         $project: { boards: 1, _id: 0 },
       },
       {
-        $match: { "boards.lists._id": mongoose.Types.ObjectId(data.oldListId)}
+        $match: { "boards.lists._id": mongoose.Types.ObjectId(data.oldListId) },
       },
       {
-        $replaceRoot: { newRoot: "$boards" }
+        $replaceRoot: { newRoot: "$boards" },
       },
       {
-        $unwind: "$lists"
+        $unwind: "$lists",
       },
       {
-        $match: {"lists.cards._id": mongoose.Types.ObjectId(data.cardId) }
+        $match: { "lists.cards._id": mongoose.Types.ObjectId(data.cardId) },
       },
       {
-        $project: { lists: 1, _id: 0 }
+        $project: { lists: 1, _id: 0 },
       },
       {
-        $replaceRoot: { newRoot: "$lists" }
+        $replaceRoot: { newRoot: "$lists" },
       },
       {
-        $unwind: "$cards"
+        $unwind: "$cards",
       },
       {
-        $match: {"cards._id": mongoose.Types.ObjectId(data.cardId)}
+        $match: { "cards._id": mongoose.Types.ObjectId(data.cardId) },
       },
       {
-        $project: { "cards": 1, _id: 0 }
+        $project: { cards: 1, _id: 0 },
       },
       {
-        $replaceRoot: { newRoot: "$cards" }
-      }
+        $replaceRoot: { newRoot: "$cards" },
+      },
     ]).exec();
 
     await WorkspaceModel.findOneAndUpdate(
@@ -220,18 +220,18 @@ export const updateLists = async (data: {
         ],
       }
     ).exec();
-    
+
     await WorkspaceModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId)
+        _id: mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $push: {
           "boards.$[board].lists.$[list].cards": {
             $each: cardToPush,
-            $position: data.newListIndex
-          }
-        }
+            $position: data.newListIndex,
+          },
+        },
       },
       {
         arrayFilters: [
@@ -239,7 +239,7 @@ export const updateLists = async (data: {
           { "list._id": mongoose.Types.ObjectId(data.newListId) },
         ],
       }
-    )
+    );
   } catch (error: any) {
     console.error(error);
     throw new Error(error);

@@ -38,7 +38,7 @@ interface CardModalProps {
 
 type CardModalType = {
   title: string;
-  labelsSelected: LabelType[],
+  labelsSelected: LabelType[];
   description?: string;
   descriptionEnabled: boolean;
   comments?: [];
@@ -190,9 +190,9 @@ const CardModal = (props: CardModalProps) => {
 
   const downloadAttachment = async (fileId: string, filename: string) => {
     if (!fileId || !filename) return;
-    
-    let extension = filename.split('.')[1];
-    console.log(extension);
+
+    let extension = filename.split(".")[1];
+
     let user = JSON.parse(sessionStorage.getItem("user")!);
     try {
       const result = await axios.request({
@@ -203,14 +203,14 @@ const CardModal = (props: CardModalProps) => {
           filename: filename,
           Authorization: `Bearer ${user.token}`,
         },
-        responseType: 'blob'
+        responseType: "blob",
       });
 
       if (result.data) {
         const url = window.URL.createObjectURL(new Blob([result.data]));
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
-        link.setAttribute('download', `Filename.${extension}`);
+        link.setAttribute("download", `Filename.${extension}`);
 
         document.body.appendChild(link);
         link.click();
@@ -253,7 +253,6 @@ const CardModal = (props: CardModalProps) => {
         loading: false,
         fetch: true,
       });
-
     } catch (error) {
       console.error(error);
       setCard({
@@ -286,9 +285,9 @@ const CardModal = (props: CardModalProps) => {
         const newLabels = [...card.labelsSelected];
 
         newLabels.map((label: LabelType) => {
-          label.title = ""
+          label.title = "";
           label.checked = false;
-        })
+        });
 
         if (labelsSelected.length === 0) {
           newLabels.map((label: LabelType) => {
@@ -297,15 +296,15 @@ const CardModal = (props: CardModalProps) => {
           });
         } else {
           newLabels.map((label: LabelType) => {
-           labelsSelected.map((selected: LabelType) => {
+            labelsSelected.map((selected: LabelType) => {
               if (label.color === selected.color) {
                 label.checked = true;
                 label.title = selected.title;
               }
-            })
-          })
+            });
+          });
         }
-   
+
         setCard({
           ...card,
           labelsSelected: newLabels,
@@ -315,7 +314,6 @@ const CardModal = (props: CardModalProps) => {
           loading: false,
           fetch: false,
         });
-      
       } catch (error) {
         console.error(error);
         setCard({ ...card, loading: false, fetch: false });
@@ -324,7 +322,7 @@ const CardModal = (props: CardModalProps) => {
 
     fetch();
   }, [card.fetch]);
-  
+
   return (
     <>
       {card.labelModalClicked ? (
@@ -387,7 +385,9 @@ const CardModal = (props: CardModalProps) => {
               changeComment(event)
             }
             clickAddCommentButton={() => clickAddCommentButton()}
-            clickFilename={(fileId: string, filename: string) => downloadAttachment(fileId, filename)}
+            clickFilename={(fileId: string, filename: string) =>
+              downloadAttachment(fileId, filename)
+            }
             clickDeleteFileIcon={(fileId: string) => deleteAttachment(fileId)}
           />
           <SideMenu

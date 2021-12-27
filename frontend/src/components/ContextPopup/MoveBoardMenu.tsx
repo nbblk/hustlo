@@ -28,7 +28,7 @@ const MoveBoardMenu = (props: MoveBoardMenuProps) => {
           },
         });
         const boards = result.data[0].boards;
-        console.log(boards);
+
         if (boards) {
           setBoard({ ...board, list: boards, fetch: false });
         }
