@@ -285,22 +285,26 @@ const CardModal = (props: CardModalProps) => {
         const labelsSelected = result.labelsSelected;
         const newLabels = [...card.labelsSelected];
 
+        newLabels.map((label: LabelType) => {
+          label.title = ""
+          label.checked = false;
+        })
+
         if (labelsSelected.length === 0) {
           newLabels.map((label: LabelType) => {
             label.checked = false;
             return;
           });
         } else {
-          labelsSelected.map((selected: LabelType) => {
-            newLabels.map((label: LabelType) => {
+          newLabels.map((label: LabelType) => {
+           labelsSelected.map((selected: LabelType) => {
               if (label.color === selected.color) {
                 label.checked = true;
                 label.title = selected.title;
               }
             })
-          });
+          })
         }
-        console.log(newLabels);
    
         setCard({
           ...card,

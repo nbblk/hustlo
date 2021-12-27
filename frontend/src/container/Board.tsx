@@ -716,7 +716,6 @@ function Board(props: any) {
           },
         });
         const curBoard = result.data[0];
-        console.log("curBoard", curBoard);
         setBoard({
           ...board,
           title: curBoard.name,
