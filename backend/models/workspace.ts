@@ -67,9 +67,9 @@ const schema = new Schema<Workspace>({
                   fileId: { type: Schema.Types.ObjectId, required: true },
                   filename: { type: String, required: true },
                   mimetype: { type: String, required: true },
-                  size: { type: Number, required: true}
-                }
-              ]
+                  size: { type: Number, required: true },
+                },
+              ],
             },
           ],
         },

@@ -6,7 +6,7 @@ import {
   updateWorkspace,
   getWorkspaceList,
   getBoardTitles,
-  updateLists
+  updateLists,
 } from "../services/board";
 import * as dotenv from "dotenv";
 import { validationResult } from "express-validator";

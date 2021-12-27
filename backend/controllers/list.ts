@@ -56,8 +56,8 @@ const restoreList = async (req: express.Request, res: express.Response) => {
   let data = {
     workspaceId: req.body.workspaceId,
     boardId: req.body.boardId,
-    listId: req.body.listId
-  }
+    listId: req.body.listId,
+  };
   try {
     await restore(data);
     res.sendStatus(201);
@@ -74,7 +74,6 @@ const restoreList = async (req: express.Request, res: express.Response) => {
     }
     res.status(status).send(message);
   }
-
 };
 
 export { updateList, updateListTitle, restoreList };

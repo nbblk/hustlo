@@ -13,10 +13,9 @@ import {
   deleteAttachment,
   fetchArchivedCards,
   archiveCard,
-  restoreCard
+  restoreCard,
 } from "../controllers/card";
 import { GridFsStorage } from "multer-gridfs-storage";
-
 
 dotenv.config({ path: "./.env" });
 
@@ -104,7 +103,7 @@ cardRouter.get(
   header("workspaceId").notEmpty(),
   header("boardId").notEmpty(),
   fetchArchivedCards
-)
+);
 
 cardRouter.patch(
   "/archive",

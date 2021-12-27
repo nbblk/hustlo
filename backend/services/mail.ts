@@ -1,9 +1,9 @@
 const sgMail = require("@sendgrid/mail");
 
 export type template = {
-  title: string,
-  text: string,
-  html: string
+  title: string;
+  text: string;
+  html: string;
 };
 
 export const send = async (email: string, content: template) => {

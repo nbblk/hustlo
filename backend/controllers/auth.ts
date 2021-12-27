@@ -38,11 +38,15 @@ const signup = async (
 };
 
 type redirectType = {
-  url: string,
-  type: string
-}
+  url: string;
+  type: string;
+};
 
-const redirect = async (req: express.Request, res: express.Response, redirect: redirectType) => {
+const redirect = async (
+  req: express.Request,
+  res: express.Response,
+  redirect: redirectType
+) => {
   const hash = req.query.h?.toString();
   if (!hash) {
     res.status(401).send("Invalid access");
@@ -59,7 +63,7 @@ const redirect = async (req: express.Request, res: express.Response, redirect: r
 const addPassword = async (req: express.Request, res: express.Response) => {
   await updatePassword(req.body.email, req.body.password)
     .then(() => {
-    res.status(200).send("Updated");
+      res.status(200).send("Updated");
     })
     .catch((error) => {
       const errors = validationResult(req);
@@ -101,7 +105,10 @@ const OAuthLogin = async (req: express.Request, res: express.Response) => {
   }
 };
 
-const sendRecoveryLink = async (req: express.Request, res: express.Response) => {
+const sendRecoveryLink = async (
+  req: express.Request,
+  res: express.Response
+) => {
   try {
     await sendEmailWithLink(req.body.email);
     res.sendStatus(200);
@@ -111,4 +118,11 @@ const sendRecoveryLink = async (req: express.Request, res: express.Response) => 
   }
 };
 
-export { signup, redirect, addPassword, basicLogin, OAuthLogin, sendRecoveryLink };
+export {
+  signup,
+  redirect,
+  addPassword,
+  basicLogin,
+  OAuthLogin,
+  sendRecoveryLink,
+};
