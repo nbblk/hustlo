@@ -108,7 +108,7 @@ function Board(props: any) {
     createWorkspace: false,
     createBoard: false,
     fetchWorkspace: false,
-    list: []
+    list: [],
   });
 
   // a little function to help us with reordering the result
@@ -654,7 +654,6 @@ function Board(props: any) {
     }
   };
 
-  
   const fetchWorkspaceList = async () => {
     let user = JSON.parse(sessionStorage.getItem("user")!); // !
     setLoading(true);
@@ -670,7 +669,7 @@ function Board(props: any) {
       let workspaces: any = [];
       list.data.map((workspace: any) => {
         workspaces.push({ _id: workspace._id, name: workspace.name });
-      })
+      });
       setMenu({
         ...menu,
         list: workspaces,
@@ -684,7 +683,7 @@ function Board(props: any) {
       });
       setLoading(false);
     }
-  }
+  };
 
   const clickBoardToMove = () => {
     setBoard({ ...board, _id: boardId, fetch: true });
@@ -738,7 +737,13 @@ function Board(props: any) {
     if (board.fetch) {
       fetch();
     }
-  }, [board.fetch, board.update, board.archiveCard, board.reorderList, menu.createWorkspace]);
+  }, [
+    board.fetch,
+    board.update,
+    board.archiveCard,
+    board.reorderList,
+    menu.createWorkspace,
+  ]);
 
   return (
     <div className="w-full h-full bg-gray-lightest overflow-x-scroll">
@@ -840,7 +845,7 @@ function Board(props: any) {
           listId: string,
           cardId: string
         ) => clickRestoreCardButton(index, listId, cardId)}
-        clickBoardToMove={() => clickBoardToMove() }
+        clickBoardToMove={() => clickBoardToMove()}
       />
       <div className="w-full flex flex-nowrap justify-start items-start overflow-x-scroll">
         <DragDropContext onDragEnd={(result: DropResult) => onDragEnd(result)}>

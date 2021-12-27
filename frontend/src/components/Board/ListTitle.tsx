@@ -17,9 +17,7 @@ const ListTitle = (props: ListTitleProps) => (
       height={"8"}
       width={"full"}
       border={false}
-      placeholder={
-        !props.title ? "Enter list title..." : ""
-      }
+      placeholder={!props.title ? "Enter list title..." : ""}
       change={props.change}
       blur={props.blur}
       disabled={props.active ? false : true}

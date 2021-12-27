@@ -8,15 +8,15 @@ type SlideIndexes = {
 };
 
 type FeatureProps = {
-  smallTitle?: string,
-  title: string,
-  body: string,
-  slideDown: boolean,
-  slideDownId?: string,
-  slideDownTitle?: string,
-  slideDownBody?: string,
-  slideDownBullets?: string[]
-}
+  smallTitle?: string;
+  title: string;
+  body: string;
+  slideDown: boolean;
+  slideDownId?: string;
+  slideDownTitle?: string;
+  slideDownBody?: string;
+  slideDownBullets?: string[];
+};
 
 const Features = () => {
   const [expand, isExpanded] = useState({ first: false, second: false });

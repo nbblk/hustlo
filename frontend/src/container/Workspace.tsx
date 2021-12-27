@@ -44,7 +44,7 @@ function Workspace() {
       updateWorkspace: false,
       fetchWorkspace: false,
       deleteWorkspace: false,
-    })
+    });
   };
 
   const createMenuDismiss = () => {
@@ -57,7 +57,7 @@ function Workspace() {
       updateWorkspace: false,
       fetchWorkspace: false,
       deleteWorkspace: false,
-    })
+    });
   };
 
   const createBoardClicked = () => {
@@ -95,7 +95,7 @@ function Workspace() {
       updateWorkspace: true,
       createWorkspace: false,
       createBoard: false,
-      fetchWorkspace: false,  
+      fetchWorkspace: false,
       deleteWorkspace: false,
     });
   };
@@ -110,7 +110,7 @@ function Workspace() {
       updateWorkspace: false,
       createWorkspace: false,
       createBoard: false,
-      fetchWorkspace: false, 
+      fetchWorkspace: false,
     });
   };
 

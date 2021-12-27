@@ -14,7 +14,7 @@ const ChangeWorkspaceMenu = (props: ChangeWOrkspaceProps) => {
     lists: [],
     selected: { title: "", _id: "" },
     fetch: false,
-    success: false
+    success: false,
   });
 
   const changeHandler = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -44,7 +44,7 @@ const ChangeWorkspaceMenu = (props: ChangeWOrkspaceProps) => {
       setWorkspace({
         ...workspace,
         fetch: true,
-        success: true
+        success: true,
       });
     } catch (error) {
       console.error(error);
@@ -108,7 +108,9 @@ const ChangeWorkspaceMenu = (props: ChangeWOrkspaceProps) => {
           value={"Change"}
           click={() => clickHandler()}
         />
-        <small className="text-green">{workspace.success ? "Board moved successfully!" : null}</small>
+        <small className="text-green">
+          {workspace.success ? "Board moved successfully!" : null}
+        </small>
       </div>
     </div>
   );

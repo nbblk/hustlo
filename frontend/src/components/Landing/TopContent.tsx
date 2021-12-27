@@ -26,7 +26,9 @@ const TopContent = () => {
         border={true}
         borderColor="border-gray-lightest"
         placeholder="Email"
-        change={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+        change={(event: ChangeEvent<HTMLInputElement>) =>
+          setEmail(event.target.value)
+        }
       />
       <Button
         width="full md:w-2/5 xl:w-1/5"
@@ -39,7 +41,9 @@ const TopContent = () => {
         value="Sign up — it’s free!"
         click={() => {
           history.push("/signup", { email: email });
-        } } textSize="md"      />
+        }}
+        textSize="md"
+      />
     </section>
   );
 };

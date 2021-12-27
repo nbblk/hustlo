@@ -52,7 +52,7 @@ const LabelModal = (props: LabelModalProps) => {
           }
         />
       );
-    } 
+    }
     if (props.isAdd) {
       button = (
         <Button
@@ -67,7 +67,7 @@ const LabelModal = (props: LabelModalProps) => {
           click={() => props.submitAddNewLabelButton(label.index, label.title)}
         />
       );
-    } 
+    }
     if (props.isMain) {
       button = (
         <Button

@@ -12,30 +12,30 @@ const msalConfig = {
   system: {
     loggerOptions: {
       loggerCallback: (level: any, message: any, containsPii: any) => {
-          if (containsPii) {
-              return;
-          }
-          switch (level) {
-              case LogLevel.Error:
-                  console.error(message);
-                  return;
-              case LogLevel.Info:
-                  console.info(message);
-                  return;
-              case LogLevel.Verbose:
-                  console.debug(message);
-                  return;
-              case LogLevel.Warning:
-                  console.warn(message);
-                  return;
-              default:
-                  console.debug(message)
-                  return;
-          }
+        if (containsPii) {
+          return;
+        }
+        switch (level) {
+          case LogLevel.Error:
+            console.error(message);
+            return;
+          case LogLevel.Info:
+            console.info(message);
+            return;
+          case LogLevel.Verbose:
+            console.debug(message);
+            return;
+          case LogLevel.Warning:
+            console.warn(message);
+            return;
+          default:
+            console.debug(message);
+            return;
+        }
       },
-      logLevel: LogLevel.Verbose
-  }
-  }
+      logLevel: LogLevel.Verbose,
+    },
+  },
 };
 
 // Add scopes here for ID token to be used at Microsoft identity platform endpoints.

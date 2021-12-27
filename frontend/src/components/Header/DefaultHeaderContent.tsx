@@ -5,7 +5,7 @@ import Logo from "../Logo";
 const DefaultHeaderContent = () => {
   return (
     <>
-      <Logo textSize="2xl" withImage/>
+      <Logo textSize="2xl" withImage />
       <div className="w-full md:w-auto flex flex-col md:flex-row">
         <Link to="/login">
           <Button
@@ -15,8 +15,8 @@ const DefaultHeaderContent = () => {
             hoverColor="none"
             textColor="blue"
             textSize="md"
-            value="Log in" 
-             />
+            value="Log in"
+          />
         </Link>
         <Link to="/signup">
           <Button
@@ -27,8 +27,8 @@ const DefaultHeaderContent = () => {
             hoverColor="white"
             textColor="white hover:text-blue"
             textSize="md"
-            value="Sign up" 
-           />
+            value="Sign up"
+          />
         </Link>
       </div>
     </>

@@ -14,8 +14,13 @@ const HamburgerMenu = (props: any) => {
 
   const searchHandler = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.value.length > 0) {
-      setSearch({ isSearch: true, keyword: event.target.value, loading: true, result: [] });
-    } 
+      setSearch({
+        isSearch: true,
+        keyword: event.target.value,
+        loading: true,
+        result: [],
+      });
+    }
   };
 
   useEffect(() => {
@@ -31,7 +36,12 @@ const HamburgerMenu = (props: any) => {
             Authorization: `Bearer ${user.token}`,
           },
         });
-        setSearch({ isSearch: true, keyword: "", loading: false, result: result.data });
+        setSearch({
+          isSearch: true,
+          keyword: "",
+          loading: false,
+          result: result.data,
+        });
       } catch (error) {
         console.error(error);
         setSearch({ ...search, isSearch: false, keyword: "", loading: false });

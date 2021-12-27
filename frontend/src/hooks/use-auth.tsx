@@ -56,7 +56,7 @@ const authContext = createContext<AuthProps>({
   basicLogin: () => Promise,
   basicLogout: () => <Redirect to="/" />,
   requestEmailVerification: () => Promise,
-  setupPassword: () => Promise,  
+  setupPassword: () => Promise,
   sendRecoveryEmail: () => Promise,
   googleLoginSuccess: () => Promise,
   googleLoginFailure: () => Promise,
@@ -92,9 +92,8 @@ function useAuthProvider() {
     }
 
     if (auth.isPasswordUpdated) {
-      setAuth({ ...auth, isPasswordUpdated: false })
+      setAuth({ ...auth, isPasswordUpdated: false });
     }
-
   }, [auth.loggedIn, auth.isPasswordUpdated]);
 
   const basicLogin = async (
@@ -141,7 +140,7 @@ function useAuthProvider() {
         isPasswordUpdated: false,
         isRecoveryEmailSent: false,
         errorMsg: "Please enter a valid email.",
-        loading: false
+        loading: false,
       });
     }
   };
