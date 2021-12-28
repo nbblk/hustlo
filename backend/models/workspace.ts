@@ -1,7 +1,7 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, SchemaType } from "mongoose";
 
 export interface Workspace {
-  userId: string;
+  userId: SchemaType | string;
   name: string;
   description: string;
   boards: Board[];

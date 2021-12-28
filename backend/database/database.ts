@@ -13,10 +13,10 @@ export const connect = () => {
   }
   mongoose
     .connect(uri, {
-      useNewUrlParser: true,
-      useFindAndModify: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
+//      useNewUrlParser: true,
+//      useFindAndModify: true,
+ //     useUnifiedTopology: true,
+ //     useCreateIndex: true,
     })
     .catch((error: any) => {
       console.error(error);

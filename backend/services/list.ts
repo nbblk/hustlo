@@ -5,9 +5,9 @@ export const fetch = async (boardId: string, workspaceId: string) => {
   let docs;
   try {
     docs = await WorkspaceModel.aggregate([
-      { $match: { _id: mongoose.Types.ObjectId(workspaceId) } },
+      { $match: { _id: new mongoose.Types.ObjectId(workspaceId) } },
       { $unwind: "$boards" },
-      { $match: { "boards._id": mongoose.Types.ObjectId(boardId) } },
+      { $match: { "boards._id": new mongoose.Types.ObjectId(boardId) } },
       { $replaceRoot: { newRoot: "$boards" } },
       {
         $set: {
@@ -56,9 +56,9 @@ export const fetchArchived = async (boardId: string, workspaceId: string) => {
   let docs;
   try {
     docs = await WorkspaceModel.aggregate([
-      { $match: { _id: mongoose.Types.ObjectId(workspaceId) } },
+      { $match: { _id: new mongoose.Types.ObjectId(workspaceId) } },
       { $unwind: "$boards" },
-      { $match: { "boards._id": mongoose.Types.ObjectId(boardId) } },
+      { $match: { "boards._id": new mongoose.Types.ObjectId(boardId) } },
       { $unwind: "$boards.lists" },
       { $match: { "boards.lists.archived": true } },
       { $project: { boards: 1, _id: 0 } },
@@ -84,13 +84,13 @@ export const create = async (workspaceId: string, boardId: string) => {
   try {
     doc = await WorkspaceModel.findOneAndUpdate(
       {
-        _id: mongoose.Types.ObjectId(workspaceId),
-        "boards._id": mongoose.Types.ObjectId(boardId),
+        _id: new mongoose.Types.ObjectId(workspaceId),
+        "boards._id": new mongoose.Types.ObjectId(boardId),
       },
       {
         $push: {
           "boards.$.lists": {
-            _id: mongoose.Types.ObjectId(),
+            _id: new mongoose.Types.ObjectId(),
             title: "",
             active: false,
             cards: [],
@@ -116,15 +116,15 @@ export const modifyList = async (data: {
   try {
     await WorkspaceModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $set: { "boards.$[board].lists.$[list]": data.list },
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
         ],
       }
     );
@@ -143,15 +143,15 @@ export const updateTitle = async (data: {
   try {
     await WorkspaceModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $set: { "boards.$[board].lists.$[list].title": data.title },
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
         ],
       }
     );
@@ -169,15 +169,15 @@ export const archive = async (data: {
   try {
     await WorkspaceModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $set: { "boards.$[board].lists.$[list].archived": true },
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
         ],
       }
     );
@@ -195,15 +195,15 @@ export const restore = async (data: {
   try {
     await WorkspaceModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $set: { "boards.$[board].lists.$[list].archived": false },
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
         ],
       }
     );
