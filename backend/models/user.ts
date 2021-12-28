@@ -2,6 +2,7 @@ import { Schema, model } from "mongoose";
 
 // 1. Create an interface representing a document in MongoDB.
 export interface User {
+  oauth: string;
   email: string;
   isVerified: boolean;
   hash: string;

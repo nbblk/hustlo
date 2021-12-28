@@ -10,15 +10,15 @@ export const fetchCardInfo = async (data: {
   let doc;
   try {
     doc = await WorkspaceModel.aggregate([
-      { $match: { _id: mongoose.Types.ObjectId(data.workspaceId) } },
+      { $match: { _id: new mongoose.Types.ObjectId(data.workspaceId) } },
       { $unwind: "$boards" },
       { $unwind: "$boards.lists" },
       { $unwind: "$boards.lists.cards" },
       {
         $match: {
-          "boards._id": mongoose.Types.ObjectId(data.boardId),
-          "boards.lists._id": mongoose.Types.ObjectId(data.listId),
-          "boards.lists.cards._id": mongoose.Types.ObjectId(data.cardId),
+          "boards._id": new mongoose.Types.ObjectId(data.boardId),
+          "boards.lists._id": new mongoose.Types.ObjectId(data.listId),
+          "boards.lists.cards._id": new mongoose.Types.ObjectId(data.cardId),
         },
       },
       {
@@ -44,12 +44,12 @@ export const create = async (data: {
   try {
     await WorkspaceModel.findOneAndUpdate(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $push: {
           "boards.$[board].lists.$[list].cards": {
-            _id: mongoose.Types.ObjectId(),
+            _id: new mongoose.Types.ObjectId(),
             title: data.title,
             description: "",
             archived: false,
@@ -58,8 +58,8 @@ export const create = async (data: {
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
         ],
         useFindAndModify: true,
       }
@@ -80,7 +80,7 @@ export const updateDescription = async (data: {
   try {
     await WorkspaceModel.findOneAndUpdate(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $set: {
@@ -90,9 +90,9 @@ export const updateDescription = async (data: {
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
-          { "card._id": mongoose.Types.ObjectId(data.cardId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
+          { "card._id": new mongoose.Types.ObjectId(data.cardId) },
         ],
         useFindAndModify: true,
       }
@@ -122,7 +122,7 @@ export const updateLabel = async (data: {
   try {
     await WorkspaceModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $set: {
@@ -133,9 +133,9 @@ export const updateLabel = async (data: {
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
-          { "card._id": mongoose.Types.ObjectId(data.cardId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
+          { "card._id": new mongoose.Types.ObjectId(data.cardId) },
         ],
         useFindAndModify: true,
       }
@@ -156,7 +156,7 @@ export const updateComment = async (data: {
   try {
     await WorkspaceModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $push: {
@@ -167,9 +167,9 @@ export const updateComment = async (data: {
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
-          { "card._id": mongoose.Types.ObjectId(data.cardId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
+          { "card._id": new mongoose.Types.ObjectId(data.cardId) },
         ],
         useFindAndModify: true,
         upsert: true,
@@ -196,7 +196,7 @@ export const uploadAttachment = async (data: {
   try {
     await WorkspaceModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $push: {
@@ -205,9 +205,9 @@ export const uploadAttachment = async (data: {
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
-          { "card._id": mongoose.Types.ObjectId(data.cardId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
+          { "card._id": new mongoose.Types.ObjectId(data.cardId) },
         ],
         useFindAndModify: true,
         upsert: true,
@@ -229,7 +229,7 @@ export const deleteFile = async (data: {
   try {
     await WorkspaceModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $pull: {
@@ -240,9 +240,9 @@ export const deleteFile = async (data: {
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
-          { "card._id": mongoose.Types.ObjectId(data.cardId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
+          { "card._id": new mongoose.Types.ObjectId(data.cardId) },
         ],
         useFindAndModify: true,
         upsert: true,
@@ -261,9 +261,9 @@ export const getArchivedCards = async (data: {
   let docs;
   try {
     docs = await WorkspaceModel.aggregate([
-      { $match: { _id: mongoose.Types.ObjectId(data.workspaceId) } },
+      { $match: { _id: new mongoose.Types.ObjectId(data.workspaceId) } },
       { $unwind: "$boards" },
-      { $match: { "boards._id": mongoose.Types.ObjectId(data.boardId) } },
+      { $match: { "boards._id": new mongoose.Types.ObjectId(data.boardId) } },
       { $replaceRoot: { newRoot: "$boards" } },
       {
         $set: {
@@ -321,7 +321,7 @@ export const archive = async (data: {
   try {
     await WorkspaceModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $set: {
@@ -330,9 +330,9 @@ export const archive = async (data: {
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
-          { "card._id": mongoose.Types.ObjectId(data.cardId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
+          { "card._id": new mongoose.Types.ObjectId(data.cardId) },
         ],
         useFindAndModify: true,
         upsert: true,
@@ -353,7 +353,7 @@ export const restore = async (data: {
   try {
     await WorkspaceModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(data.workspaceId),
+        _id: new mongoose.Types.ObjectId(data.workspaceId),
       },
       {
         $set: {
@@ -362,9 +362,9 @@ export const restore = async (data: {
       },
       {
         arrayFilters: [
-          { "board._id": mongoose.Types.ObjectId(data.boardId) },
-          { "list._id": mongoose.Types.ObjectId(data.listId) },
-          { "card._id": mongoose.Types.ObjectId(data.cardId) },
+          { "board._id": new mongoose.Types.ObjectId(data.boardId) },
+          { "list._id": new mongoose.Types.ObjectId(data.listId) },
+          { "card._id": new mongoose.Types.ObjectId(data.cardId) },
         ],
         useFindAndModify: true,
         upsert: true,

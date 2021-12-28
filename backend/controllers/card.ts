@@ -162,7 +162,7 @@ const downloadAttachment = async (
       mongoose.connection.db
     );
     await gridFsBucket
-      .openDownloadStream(mongoose.Types.ObjectId(req.params.fileId))
+      .openDownloadStream(new mongoose.Types.ObjectId(req.params.fileId))
       .pipe(res);
   } catch (error: any) {
     console.error(error);
@@ -191,7 +191,7 @@ const deleteAttachment = async (
     fileId: req.params.fileId!,
   };
 
-  let fileId = mongoose.Types.ObjectId(data.fileId);
+  let fileId = new mongoose.Types.ObjectId(data.fileId);
 
   try {
     const gridFsBucket = new mongoose.mongo.GridFSBucket(

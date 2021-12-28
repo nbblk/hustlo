@@ -1,6 +1,8 @@
 node_modules/
-backend/build/
 cert/
 .env
 .vscode/
 backend/keys/
+backend/build/
+build/
+
