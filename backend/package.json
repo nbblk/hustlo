@@ -13,7 +13,6 @@
     "test": "npm test",
     "build": "tsc --project ./"
   },
-  "type": "module",
   "engines": { "node": "16.13.1"},
   "repository": {
     "type": "git",
