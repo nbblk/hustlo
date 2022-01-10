@@ -4,11 +4,17 @@
   "description": "Web server of Hustlo",
   "main": "index.js",
   "scripts": {
-    "start": "node index.ts",
+    "start": "node build/index.js",
+    "postinstall": "tsc",
+    "dev": "nodemon index.ts",
+    "watch-node": "nodemon build/index.js",
+    "watch-ts": "tsc -w",
+    "deploy": "git add . && git commit -m Heroku && git subtree push --prefix backend heroku master",
     "test": "npm test",
     "build": "tsc --project ./"
   },
   "type": "module",
+  "engines": { "node": "16.13.1"},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nbblk/hustlo.git"
