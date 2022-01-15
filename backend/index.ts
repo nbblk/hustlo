@@ -10,12 +10,13 @@ import workspaceRouter from "./routes/workspace";
 import boardRouter from "./routes/board";
 import listRouter from "./routes/list";
 import cardRouter from "./routes/card";
+import { env } from "process";
 
-dotenv.config({ path: "./.env" });
+dotenv.config({ path: `./.env.${env.NODE_ENV}` });
 
-const SCHEME = process.env.SERVER_SCHEME;
-const HOSTNAME = process.env.SERVER_HOSTNAME;
-const PORT = process.env.SERVER_PORT;
+const SCHEME = env.SERVER_SCHEME;
+const HOSTNAME = env.SERVER_HOSTNAME;
+const PORT = env.PORT;
 const app = express();
 
 connect();
@@ -31,16 +32,14 @@ app.use("/board", boardRouter);
 app.use("/list", listRouter);
 app.use("/card", cardRouter);
 
-https
-  .createServer(
-    {
-      key: fs.readFileSync(`${process.env.CERT_KEY_PATH}`),
-      cert: fs.readFileSync(`${process.env.CERT_PATH}`),
-    },
-    app
-  )
-  .listen(PORT, () => {
-    console.log(
-      `[server]: Server is running at ${SCHEME}://${HOSTNAME}:${PORT}`
-    );
-  });
+const options =
+  env.NODE_ENV === "dev"
+    ? {
+        key: fs.readFileSync(env.CERT_KEY_PATH!),
+        cert: fs.readFileSync(env.CERT_PATH!),
+      }
+    : {};
+
+https.createServer(options, app).listen(PORT, () => {
+  console.log(`[server]: Server is running at ${SCHEME}://${HOSTNAME}:${PORT}`);
+});
