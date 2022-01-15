@@ -286,7 +286,7 @@ function Workspace() {
       }
     }
     getList();
-  }, []);
+  }, [workspace.fetchWorkspace]);
 
   return (
     <div>
