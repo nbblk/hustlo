@@ -44,12 +44,12 @@ if (env.NODE_ENV === "dev") {
       app
     )
     .listen(PORT, () => {
-      console.log(
-        `[server]: Server is running at ${SCHEME}://${HOSTNAME}:${PORT}`
-      );
+      console.log(`Server is running at ${SCHEME}://${HOSTNAME}:${PORT}`);
     });
 } else if (env.NODE_ENV === "prod" || env.NODE_ENV === "production") {
-  http.createServer(app);
+  http.createServer(app).listen(PORT, () => {
+    console.log(`Server is running at ${env.SERVER_ORIGIN}`);
+  });
 } else {
   console.error("NODE_ENV", env.NODE_ENV);
 }
