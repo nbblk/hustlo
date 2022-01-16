@@ -1,5 +1,6 @@
 import express from "express";
 import fs from "fs";
+import http from "http";
 import https from "https";
 import { connect } from "./database/database";
 import cors from "cors";
@@ -32,14 +33,23 @@ app.use("/api/board", boardRouter);
 app.use("/api/list", listRouter);
 app.use("/api/card", cardRouter);
 
-const options =
-  env.NODE_ENV === "dev"
-    ? {
+if (env.NODE_ENV === "dev") {
+  // to use https connection with self-signed tls cert
+  https
+    .createServer(
+      {
         key: fs.readFileSync(env.CERT_KEY_PATH!),
         cert: fs.readFileSync(env.CERT_PATH!),
-      }
-    : {};
-
-https.createServer(options, app).listen(PORT, () => {
-  console.log(`[server]: Server is running at ${SCHEME}://${HOSTNAME}:${PORT}`);
-});
+      },
+      app
+    )
+    .listen(PORT, () => {
+      console.log(
+        `[server]: Server is running at ${SCHEME}://${HOSTNAME}:${PORT}`
+      );
+    });
+} else if (env.NODE_ENV === "prod" || env.NODE_ENV === "production") {
+  http.createServer(app);
+} else {
+  console.error("NODE_ENV", env.NODE_ENV);
+}
