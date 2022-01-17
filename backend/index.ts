@@ -27,11 +27,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/", authRouter);
-app.use("/api/workspace", workspaceRouter);
-app.use("/api/board", boardRouter);
-app.use("/api/list", listRouter);
-app.use("/api/card", cardRouter);
+app.use("/", authRouter);
+app.use("/workspace", workspaceRouter);
+app.use("/board", boardRouter);
+app.use("/list", listRouter);
+app.use("/card", cardRouter);
 
 if (env.NODE_ENV === "dev") {
   // to use https connection with self-signed tls cert
