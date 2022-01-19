@@ -1,4 +1,4 @@
-import { PublicClientApplication, Logger, LogLevel } from "@azure/msal-browser";
+import { PublicClientApplication, LogLevel } from "@azure/msal-browser";
 
 const msalConfig = {
   auth: {
@@ -33,7 +33,7 @@ const msalConfig = {
             return;
         }
       },
-      logLevel: LogLevel.Verbose,
+      logLevel: LogLevel.Error,
     },
   },
 };
