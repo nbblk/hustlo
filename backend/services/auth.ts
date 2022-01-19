@@ -38,9 +38,9 @@ export const sendConfirmationEmail = async (email: string) => {
   });
   const hash = created.hash;
   send(email, {
-    title: "Password reset",
-    text: "We are resetting your password",
-    html: `<h1>Almost done</h1><p>Please click the <a clicktracking="off" href="${process.env.SERVER_ORIGIN}/confirm-email?h=${hash}">link</a> to finish the process.</p>`,
+    title: "Email Verification",
+    text: "We are setting up your account",
+    html: `<h1>Almost done</h1><p>Please click the <a clicktracking="off" href="${process.env.SERVER_ORIGIN}/confirm-email?h=${hash}">link</a> to set up your account.</p>`,
   }).catch((error) => {
     throw Error("Failed to send an email: " + error);
   });
