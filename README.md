@@ -1,7 +1,5 @@
 # Hustlo
 
----
-
 Project management application that is inspired by Trello that lets you easily follow up your side projects.
 
 https://hustlo.xyz
